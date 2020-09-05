@@ -14,7 +14,7 @@ application {
 
 plugins {
     application
-    kotlin("jvm").version("1.3.31")
+    kotlin("jvm").version("1.4.0")
     maven
 }
 
