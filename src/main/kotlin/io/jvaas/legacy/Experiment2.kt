@@ -1,3 +1,7 @@
+package io.jvaas.legacy
+
+import Cities
+import TableDefinition
 import kotlin.reflect.KProperty0
 
 object Experiment2 {
@@ -20,7 +24,7 @@ object Experiment2 {
         }
 
 
-        //Experiment1.SELECT
+        //io.jvaas.legacy.Experiment1.SELECT
 
     }
 
