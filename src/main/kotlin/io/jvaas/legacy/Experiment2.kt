@@ -1,7 +1,5 @@
 package io.jvaas.legacy
 
-import Cities
-import TableDefinition
 import kotlin.reflect.KProperty0
 
 object Experiment2 {

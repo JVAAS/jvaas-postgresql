@@ -31,6 +31,7 @@ tasks.withType<KotlinCompile> {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
+    implementation("org.antlr:antlr4-runtime:4.8-1")
 
     testImplementation(group = "junit", name = "junit", version = "4.12")
 }

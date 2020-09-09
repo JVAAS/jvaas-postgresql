@@ -1,6 +1,5 @@
 package io.jvaas.legacy
 
-import Cities
 import kotlin.reflect.KProperty0
 
 object Experiment3 {
