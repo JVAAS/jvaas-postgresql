@@ -3,7 +3,6 @@ package io.jvaas
 import io.jvaas.gen.PostgreSQLLexer
 import io.jvaas.gen.PostgreSQLParser
 import io.jvaas.gen.PostgreSQLParserBaseVisitor
-import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
