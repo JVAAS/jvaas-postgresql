@@ -4,6 +4,7 @@ import io.jvaas.gen.PostgreSQLLexer
 import io.jvaas.gen.PostgreSQLParser
 import io.jvaas.gen.PostgreSQLParserBaseVisitor
 import org.antlr.v4.runtime.ANTLRInputStream
+import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
 
@@ -26,7 +27,7 @@ object Scratch {
 			SELECT * FROM table WHERE column = 1
 		""".trimIndent()
 
-		val lexer = PostgreSQLLexer(ANTLRInputStream(sql))
+		val lexer = PostgreSQLLexer(CharStreams.fromString(sql))
 		val parser = PostgreSQLParser(CommonTokenStream(lexer))
 		val parseTree: ParseTree = parser.???
 
