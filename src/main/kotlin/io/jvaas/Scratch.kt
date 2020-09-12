@@ -12,9 +12,20 @@ import org.antlr.v4.runtime.CommonTokenStream
 class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 	override fun visitCreate_table_statement(ctx: SQLParser.Create_table_statementContext?) {
+		var createTableVisited = false
 		ctx?.children?.forEach {
 			when (it.payload.javaClass) {
-				Schema_qualified_nameContext::class.java -> model.tables.add(Table(name = it.text))
+				Schema_qualified_nameContext::class.java -> {
+					model.tables.add(Table(name = it.text))
+					createTableVisited = true
+				}
+				else -> {
+					if (createTableVisited) {
+						println(it.payload)
+						println(it.text)
+					}
+				}
+
 			}
 		}
 		super.visitCreate_table_statement(ctx)
