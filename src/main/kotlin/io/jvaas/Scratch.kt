@@ -8,11 +8,14 @@ import org.antlr.v4.runtime.CommonTokenStream
 
 class Visitor : SQLParserBaseVisitor<Unit>() {
 
+	var tableName = ""
+
 	override fun visitCreate_table_statement(ctx: SQLParser.Create_table_statementContext?) {
-		ctx?.children?.forEach {
-			println(it.text)
-		}
+
+		tableName = ctx?.getChild(1)?.text ?: ""
+
 		super.visitCreate_table_statement(ctx)
+
 	}
 
 }
@@ -23,7 +26,7 @@ object Scratch {
 	fun main(args: Array<String>) {
 
 
-		val sql =
+		val sql1 =
 			// language=SQL
 			"""
 			CREATE TABLE account (
@@ -42,14 +45,35 @@ object Scratch {
 				verify_hash  varchar,
 				reset_hash   varchar,
 				phone        varchar
-			)
+			);
 		""".trimIndent()
-		println(sql)
 
-		val lexer = SQLLexer(CharStreams.fromString(sql))
-		val parser = SQLParser(CommonTokenStream(lexer))
+		// language=SQL
+		val sql2 = "SELECT email, full_name FROM account WHERE id = 'TEST'"
 
-		Visitor().visit(parser.sql())
+		// language=SQL
+		val sql3 = """
+		CREATE TABLE session(
+			id           uuid                    not null
+				constraint account_pk
+					primary key,
+			created 	timestamp	default now() not null
+		)
+		""".trimIndent()
+
+
+		val visitor = Visitor()
+		listOf(sql1, sql2, sql3).forEach { sql ->
+			val lexer = SQLLexer(CharStreams.fromString(sql))
+			val parser = SQLParser(CommonTokenStream(lexer))
+
+			visitor.visit(parser.sql())
+			println(visitor.tableName)
+
+		}
+
+
+
 
 	}
 
