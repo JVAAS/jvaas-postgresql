@@ -1,1 +1,1 @@
-*.g4 files from https://github.com/pgcodekeeper/pgcodekeeper
+*.g4 files from https://github.com/pgcodekeeper/pgcodekeeper/tree/master/apgdiff/antlr-src
