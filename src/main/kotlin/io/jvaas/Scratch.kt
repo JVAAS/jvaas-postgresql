@@ -1,23 +1,17 @@
 package io.jvaas
 
-import io.jvaas.gen.PostgreSQLLexer
-import io.jvaas.gen.PostgreSQLParser
-import io.jvaas.gen.PostgreSQLParserBaseVisitor
+import io.jvaas.gen.SQLLexer
+import io.jvaas.gen.SQLParser
+import io.jvaas.gen.SQLParserBaseVisitor
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
-import org.antlr.v4.runtime.tree.ParseTree
 
+class Visitor : SQLParserBaseVisitor<Unit>() {
 
-class Visitor : PostgreSQLParserBaseVisitor<Unit>() {
-
-	override fun visitSelect_stmt(ctx: PostgreSQLParser.Select_stmtContext?) {
-		println(ctx?.text)
-		super.visitSelect_stmt(ctx)
-	}
-
-	override fun visitStmt(ctx: PostgreSQLParser.StmtContext?) {
-		println(ctx?.text)
-		super.visitStmt(ctx)
+	override fun visitCreate_table_statement(ctx: SQLParser.Create_table_statementContext?) {
+		println(ctx?.children)
+		println(ctx?.name)
+		super.visitCreate_table_statement(ctx)
 	}
 
 }
@@ -28,40 +22,39 @@ object Scratch {
 	fun main(args: Array<String>) {
 
 
-		val sql =
+		var sql =
 			// language=SQL
 			"""
-			INSERT INTO listing AS l			 (
-				-- core fields
-				l.section, l.id, l.created, l.modified, l.version,
-				-- basic fields
-				l.sale, l.rental, l.salePrice, l.rentalPrice, l.title, l.titleUrl, l.description,
-				-- detail fields
-				l.bedrooms, l.bathrooms, l.garages, l.parkings, l.floorSize, l.erfSize, l.ratesAndTaxes, l.levies
-				-- region fields
-				l.country, l.countryUrl, l.province, l.provinceUrl, l.city, l.cityUrl, l.suburb, l.suburbUrl
-				-- agent fields
-				-- admin fields
-			) VALUES (
-				-- core fields
-				?, ?, now(), now(), ?,
-				-- basic fields
-				?, ?, ?, ?, ?, ?, ?,
-				-- detail fields
-				?, ?, ?, ?, ?, ?, ?, ?,
-				-- region fields
-				?, ?, ?, ?, ?, ?, ?, ?
-			) ON CONFLICT (l.id) DO UPDATE SET
-				-- core fields
-				l.section = ?,
-				l.modified = now(),
-				l.version = listing.version + 1
-		""".trimIndent()
-		val lexer = PostgreSQLLexer(CharStreams.fromString(sql))
-		val parser = PostgreSQLParser(CommonTokenStream(lexer))
-		val parseTree: ParseTree = parser.root()
+				CREATE TABLE account (
+				    id           uuid                    not null
+				        constraint account_pk
+				            primary key,
+				    created      timestamp default now() not null,
+				    modified     timestamp default now() not null,
+				    version      integer   default 0     not null,
+				    display_name varchar,
+				    email        varchar                 not null,
+				    enabled      boolean   default false not null,
+				    full_name    varchar,
+				    hash         varchar,
+				    verified     boolean   default false not null,
+				    verify_hash  varchar,
+				    reset_hash   varchar,
+				    phone        varchar
+					)
+				
+			""".trimIndent()
 
-		Visitor().visit(parseTree)
+//		sql = sql.replace('\t', ' ')
+//		sql = sql.replace('\n', ' ')
+//		sql = sql.replace(' ', ' ')
+//		sql = sql.replace("[ ]+".toRegex(), " ")
+		println(sql)
+
+		val lexer = SQLLexer(CharStreams.fromString(sql))
+		val parser = SQLParser(CommonTokenStream(lexer))
+
+		Visitor().visit(parser.sql())
 
 	}
 

@@ -1,0 +1,11 @@
+T__0=1
+T__1=2
+COMMA=3
+QUOTE_CHAR=4
+Privileges=5
+Identifier=6
+QuotedIdentifier=7
+'{'=1
+'}'=2
+','=3
+'"'=4
