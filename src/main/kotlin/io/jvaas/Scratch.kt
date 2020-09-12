@@ -9,8 +9,9 @@ import org.antlr.v4.runtime.CommonTokenStream
 class Visitor : SQLParserBaseVisitor<Unit>() {
 
 	override fun visitCreate_table_statement(ctx: SQLParser.Create_table_statementContext?) {
-		println(ctx?.children)
-		println(ctx?.name)
+		ctx?.children?.forEach {
+			println(it.text)
+		}
 		super.visitCreate_table_statement(ctx)
 	}
 
