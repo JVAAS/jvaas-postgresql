@@ -4,18 +4,17 @@ import io.jvaas.gen.SQLLexer
 import io.jvaas.gen.SQLParser
 import io.jvaas.gen.SQLParser.Schema_qualified_nameContext
 import io.jvaas.gen.SQLParserBaseVisitor
+import io.jvaas.types.Model
+import io.jvaas.types.Table
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
-class Visitor : SQLParserBaseVisitor<Unit>() {
-
-	var tableName = ""
+class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 	override fun visitCreate_table_statement(ctx: SQLParser.Create_table_statementContext?) {
-		println(ctx?.children?.size)
 		ctx?.children?.forEach {
 			when (it.payload.javaClass) {
-				Schema_qualified_nameContext::class.java -> tableName = it.text
+				Schema_qualified_nameContext::class.java -> model.tables.add(Table(name = it.text))
 			}
 		}
 		super.visitCreate_table_statement(ctx)
@@ -74,16 +73,20 @@ object Scratch {
 			)
 		""".trimIndent()
 
-		val visitor = Visitor()
+		// create new model to track visits of
+		val model = Model()
+
+		// loop through each SQL snippet
 		listOf(sql1, sql2, sql3, sql4).forEach { sql ->
 			val lexer = SQLLexer(CharStreams.fromString(sql))
 			val parser = SQLParser(CommonTokenStream(lexer))
-
-			visitor.visit(parser.sql())
-			println(visitor.tableName)
-
+			Visitor(model = model).visit(parser.sql())
 		}
 
+		// confirm that model contains all the data
+		model.tables.forEach {  table ->
+			println(table.name)
+		}
 
 
 
