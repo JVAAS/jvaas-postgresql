@@ -22,7 +22,7 @@ object Scratch {
 	fun main(args: Array<String>) {
 
 
-		var sql =
+		val sql =
 			// language=SQL
 			"""
 			CREATE TABLE account (
