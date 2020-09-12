@@ -3,6 +3,7 @@ package io.jvaas
 import io.jvaas.gen.SQLLexer
 import io.jvaas.gen.SQLParser
 import io.jvaas.gen.SQLParser.Schema_qualified_nameContext
+import io.jvaas.gen.SQLParser.Table_column_defContext
 import io.jvaas.gen.SQLParserBaseVisitor
 import io.jvaas.types.Model
 import io.jvaas.types.Table
@@ -13,23 +14,34 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 	override fun visitCreate_table_statement(ctx: SQLParser.Create_table_statementContext?) {
 		var createTableVisited = false
-		ctx?.children?.forEach {
-			when (it.payload.javaClass) {
+		ctx?.children?.forEach { child ->
+			when (child.payload.javaClass) {
 				Schema_qualified_nameContext::class.java -> {
-					model.tables.add(Table(name = it.text))
+					model.tables.add(Table(name = child.text))
 					createTableVisited = true
 				}
-				else -> {
-					if (createTableVisited) {
-						println(it.payload)
-						println(it.text)
-					}
-				}
-
 			}
 		}
 		super.visitCreate_table_statement(ctx)
 	}
+
+	override fun visitDefine_columns(ctx: SQLParser.Define_columnsContext?) {
+		println(ctx?.text)
+		ctx?.children?.forEach { child ->
+			println()
+			when (child.payload.javaClass) {
+				Table_column_defContext::class.java -> {
+					val child0 = child.getChild(0)
+					for (i in 0 until child0.childCount) {
+						val childi = child0.getChild(i)
+						println(childi.text)
+					}
+				}
+			}
+		}
+		super.visitDefine_columns(ctx)
+	}
+
 
 }
 
