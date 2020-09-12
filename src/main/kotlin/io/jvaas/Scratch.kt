@@ -34,17 +34,23 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 					}.forEach { columnDefContextToken ->
 						when (columnDefContextToken) {
 							is IdentifierContext -> {
-								model.tables.last().columns.add(Column(name = columnDefContextToken.text))
+								model.lastTable.columns.add(Column(name = columnDefContextToken.text))
 							}
 							is Data_typeContext -> {
-								model.tables.last().columns.last().type = columnDefContextToken.text
+								model.lastColumn.type = columnDefContextToken.text
 							}
 							is Constraint_commonContext -> {
-
+								columnDefContextToken.children.forEach { columnDefContextTokenConstraint ->
+									if (columnDefContextTokenConstraint.text == "notnull") {
+										model.lastColumn.nullable = false
+									} else if (columnDefContextTokenConstraint.text.startsWith("default")) {
+										model.lastColumn.default =
+											columnDefContextTokenConstraint.text.replaceFirst("default", "")
+									}
+								}
 							}
 							else -> println(columnDefContextToken.payload::class.java)
 						}
-
 					}
 				}
 			}
@@ -119,6 +125,7 @@ object Scratch {
 		// confirm that model contains all the data
 		model.tables.forEach { table ->
 			println(table)
+			println("")
 		}
 
 
