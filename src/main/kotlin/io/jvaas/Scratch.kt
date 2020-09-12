@@ -12,9 +12,10 @@ class Visitor : SQLParserBaseVisitor<Unit>() {
 	var tableName = ""
 
 	override fun visitCreate_table_statement(ctx: SQLParser.Create_table_statementContext?) {
+		println(ctx?.children?.size)
 		ctx?.children?.forEach {
-			if (it.payload.javaClass == Schema_qualified_nameContext::class.java) {
-				tableName = it.text
+			when (it.payload.javaClass) {
+				Schema_qualified_nameContext::class.java -> tableName = it.text
 			}
 		}
 		super.visitCreate_table_statement(ctx)
