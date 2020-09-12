@@ -2,6 +2,7 @@ package io.jvaas
 
 import io.jvaas.gen.SQLLexer
 import io.jvaas.gen.SQLParser
+import io.jvaas.gen.SQLParser.Schema_qualified_nameContext
 import io.jvaas.gen.SQLParserBaseVisitor
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -11,11 +12,12 @@ class Visitor : SQLParserBaseVisitor<Unit>() {
 	var tableName = ""
 
 	override fun visitCreate_table_statement(ctx: SQLParser.Create_table_statementContext?) {
-
-		tableName = ctx?.getChild(1)?.text ?: ""
-
+		ctx?.children?.forEach {
+			if (it.payload.javaClass == Schema_qualified_nameContext::class.java) {
+				tableName = it.text
+			}
+		}
 		super.visitCreate_table_statement(ctx)
-
 	}
 
 }
