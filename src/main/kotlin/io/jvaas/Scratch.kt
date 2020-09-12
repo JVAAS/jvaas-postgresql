@@ -61,9 +61,18 @@ object Scratch {
 		)
 		""".trimIndent()
 
+		// language=SQL
+		val sql4 = """
+			CREATE TABLE IF NOT EXISTS blah(
+				id           uuid                    not null
+				constraint account_pk
+					primary key,
+				created 	timestamp	default now() not null
+			)
+		""".trimIndent()
 
 		val visitor = Visitor()
-		listOf(sql1, sql2, sql3).forEach { sql ->
+		listOf(sql1, sql2, sql3, sql4).forEach { sql ->
 			val lexer = SQLLexer(CharStreams.fromString(sql))
 			val parser = SQLParser(CommonTokenStream(lexer))
 
