@@ -25,30 +25,24 @@ object Scratch {
 		var sql =
 			// language=SQL
 			"""
-				CREATE TABLE account (
-				    id           uuid                    not null
-				        constraint account_pk
-				            primary key,
-				    created      timestamp default now() not null,
-				    modified     timestamp default now() not null,
-				    version      integer   default 0     not null,
-				    display_name varchar,
-				    email        varchar                 not null,
-				    enabled      boolean   default false not null,
-				    full_name    varchar,
-				    hash         varchar,
-				    verified     boolean   default false not null,
-				    verify_hash  varchar,
-				    reset_hash   varchar,
-				    phone        varchar
-					)
-				
-			""".trimIndent()
-
-//		sql = sql.replace('\t', ' ')
-//		sql = sql.replace('\n', ' ')
-//		sql = sql.replace(' ', ' ')
-//		sql = sql.replace("[ ]+".toRegex(), " ")
+			CREATE TABLE account (
+				id           uuid                    not null
+					constraint account_pk
+						primary key,
+				created      timestamp default now() not null,
+				modified     timestamp default now() not null,
+				version      integer   default 0     not null,
+				display_name varchar,
+				email        varchar                 not null,
+				enabled      boolean   default false not null,
+				full_name    varchar,
+				hash         varchar,
+				verified     boolean   default false not null,
+				verify_hash  varchar,
+				reset_hash   varchar,
+				phone        varchar
+			)
+		""".trimIndent()
 		println(sql)
 
 		val lexer = SQLLexer(CharStreams.fromString(sql))
