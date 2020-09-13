@@ -3,8 +3,7 @@ package io.jvaas
 import io.jvaas.gen.SQLLexer
 import io.jvaas.gen.SQLParser
 import io.jvaas.type.Model
-import io.jvaas.visitor.CreateVisitor
-import io.jvaas.visitor.InsertVisitor
+import io.jvaas.visitor.Visitor
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
@@ -23,8 +22,7 @@ object Scratch {
 		listOf(setupSql, sampleSql).forEach {
 			val lexer = SQLLexer(CharStreams.fromStream(it))
 			val parser = SQLParser(CommonTokenStream(lexer))
-			CreateVisitor(model = model).visit(parser.sql())
-			InsertVisitor(model = model).visit(parser.sql())
+			Visitor(model = model).visit(parser.sql())
 		}
 
 		// confirm that model contains all the data

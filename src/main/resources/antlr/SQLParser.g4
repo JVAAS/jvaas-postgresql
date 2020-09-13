@@ -2460,6 +2460,7 @@ precision_param
 
 vex
   : vex CAST_EXPRESSION data_type
+  | PLACEHOLDER (COMMA vex)*
   | LEFT_PAREN vex RIGHT_PAREN indirection_list?
   | LEFT_PAREN vex (COMMA vex)+ RIGHT_PAREN
   | vex collate_identifier
@@ -2811,7 +2812,7 @@ values_stmt
     ;
 
 values_values
-    : LEFT_PAREN (vex | PLACEHOLDER | DEFAULT) (COMMA (vex | PLACEHOLDER | DEFAULT))* RIGHT_PAREN
+    : LEFT_PAREN (vex | DEFAULT) (COMMA (vex | DEFAULT))* RIGHT_PAREN
     ;
 
 orderby_clause

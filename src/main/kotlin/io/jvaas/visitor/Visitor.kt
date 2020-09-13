@@ -56,14 +56,26 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 	override fun visitInsert_stmt_for_psql(ctx: SQLParser.Insert_stmt_for_psqlContext?) {
 
-		ctx?.children?.forEach { child ->
-			println(child.payload.javaClass)
-			println(child.text)
-		}
-
-		println(ctx?.children)
+//		ctx?.children?.forEach { child ->
+//			println(child.payload.javaClass)
+//			println(child.text)
+//		}
+//
+//		println(ctx?.children)
 
 		super.visitInsert_stmt_for_psql(ctx)
+	}
+
+	// UPDATE
+	override fun visitUpdate_stmt_for_psql(ctx: SQLParser.Update_stmt_for_psqlContext?) {
+		println("UPDATE")
+		super.visitUpdate_stmt_for_psql(ctx)
+	}
+
+	// UPDATE SET
+	override fun visitUpdate_set(ctx: SQLParser.Update_setContext?) {
+		println("SET")
+		super.visitUpdate_set(ctx)
 	}
 
 }
