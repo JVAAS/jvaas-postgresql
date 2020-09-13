@@ -2488,6 +2488,7 @@ vex
   | vex AND vex
   | vex OR vex
   | value_expression_primary
+  | PLACEHOLDER
   ;
 
 // partial copy of vex
@@ -2879,9 +2880,9 @@ update_stmt_for_psql
     ;
 
 update_set
-    : column+=indirection_identifier EQUAL (value+=vex | PLACEHOLDER | DEFAULT)
+    : column+=indirection_identifier EQUAL (value+=vex | DEFAULT)
     | LEFT_PAREN column+=indirection_identifier (COMMA column+=indirection_identifier)* RIGHT_PAREN EQUAL ROW?
-    (LEFT_PAREN (value+=vex | PLACEHOLDER | DEFAULT) (COMMA (value+=vex | PLACEHOLDER | DEFAULT))* RIGHT_PAREN | table_subquery)
+    (LEFT_PAREN (value+=vex | DEFAULT) (COMMA (value+=vex | DEFAULT))* RIGHT_PAREN | table_subquery)
     ;
 
 notify_stmt
