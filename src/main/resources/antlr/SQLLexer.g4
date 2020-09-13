@@ -795,6 +795,7 @@ LESS_LESS : '<<';
 GREATER_GREATER : '>>';
 DOUBLE_DOT: '..';
 HASH_SIGN: '#';              // last operator rule, sync with CustomSQLAntlrErrorStrategy
+PLACEHOLDER: '?';
 
 BlockComment
     :   '/*' (BlockComment |.)*? '*/' -> channel(HIDDEN)
@@ -975,12 +976,5 @@ EndDollarStringConstant
     ;
 
 
-/**
-===============================================================================
- Extra tokens
-===============================================================================
-**/
 
-PLACEHOLDER
-    : '?'
-    ;
+

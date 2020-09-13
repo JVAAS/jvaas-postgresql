@@ -2460,7 +2460,6 @@ precision_param
 
 vex
   : vex CAST_EXPRESSION data_type
-  | PLACEHOLDER (COMMA vex)*
   | LEFT_PAREN vex RIGHT_PAREN indirection_list?
   | LEFT_PAREN vex (COMMA vex)+ RIGHT_PAREN
   | vex collate_identifier
@@ -2880,9 +2879,9 @@ update_stmt_for_psql
     ;
 
 update_set
-    : column+=indirection_identifier EQUAL (value+=vex | DEFAULT)
+    : column+=indirection_identifier EQUAL (value+=vex | PLACEHOLDER | DEFAULT)
     | LEFT_PAREN column+=indirection_identifier (COMMA column+=indirection_identifier)* RIGHT_PAREN EQUAL ROW?
-    (LEFT_PAREN (value+=vex | DEFAULT) (COMMA (value+=vex | DEFAULT))* RIGHT_PAREN | table_subquery)
+    (LEFT_PAREN (value+=vex | PLACEHOLDER | DEFAULT) (COMMA (value+=vex | PLACEHOLDER | DEFAULT))* RIGHT_PAREN | table_subquery)
     ;
 
 notify_stmt
