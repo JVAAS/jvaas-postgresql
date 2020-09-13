@@ -5,8 +5,13 @@ import io.jvaas.gen.SQLParserBaseVisitor
 import io.jvaas.type.Column
 import io.jvaas.type.Model
 import io.jvaas.type.Table
+import org.antlr.v4.runtime.tree.ParseTree
 
 class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
+
+	fun getSQL(children: List<ParseTree>): String {
+		return children.map { it.text }.joinToString(" ")
+	}
 
 	override fun visitCreateTableStatement(ctx: SQLParser.CreateTableStatementContext?) {
 		var createTableVisited = false
@@ -54,7 +59,10 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		}
 	}
 
+
+
 	override fun visitInsertStmtForPsql(ctx: SQLParser.InsertStmtForPsqlContext?) {
+
 
 //		ctx?.children?.forEach { child ->
 //			println(child.payload.javaClass)
@@ -68,7 +76,12 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 	// UPDATE
 	override fun visitUpdateStmtForPsql(ctx: SQLParser.UpdateStmtForPsqlContext?) {
-		println("UPDATE")
+
+
+		val sql = getSQL(ctx?.children ?: listOf())
+		println(">>>>>" + sql)
+
+
 		super.visitUpdateStmtForPsql(ctx)
 	}
 
