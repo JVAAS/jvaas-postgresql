@@ -5,7 +5,7 @@ options {
     tokenVocab=TSQLLexer;
 }
 
-@header {package cz.startnet.utils.pgdiff.parsers.antlr;}
+@header {}
 
 tsql_file
     : BOM? go_statement* batch* EOF

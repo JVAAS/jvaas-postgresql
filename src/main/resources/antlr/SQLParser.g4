@@ -5,7 +5,7 @@ options {
     tokenVocab=SQLLexer;
 }
 
-@header {package cz.startnet.utils.pgdiff.parsers.antlr;}
+@header {}
 
 // to start parsing, it is recommended to use only rules with EOF
 // this eliminates the ambiguous parsing options and speeds up the process
@@ -2811,7 +2811,7 @@ values_stmt
     ;
 
 values_values
-    : LEFT_PAREN (vex | DEFAULT) (COMMA (vex | DEFAULT))* RIGHT_PAREN
+    : LEFT_PAREN (vex | PLACEHOLDER | DEFAULT) (COMMA (vex | PLACEHOLDER | DEFAULT))* RIGHT_PAREN
     ;
 
 orderby_clause

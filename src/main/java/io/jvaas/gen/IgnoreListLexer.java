@@ -1,6 +1,5 @@
 // Generated from /home/vlad/Code/jvaas-platform/jvaas-postgresql/src/main/resources/antlr/IgnoreList.g4 by ANTLR 4.8
 package io.jvaas.gen;
-
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -18,7 +17,7 @@ public class IgnoreListLexer extends Lexer {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		HIDE=1, SHOW=2, ALL=3, CONTENT=4, QUALIFIED=5, REGEX=6, NONE=7, DB=8,
+		HIDE=1, SHOW=2, ALL=3, CONTENT=4, QUALIFIED=5, REGEX=6, NONE=7, DB=8, 
 		TYPE=9, Identifier=10, SQstring=11, DQstring=12, COMMA=13, NewLine=14, 
 		COMMENT=15, WS=16, BAD=17;
 	public static String[] channelNames = {

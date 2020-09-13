@@ -3,7 +3,7 @@ grammar IgnoreList;
 options {
     language=Java;
 }
-@header {package cz.startnet.utils.pgdiff.parsers.antlr;}
+@header {}
 
 compileUnit: NewLine* rule_list NewLine* EOF;
 rule_list: white | black;

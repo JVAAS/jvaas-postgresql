@@ -3,7 +3,7 @@ grammar Privileges;
 options {
     language=Java;
 }
-@header {package cz.startnet.utils.pgdiff.parsers.antlr;}
+@header {}
 
 privileges : '{' acls+=privilege (COMMA acls+=privilege)* '}' EOF;
   

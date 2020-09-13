@@ -1,6 +1,6 @@
 lexer grammar TSQLLexer;
 
-@header {package cz.startnet.utils.pgdiff.parsers.antlr;}
+@header {}
 
 // Basic keywords (from https://msdn.microsoft.com/en-us/library/ms189822.aspx)
 ADD: A D D;  // first identifier rule, sync with CustomTSQLAntlrErrorStrategy

@@ -1,6 +1,5 @@
 // Generated from /home/vlad/Code/jvaas-platform/jvaas-postgresql/src/main/resources/antlr/TSQLParser.g4 by ANTLR 4.8
 package io.jvaas.gen;
-
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**

@@ -620,6 +620,7 @@ BOM=619
 BAD=620
 Text_between_Dollar=621
 EndDollarStringConstant=622
+PLACEHOLDER=623
 '='=576
 ':'=577
 ';'=578
@@ -651,3 +652,4 @@ EndDollarStringConstant=622
 ' '=615
 '\u0009'=618
 '\ufeff'=619
+'?'=623

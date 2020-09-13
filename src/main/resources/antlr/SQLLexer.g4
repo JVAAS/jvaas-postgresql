@@ -19,7 +19,6 @@
 lexer grammar SQLLexer;
 
 @header {
-package cz.startnet.utils.pgdiff.parsers.antlr;
 import java.util.ArrayDeque;
 import java.util.Deque;
 }
@@ -974,3 +973,12 @@ Text_between_Dollar
 EndDollarStringConstant
     : '$' Tag? '$' {getText().equals(_tags.peek())}? {_tags.pop();} -> popMode
     ;
+
+
+/**
+===============================================================================
+ Extra tokens
+===============================================================================
+**/
+
+PLACEHOLDER : '?';

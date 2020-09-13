@@ -6,7 +6,7 @@ import io.jvaas.type.Column
 import io.jvaas.type.Model
 import io.jvaas.type.Table
 
-class CreateTableVisitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
+class CreateVisitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 	override fun visitCreate_table_statement(ctx: SQLParser.Create_table_statementContext?) {
 		var createTableVisited = false
