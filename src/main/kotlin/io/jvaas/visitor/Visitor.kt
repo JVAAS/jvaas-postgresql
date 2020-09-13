@@ -75,6 +75,11 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 	// UPDATE SET
 	override fun visitUpdate_set(ctx: SQLParser.Update_setContext?) {
 		println("SET")
+		ctx?.children?.forEach {
+			println(it.payload::class.java)
+			println(it.text)
+			println()
+		}
 		super.visitUpdate_set(ctx)
 	}
 

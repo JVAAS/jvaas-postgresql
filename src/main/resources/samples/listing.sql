@@ -22,5 +22,5 @@ UPDATE listing SET parkings = 1 WHERE id = 1;
 UPDATE listing SET floor_size = 1 WHERE id = 1;
 UPDATE listing SET erf_size = 1 WHERE id = 1;
 UPDATE listing SET rates_and_taxes = 1 WHERE id = 1;
-UPDATE listing SET published = true WHERE id = 1;
+UPDATE listing SET published = ? WHERE id = ?;
 UPDATE listing SET section = ? WHERE id = ?;
