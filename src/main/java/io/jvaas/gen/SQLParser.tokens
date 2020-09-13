@@ -621,6 +621,7 @@ BOM=620
 BAD=621
 Text_between_Dollar=622
 EndDollarStringConstant=623
+TextBetween_Dollar=624
 '='=576
 ':'=577
 ';'=578

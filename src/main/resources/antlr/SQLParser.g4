@@ -15,68 +15,68 @@ sql
     : BOM? SEMI_COLON* (statement (SEMI_COLON+ | EOF))* EOF
     ;
 
-qname_parser
-    : schema_qualified_name EOF
+qnameParser
+    : schemaQualifiedName EOF
     ;
 
-function_args_parser
-    : schema_qualified_name? function_args EOF
+functionArgsParser
+    : schemaQualifiedName? functionArgs EOF
     ;
 
-vex_eof
+vexEof
     : vex (COMMA vex)* EOF
     ;
 
-plpgsql_function
-    : comp_options? function_block SEMI_COLON? EOF
+plpgsqlFunction
+    : compOptions? functionBlock SEMI_COLON? EOF
     ;
 
-plpgsql_function_test_list
-    : (comp_options? function_block SEMI_COLON)* EOF
+plpgsqlFunctionTestList
+    : (compOptions? functionBlock SEMI_COLON)* EOF
     ;
 
 /******* END Start symbols *******/
 
 statement
-    : data_statement
-    | schema_statement
-    | script_statement
+    : dataStatement
+    | schemaStatement
+    | scriptStatement
     ;
 
-data_statement
-    : select_stmt
-    | insert_stmt_for_psql
-    | update_stmt_for_psql
-    | delete_stmt_for_psql
+dataStatement
+    : selectStmt
+    | insertStmtForPsql
+    | updateStmtForPsql
+    | deleteStmtForPsql
     ;
 
-script_statement
-    : script_transaction
-    | script_additional
+scriptStatement
+    : scriptTransaction
+    | scriptAdditional
     ;
 
-script_transaction
-    : (START TRANSACTION | BEGIN (WORK | TRANSACTION)?) (transaction_mode (COMMA transaction_mode)*)?
+scriptTransaction
+    : (START TRANSACTION | BEGIN (WORK | TRANSACTION)?) (transactionMode (COMMA transactionMode)*)?
     | (COMMIT | END | ABORT | ROLLBACK) (WORK | TRANSACTION)? (AND NO? CHAIN)?
     | (COMMIT PREPARED | PREPARE TRANSACTION) Character_String_Literal
     | (SAVEPOINT | RELEASE SAVEPOINT?) identifier
-    | ROLLBACK PREPARED Character_String_Literal 
+    | ROLLBACK PREPARED Character_String_Literal
     | ROLLBACK (WORK | TRANSACTION)? TO SAVEPOINT? identifier
-    | lock_table
+    | lockTable
     ;
 
-transaction_mode
+transactionMode
     : ISOLATION LEVEL (SERIALIZABLE | REPEATABLE READ | READ COMMITTED | READ UNCOMMITTED)
     | READ WRITE
     | READ ONLY
     | NOT? DEFERRABLE
     ;
 
-lock_table
-    : LOCK TABLE? only_table_multiply (COMMA only_table_multiply)* (IN lock_mode MODE)? NOWAIT?
+lockTable
+    : LOCK TABLE? onlyTableMultiply (COMMA onlyTableMultiply)* (IN lockMode MODE)? NOWAIT?
     ;
 
-lock_mode
+lockMode
     : (ROW | ACCESS) SHARE
     | ROW EXCLUSIVE
     | SHARE (ROW | UPDATE) EXCLUSIVE
@@ -84,370 +84,370 @@ lock_mode
     | ACCESS? EXCLUSIVE
     ;
 
-script_additional
-    : additional_statement
-    | VACUUM vacuum_mode table_cols_list?
-    | (FETCH | MOVE) fetch_move_direction? (FROM | IN)? identifier
+scriptAdditional
+    : additionalStatement
+    | VACUUM vacuumMode tableColsList?
+    | (FETCH | MOVE) fetchMoveDirection? (FROM | IN)? identifier
     | CLOSE (identifier | ALL)
-    | CALL function_call
+    | CALL functionCall
     | DISCARD (ALL | PLANS | SEQUENCES | TEMPORARY | TEMP)
-    | declare_statement
-    | execute_statement
-    | explain_statement
-    | show_statement
+    | declareStatement
+    | executeStatement
+    | explainStatement
+    | showStatement
     ;
 
-additional_statement
-    : anonymous_block
+additionalStatement
+    : anonymousBlock
     | LISTEN identifier
     | UNLISTEN (identifier | MULTIPLY)
-    | ANALYZE (LEFT_PAREN analyze_mode (COMMA analyze_mode)* RIGHT_PAREN | VERBOSE)? table_cols_list?
-    | CLUSTER VERBOSE? (identifier ON schema_qualified_name | schema_qualified_name (USING identifier)?)?
+    | ANALYZE (LEFT_PAREN analyzeMode (COMMA analyzeMode)* RIGHT_PAREN | VERBOSE)? tableColsList?
+    | CLUSTER VERBOSE? (identifier ON schemaQualifiedName | schemaQualifiedName (USING identifier)?)?
     | CHECKPOINT
     | LOAD Character_String_Literal
     | DEALLOCATE PREPARE? (identifier | ALL)
-    | REINDEX (LEFT_PAREN VERBOSE RIGHT_PAREN)? (INDEX | TABLE | SCHEMA | DATABASE | SYSTEM) CONCURRENTLY? schema_qualified_name
+    | REINDEX (LEFT_PAREN VERBOSE RIGHT_PAREN)? (INDEX | TABLE | SCHEMA | DATABASE | SYSTEM) CONCURRENTLY? schemaQualifiedName
     | RESET ((identifier DOT)? identifier | TIME ZONE | SESSION AUTHORIZATION | ALL)
-    | REFRESH MATERIALIZED VIEW CONCURRENTLY? schema_qualified_name (WITH NO? DATA)?
-    | PREPARE identifier (LEFT_PAREN data_type (COMMA data_type)* RIGHT_PAREN)? AS data_statement
-    | REASSIGN OWNED BY user_name (COMMA user_name)* TO user_name
-    | copy_statement
-    | truncate_stmt
-    | notify_stmt
+    | REFRESH MATERIALIZED VIEW CONCURRENTLY? schemaQualifiedName (WITH NO? DATA)?
+    | PREPARE identifier (LEFT_PAREN dataType (COMMA dataType)* RIGHT_PAREN)? AS dataStatement
+    | REASSIGN OWNED BY userName (COMMA userName)* TO userName
+    | copyStatement
+    | truncateStmt
+    | notifyStmt
     ;
 
-explain_statement
-    : EXPLAIN (ANALYZE? VERBOSE? | LEFT_PAREN explain_option (COMMA explain_option)* RIGHT_PAREN) explain_query;
+explainStatement
+    : EXPLAIN (ANALYZE? VERBOSE? | LEFT_PAREN explainOption (COMMA explainOption)* RIGHT_PAREN) explainQuery;
 
-explain_query
-    : data_statement
-    | execute_statement
-    | declare_statement
-    | CREATE (create_table_as_statement | create_view_statement)
+explainQuery
+    : dataStatement
+    | executeStatement
+    | declareStatement
+    | CREATE (createTableAsStatement | createViewStatement)
     ;
 
-execute_statement
+executeStatement
     : EXECUTE identifier (LEFT_PAREN vex (COMMA vex)* RIGHT_PAREN)?
     ;
 
-declare_statement
-    : DECLARE identifier BINARY? INSENSITIVE? (NO? SCROLL)? CURSOR ((WITH | WITHOUT) HOLD)? FOR select_stmt
+declareStatement
+    : DECLARE identifier BINARY? INSENSITIVE? (NO? SCROLL)? CURSOR ((WITH | WITHOUT) HOLD)? FOR selectStmt
     ;
 
-show_statement
+showStatement
     : SHOW ((identifier DOT)? identifier | ALL | TIME ZONE | TRANSACTION ISOLATION LEVEL | SESSION AUTHORIZATION)
     ;
 
-explain_option
-    : (ANALYZE | VERBOSE | COSTS | SETTINGS | BUFFERS | TIMING | SUMMARY) boolean_value?
+explainOption
+    : (ANALYZE | VERBOSE | COSTS | SETTINGS | BUFFERS | TIMING | SUMMARY) booleanValue?
     | FORMAT (TEXT | XML | JSON | YAML)
     ;
 
-user_name
+userName
     : identifier | CURRENT_USER | SESSION_USER
     ;
 
-table_cols_list
-    : table_cols (COMMA table_cols)*
+tableColsList
+    : tableCols (COMMA tableCols)*
     ;
 
-table_cols
-    : schema_qualified_name (LEFT_PAREN identifier (COMMA identifier)* RIGHT_PAREN)?
+tableCols
+    : schemaQualifiedName (LEFT_PAREN identifier (COMMA identifier)* RIGHT_PAREN)?
     ;
 
-vacuum_mode
-    : LEFT_PAREN vacuum_option (COMMA vacuum_option)* RIGHT_PAREN 
+vacuumMode
+    : LEFT_PAREN vacuumOption (COMMA vacuumOption)* RIGHT_PAREN
     | FULL? FREEZE? VERBOSE? ANALYZE?
     ;
 
-vacuum_option
-    : (FULL | FREEZE | VERBOSE | ANALYZE | DISABLE_PAGE_SKIPPING | SKIP_LOCKED | INDEX_CLEANUP | TRUNCATE) boolean_value?
+vacuumOption
+    : (FULL | FREEZE | VERBOSE | ANALYZE | DISABLE_PAGE_SKIPPING | SKIP_LOCKED | INDEX_CLEANUP | TRUNCATE) booleanValue?
     ;
 
-analyze_mode
-    : (VERBOSE | SKIP_LOCKED) boolean_value?
+analyzeMode
+    : (VERBOSE | SKIP_LOCKED) booleanValue?
     ;
 
-boolean_value
-    : TRUE 
-    | FALSE 
-    | OFF 
-    | ON 
+booleanValue
+    : TRUE
+    | FALSE
+    | OFF
+    | ON
     | NUMBER_LITERAL
     ;
 
-fetch_move_direction
+fetchMoveDirection
     : NEXT
     | PRIOR
     | FIRST
     | LAST
-    | (ABSOLUTE | RELATIVE)? signed_number_literal
+    | (ABSOLUTE | RELATIVE)? signedNumberLiteral
     | ALL
     | FORWARD (NUMBER_LITERAL | ALL)?
     | BACKWARD (NUMBER_LITERAL | ALL)?
     ;
 
-schema_statement
-    : schema_create
-    | schema_alter
-    | schema_drop
+schemaStatement
+    : schemaCreate
+    | schemaAlter
+    | schemaDrop
     ;
 
-schema_create
-    : CREATE (create_table_statement
-    | create_foreign_table_statement
-    | create_index_statement
-    | create_extension_statement
-    | create_trigger_statement
-    | create_rewrite_statement
-    | create_function_statement
-    | create_sequence_statement
-    | create_schema_statement
-    | create_view_statement
-    | create_language_statement
-    | create_event_trigger
-    | create_type_statement
-    | create_domain_statement
-    | create_server_statement
-    | create_fts_configuration
-    | create_fts_template
-    | create_fts_parser
-    | create_fts_dictionary
-    | create_collation
-    | create_user_mapping
-    | create_transform_statement
-    | create_access_method
-    | create_user_or_role
-    | create_group
-    | create_tablespace
-    | create_statistics
-    | create_foreign_data_wrapper
-    | create_operator_statement
-    | create_aggregate_statement
-    | create_table_as_statement
-    | create_policy_statement
-    | create_subscription_statement
-    | create_cast_statement
-    | create_operator_family_statement
-    | create_operator_class_statement
-    | create_conversion_statement
-    | create_publication_statement)
+schemaCreate
+    : CREATE (createTableStatement
+    | createForeignTableStatement
+    | createIndexStatement
+    | createExtensionStatement
+    | createTriggerStatement
+    | createRewriteStatement
+    | createFunctionStatement
+    | createSequenceStatement
+    | createSchemaStatement
+    | createViewStatement
+    | createLanguageStatement
+    | createEventTrigger
+    | createTypeStatement
+    | createDomainStatement
+    | createServerStatement
+    | createFtsConfiguration
+    | createFtsTemplate
+    | createFtsParser
+    | createFtsDictionary
+    | createCollation
+    | createUserMapping
+    | createTransformStatement
+    | createAccessMethod
+    | createUserOrRole
+    | createGroup
+    | createTablespace
+    | createStatistics
+    | createForeignDataWrapper
+    | createOperatorStatement
+    | createAggregateStatement
+    | createTableAsStatement
+    | createPolicyStatement
+    | createSubscriptionStatement
+    | createCastStatement
+    | createOperatorFamilyStatement
+    | createOperatorClassStatement
+    | createConversionStatement
+    | createPublicationStatement)
 
-    | comment_on_statement
-    | rule_common
-    | set_statement
-    | schema_import
-    | security_label
+    | commentOnStatement
+    | ruleCommon
+    | setStatement
+    | schemaImport
+    | securityLabel
     ;
 
-schema_alter
-    : ALTER (alter_function_statement
-    | alter_schema_statement
-    | alter_language_statement
-    | alter_table_statement
-    | alter_index_statement
-    | alter_default_privileges
-    | alter_sequence_statement
-    | alter_view_statement
-    | alter_event_trigger
-    | alter_type_statement
-    | alter_domain_statement
-    | alter_server_statement
-    | alter_fts_statement
-    | alter_collation
-    | alter_user_mapping
-    | alter_user_or_role
-    | alter_group
-    | alter_tablespace
-    | alter_statistics
-    | alter_foreign_data_wrapper
-    | alter_operator_statement
-    | alter_aggregate_statement
-    | alter_extension_statement
-    | alter_policy_statement
-    | alter_subscription_statement
-    | alter_trigger_statement
-    | alter_rule_statement
-    | alter_operator_family_statement
-    | alter_operator_class_statement
-    | alter_conversion_statement
-    | alter_publication_statement
-    | alter_owner)
+schemaAlter
+    : ALTER (alterFunctionStatement
+    | alterSchemaStatement
+    | alterLanguageStatement
+    | alterTableStatement
+    | alterIndexStatement
+    | alterDefaultPrivileges
+    | alterSequenceStatement
+    | alterViewStatement
+    | alterEventTrigger
+    | alterTypeStatement
+    | alterDomainStatement
+    | alterServerStatement
+    | alterFtsStatement
+    | alterCollation
+    | alterUserMapping
+    | alterUserOrRole
+    | alterGroup
+    | alterTablespace
+    | alterStatistics
+    | alterForeignDataWrapper
+    | alterOperatorStatement
+    | alterAggregateStatement
+    | alterExtensionStatement
+    | alterPolicyStatement
+    | alterSubscriptionStatement
+    | alterTriggerStatement
+    | alterRuleStatement
+    | alterOperatorFamilyStatement
+    | alterOperatorClassStatement
+    | alterConversionStatement
+    | alterPublicationStatement
+    | alterOwner)
     ;
 
-schema_drop
-    : DROP (drop_function_statement
-    | drop_trigger_statement
-    | drop_rule_statement
-    | drop_policy_statement
-    | drop_cast_statement
-    | drop_operator_family_statement
-    | drop_operator_class_statement
-    | drop_statements
-    | drop_user_mapping
-    | drop_owned
-    | drop_operator_statement)
+schemaDrop
+    : DROP (dropFunctionStatement
+    | dropTriggerStatement
+    | dropRuleStatement
+    | dropPolicyStatement
+    | dropCastStatement
+    | dropOperatorFamilyStatement
+    | dropOperatorClassStatement
+    | dropStatements
+    | dropUserMapping
+    | dropOwned
+    | dropOperatorStatement)
     ;
 
-schema_import
+schemaImport
     : IMPORT FOREIGN SCHEMA name=identifier
-    ((LIMIT TO | EXCEPT) LEFT_PAREN identifier_list RIGHT_PAREN)?
+    ((LIMIT TO | EXCEPT) LEFT_PAREN identifierList RIGHT_PAREN)?
     FROM SERVER identifier INTO identifier
-    define_foreign_options?
+    defineForeignOptions?
     ;
 
-alter_function_statement
-    : (FUNCTION | PROCEDURE) function_parameters?
-      ((function_actions_common | RESET ((identifier DOT)? identifier | ALL))+ RESTRICT?
-    | rename_to
-    | set_schema
+alterFunctionStatement
+    : (FUNCTION | PROCEDURE) functionParameters?
+      ((functionActionsCommon | RESET ((identifier DOT)? identifier | ALL))+ RESTRICT?
+    | renameTo
+    | setSchema
     | DEPENDS ON EXTENSION identifier)
     ;
 
-alter_aggregate_statement
-    : AGGREGATE function_parameters (rename_to | set_schema)
+alterAggregateStatement
+    : AGGREGATE functionParameters (renameTo | setSchema)
     ;
 
-alter_extension_statement
-    : EXTENSION identifier alter_extension_action
+alterExtensionStatement
+    : EXTENSION identifier alterExtensionAction
     ;
 
-alter_extension_action
-    : set_schema
-    | UPDATE (TO (identifier | character_string))?
-    | (ADD | DROP) extension_member_object
+alterExtensionAction
+    : setSchema
+    | UPDATE (TO (identifier | characterString))?
+    | (ADD | DROP) extensionMemberObject
     ;
 
-extension_member_object
-    : ACCESS METHOD schema_qualified_name
-    | AGGREGATE function_parameters
-    | CAST LEFT_PAREN schema_qualified_name AS schema_qualified_name RIGHT_PAREN
+extensionMemberObject
+    : ACCESS METHOD schemaQualifiedName
+    | AGGREGATE functionParameters
+    | CAST LEFT_PAREN schemaQualifiedName AS schemaQualifiedName RIGHT_PAREN
     | COLLATION identifier
     | CONVERSION identifier
-    | DOMAIN schema_qualified_name
+    | DOMAIN schemaQualifiedName
     | EVENT TRIGGER identifier
     | FOREIGN DATA WRAPPER identifier
-    | FOREIGN TABLE schema_qualified_name
-    | FUNCTION function_parameters
-    | MATERIALIZED? VIEW schema_qualified_name
-    | OPERATOR operator_name
-    | OPERATOR CLASS schema_qualified_name USING identifier
-    | OPERATOR FAMILY schema_qualified_name USING identifier
+    | FOREIGN TABLE schemaQualifiedName
+    | FUNCTION functionParameters
+    | MATERIALIZED? VIEW schemaQualifiedName
+    | OPERATOR operatorName
+    | OPERATOR CLASS schemaQualifiedName USING identifier
+    | OPERATOR FAMILY schemaQualifiedName USING identifier
     | PROCEDURAL? LANGUAGE identifier
-    | PROCEDURE function_parameters
-    | ROUTINE function_parameters
+    | PROCEDURE functionParameters
+    | ROUTINE functionParameters
     | SCHEMA identifier
-    | SEQUENCE schema_qualified_name
+    | SEQUENCE schemaQualifiedName
     | SERVER identifier
-    | TABLE schema_qualified_name
-    | TEXT SEARCH CONFIGURATION schema_qualified_name
-    | TEXT SEARCH DICTIONARY schema_qualified_name
-    | TEXT SEARCH PARSER schema_qualified_name
-    | TEXT SEARCH TEMPLATE schema_qualified_name
+    | TABLE schemaQualifiedName
+    | TEXT SEARCH CONFIGURATION schemaQualifiedName
+    | TEXT SEARCH DICTIONARY schemaQualifiedName
+    | TEXT SEARCH PARSER schemaQualifiedName
+    | TEXT SEARCH TEMPLATE schemaQualifiedName
     | TRANSFORM FOR identifier LANGUAGE identifier
-    | TYPE schema_qualified_name
+    | TYPE schemaQualifiedName
     ;
 
-alter_schema_statement
-    : SCHEMA identifier rename_to
+alterSchemaStatement
+    : SCHEMA identifier renameTo
     ;
 
-alter_language_statement
-    : PROCEDURAL? LANGUAGE name=identifier (rename_to | owner_to)
+alterLanguageStatement
+    : PROCEDURAL? LANGUAGE name=identifier (renameTo | ownerTo)
     ;
 
-alter_table_statement
-    : FOREIGN? TABLE if_exists? ONLY? name=schema_qualified_name MULTIPLY?(
-        table_action (COMMA table_action)*
+alterTableStatement
+    : FOREIGN? TABLE ifExists? ONLY? name=schemaQualifiedName MULTIPLY?(
+        tableAction (COMMA tableAction)*
         | RENAME COLUMN? identifier TO identifier
-        | set_schema
-        | rename_to
+        | setSchema
+        | renameTo
         | RENAME CONSTRAINT identifier TO identifier
-        | ATTACH PARTITION child=schema_qualified_name for_values_bound
-        | DETACH PARTITION child=schema_qualified_name)
+        | ATTACH PARTITION child=schemaQualifiedName forValuesBound
+        | DETACH PARTITION child=schemaQualifiedName)
     ;
 
-table_action
-    : ADD COLUMN? if_not_exists? table_column_definition
-    | DROP COLUMN? if_exists? column=identifier cascade_restrict?
-    | ALTER COLUMN? column=identifier column_action
-    | ADD tabl_constraint=constraint_common (NOT not_valid=VALID)?
-    | validate_constraint
-    | drop_constraint
-    | (DISABLE | ENABLE) TRIGGER (trigger_name=schema_qualified_name | ALL | USER)?
-    | ENABLE (REPLICA | ALWAYS) TRIGGER trigger_name=schema_qualified_name
-    | (DISABLE | ENABLE) RULE rewrite_rule_name=schema_qualified_name
-    | ENABLE (REPLICA | ALWAYS) RULE rewrite_rule_name=schema_qualified_name
+tableAction
+    : ADD COLUMN? ifNotExists? tableColumnDefinition
+    | DROP COLUMN? ifExists? column=identifier cascadeRestrict?
+    | ALTER COLUMN? column=identifier columnAction
+    | ADD tablConstraint=constraintCommon (NOT notValid=VALID)?
+    | validateConstraint
+    | dropConstraint
+    | (DISABLE | ENABLE) TRIGGER (triggerName=schemaQualifiedName | ALL | USER)?
+    | ENABLE (REPLICA | ALWAYS) TRIGGER triggerName=schemaQualifiedName
+    | (DISABLE | ENABLE) RULE rewriteRuleName=schemaQualifiedName
+    | ENABLE (REPLICA | ALWAYS) RULE rewriteRuleName=schemaQualifiedName
     | (DISABLE | ENABLE) ROW LEVEL SECURITY
     | NO? FORCE ROW LEVEL SECURITY
-    | CLUSTER ON index_name=schema_qualified_name
+    | CLUSTER ON indexName=schemaQualifiedName
     | SET WITHOUT (CLUSTER | OIDS)
     | SET WITH OIDS
     | SET (LOGGED | UNLOGGED)
-    | SET storage_parameter
-    | RESET names_in_parens
-    | define_foreign_options
-    | INHERIT parent_table=schema_qualified_name
-    | NO INHERIT parent_table=schema_qualified_name
-    | OF type_name=schema_qualified_name
+    | SET storageParameter
+    | RESET namesInParens
+    | defineForeignOptions
+    | INHERIT parentTable=schemaQualifiedName
+    | NO INHERIT parentTable=schemaQualifiedName
+    | OF typeName=schemaQualifiedName
     | NOT OF
-    | owner_to
-    | SET table_space
+    | ownerTo
+    | SET tableSpace
     | REPLICA IDENTITY (DEFAULT | FULL | NOTHING | USING INDEX identifier)
-    | ALTER CONSTRAINT identifier table_deferrable? table_initialy_immed?
+    | ALTER CONSTRAINT identifier tableDeferrable? tableInitialyImmed?
     ;
 
-column_action
-    : (SET DATA)? TYPE data_type collate_identifier? (USING vex)?
-    | ADD identity_body
-    | set_def_column
-    | drop_def
+columnAction
+    : (SET DATA)? TYPE dataType collateIdentifier? (USING vex)?
+    | ADD identityBody
+    | setDefColumn
+    | dropDef
     | (set=SET | DROP) NOT NULL
-    | DROP IDENTITY if_exists?
-    | SET storage_parameter
-    | SET STATISTICS signed_number_literal
-    | SET STORAGE storage_option
-    | RESET names_in_parens
-    | define_foreign_options
-    | alter_identity+
+    | DROP IDENTITY ifExists?
+    | SET storageParameter
+    | SET STATISTICS signedNumberLiteral
+    | SET STORAGE storageOption
+    | RESET namesInParens
+    | defineForeignOptions
+    | alterIdentity+
     ;
 
-identity_body
-    : GENERATED (ALWAYS | BY DEFAULT) AS IDENTITY (LEFT_PAREN sequence_body+ RIGHT_PAREN)?
+identityBody
+    : GENERATED (ALWAYS | BY DEFAULT) AS IDENTITY (LEFT_PAREN sequenceBody+ RIGHT_PAREN)?
     ;
 
-alter_identity
+alterIdentity
     : SET GENERATED (ALWAYS | BY DEFAULT)
-    | SET sequence_body
+    | SET sequenceBody
     | RESTART (WITH? NUMBER_LITERAL)?
     ;
 
-storage_option
+storageOption
     : PLAIN
     | EXTERNAL
     | EXTENDED
     | MAIN
     ;
 
-validate_constraint
-    : VALIDATE CONSTRAINT constraint_name=schema_qualified_name
+validateConstraint
+    : VALIDATE CONSTRAINT constraintName=schemaQualifiedName
     ;
 
-drop_constraint
-    : DROP CONSTRAINT if_exists? constraint_name=identifier cascade_restrict?
+dropConstraint
+    : DROP CONSTRAINT ifExists? constraintName=identifier cascadeRestrict?
     ;
 
-table_deferrable
+tableDeferrable
     : NOT? DEFERRABLE
     ;
 
-table_initialy_immed
+tableInitialyImmed
     : INITIALLY (DEFERRED | IMMEDIATE)
     ;
 
-function_actions_common
+functionActionsCommon
     : (CALLED | RETURNS NULL) ON NULL INPUT
-    | TRANSFORM transform_for_type (COMMA transform_for_type)*
+    | TRANSFORM transformForType (COMMA transformForType)*
     | STRICT
     | IMMUTABLE
     | VOLATILE
@@ -455,608 +455,608 @@ function_actions_common
     | NOT? LEAKPROOF
     | EXTERNAL? SECURITY (INVOKER | DEFINER)
     | PARALLEL (SAFE | UNSAFE | RESTRICTED)
-    | COST execution_cost=unsigned_numeric_literal
-    | ROWS result_rows=unsigned_numeric_literal
-    | SUPPORT schema_qualified_name
-    | SET (config_scope=identifier DOT)? config_param=identifier ((TO | EQUAL) set_statement_value | FROM CURRENT)
-    | LANGUAGE lang_name=identifier
+    | COST executionCost=unsignedNumericLiteral
+    | ROWS resultRows=unsignedNumericLiteral
+    | SUPPORT schemaQualifiedName
+    | SET (configScope=identifier DOT)? configParam=identifier ((TO | EQUAL) setStatementValue | FROM CURRENT)
+    | LANGUAGE langName=identifier
     | WINDOW
-    | AS function_def
+    | AS functionDef
     ;
 
-function_def
-    : definition=character_string (COMMA symbol=character_string)?
+functionDef
+    : definition=characterString (COMMA symbol=characterString)?
     ;
 
-alter_index_statement
-    : INDEX if_exists? schema_qualified_name index_def_action
-    | INDEX ALL IN TABLESPACE identifier (OWNED BY identifier_list)? SET TABLESPACE identifier NOWAIT?
+alterIndexStatement
+    : INDEX ifExists? schemaQualifiedName indexDefAction
+    | INDEX ALL IN TABLESPACE identifier (OWNED BY identifierList)? SET TABLESPACE identifier NOWAIT?
     ;
 
-index_def_action
-    : rename_to
-    | ATTACH PARTITION index=schema_qualified_name
-    | DEPENDS ON EXTENSION schema_qualified_name
-    | ALTER COLUMN? sign? NUMBER_LITERAL SET STATISTICS signed_number_literal
-    | RESET LEFT_PAREN identifier_list RIGHT_PAREN
-    | SET TABLESPACE identifier 
-    | SET LEFT_PAREN option_with_value (COMMA option_with_value)* RIGHT_PAREN
+indexDefAction
+    : renameTo
+    | ATTACH PARTITION index=schemaQualifiedName
+    | DEPENDS ON EXTENSION schemaQualifiedName
+    | ALTER COLUMN? sign? NUMBER_LITERAL SET STATISTICS signedNumberLiteral
+    | RESET LEFT_PAREN identifierList RIGHT_PAREN
+    | SET TABLESPACE identifier
+    | SET LEFT_PAREN optionWithValue (COMMA optionWithValue)* RIGHT_PAREN
     ;
 
-alter_default_privileges
+alterDefaultPrivileges
     : DEFAULT PRIVILEGES
-    (FOR (ROLE | USER) identifier_list)?
-    (IN SCHEMA identifier_list)?
-    abbreviated_grant_or_revoke
+    (FOR (ROLE | USER) identifierList)?
+    (IN SCHEMA identifierList)?
+    abbreviatedGrantOrRevoke
     ;
 
-abbreviated_grant_or_revoke
-    : (GRANT | REVOKE grant_option_for?) (
-        table_column_privilege (COMMA table_column_privilege)* ON TABLES
-        | (usage_select_update (COMMA usage_select_update)* | ALL PRIVILEGES?) ON SEQUENCES
+abbreviatedGrantOrRevoke
+    : (GRANT | REVOKE grantOptionFor?) (
+        tableColumnPrivilege (COMMA tableColumnPrivilege)* ON TABLES
+        | (usageSelectUpdate (COMMA usageSelectUpdate)* | ALL PRIVILEGES?) ON SEQUENCES
         | (EXECUTE | ALL PRIVILEGES?) ON FUNCTIONS
         | (USAGE | CREATE | ALL PRIVILEGES?) ON SCHEMAS
         | (USAGE | ALL PRIVILEGES?) ON TYPES)
-    (grant_to_rule | revoke_from_cascade_restrict)
+    (grantToRule | revokeFromCascadeRestrict)
     ;
 
-grant_option_for
+grantOptionFor
     : GRANT OPTION FOR
     ;
 
-alter_sequence_statement
-    : SEQUENCE if_exists? name=schema_qualified_name
-     ( (sequence_body | RESTART (WITH? signed_number_literal)?)*
-    | set_schema
-    | rename_to)
+alterSequenceStatement
+    : SEQUENCE ifExists? name=schemaQualifiedName
+     ( (sequenceBody | RESTART (WITH? signedNumberLiteral)?)*
+    | setSchema
+    | renameTo)
     ;
 
-alter_view_statement
-    : MATERIALIZED? VIEW if_exists? name=schema_qualified_name
-     (ALTER COLUMN? column_name=schema_qualified_name  (set_def_column | drop_def)
-    | set_schema
-    | rename_to
-    | SET storage_parameter
-    | RESET names_in_parens)
+alterViewStatement
+    : MATERIALIZED? VIEW ifExists? name=schemaQualifiedName
+     (ALTER COLUMN? columnName=schemaQualifiedName  (setDefColumn | dropDef)
+    | setSchema
+    | renameTo
+    | SET storageParameter
+    | RESET namesInParens)
     ;
 
-alter_event_trigger
-    : EVENT TRIGGER name=identifier alter_event_trigger_action
+alterEventTrigger
+    : EVENT TRIGGER name=identifier alterEventTriggerAction
     ;
 
-alter_event_trigger_action
+alterEventTriggerAction
     : DISABLE
     | ENABLE (REPLICA | ALWAYS)?
-    | owner_to
-    | rename_to
+    | ownerTo
+    | renameTo
     ;
 
-alter_type_statement
-    : TYPE name=schema_qualified_name
-      (set_schema
-      | rename_to
-      | ADD VALUE if_not_exists? new_enum_value=character_string ((BEFORE | AFTER) existing_enum_value=character_string)?
-      | RENAME ATTRIBUTE attribute_name=identifier TO new_attribute_name=identifier cascade_restrict?
-      | RENAME VALUE existing_enum_name=character_string TO new_enum_name=character_string
-      | type_action (COMMA type_action)*)
+alterTypeStatement
+    : TYPE name=schemaQualifiedName
+      (setSchema
+      | renameTo
+      | ADD VALUE ifNotExists? newEnumValue=characterString ((BEFORE | AFTER) existingEnumValue=characterString)?
+      | RENAME ATTRIBUTE attributeName=identifier TO newAttributeName=identifier cascadeRestrict?
+      | RENAME VALUE existingEnumName=characterString TO newEnumName=characterString
+      | typeAction (COMMA typeAction)*)
     ;
 
-alter_domain_statement
-    : DOMAIN name=schema_qualified_name
-    (set_def_column
-    | drop_def
+alterDomainStatement
+    : DOMAIN name=schemaQualifiedName
+    (setDefColumn
+    | dropDef
     | (SET | DROP) NOT NULL
-    | ADD dom_constraint=domain_constraint (NOT not_valid=VALID)?
-    | drop_constraint
-    | RENAME CONSTRAINT schema_qualified_name TO schema_qualified_name
-    | validate_constraint
-    | rename_to
-    | set_schema)
+    | ADD domConstraint=domainConstraint (NOT notValid=VALID)?
+    | dropConstraint
+    | RENAME CONSTRAINT schemaQualifiedName TO schemaQualifiedName
+    | validateConstraint
+    | renameTo
+    | setSchema)
     ;
 
-alter_server_statement
-    : SERVER identifier alter_server_action
+alterServerStatement
+    : SERVER identifier alterServerAction
     ;
 
-alter_server_action
-    : (VERSION character_string)? define_foreign_options
-    | VERSION character_string
-    | owner_to
-    | rename_to
+alterServerAction
+    : (VERSION characterString)? defineForeignOptions
+    | VERSION characterString
+    | ownerTo
+    | renameTo
     ;
 
-alter_fts_statement
+alterFtsStatement
     : TEXT SEARCH
-      ((TEMPLATE | DICTIONARY | CONFIGURATION | PARSER) name=schema_qualified_name (rename_to | set_schema)
-      | DICTIONARY name=schema_qualified_name storage_parameter
-      | CONFIGURATION name=schema_qualified_name alter_fts_configuration)
+      ((TEMPLATE | DICTIONARY | CONFIGURATION | PARSER) name=schemaQualifiedName (renameTo | setSchema)
+      | DICTIONARY name=schemaQualifiedName storageParameter
+      | CONFIGURATION name=schemaQualifiedName alterFtsConfiguration)
     ;
 
-alter_fts_configuration
-    : (ADD | ALTER) MAPPING FOR identifier_list WITH schema_qualified_name (COMMA schema_qualified_name)*
-    | ALTER MAPPING (FOR identifier_list)? REPLACE schema_qualified_name WITH schema_qualified_name
-    | DROP MAPPING (IF EXISTS)? FOR identifier_list
+alterFtsConfiguration
+    : (ADD | ALTER) MAPPING FOR identifierList WITH schemaQualifiedName (COMMA schemaQualifiedName)*
+    | ALTER MAPPING (FOR identifierList)? REPLACE schemaQualifiedName WITH schemaQualifiedName
+    | DROP MAPPING (IF EXISTS)? FOR identifierList
     ;
 
-type_action
-    : ADD ATTRIBUTE identifier data_type collate_identifier? cascade_restrict?
-    | DROP ATTRIBUTE if_exists? identifier cascade_restrict?
-    | ALTER ATTRIBUTE identifier (SET DATA)? TYPE data_type collate_identifier? cascade_restrict?
+typeAction
+    : ADD ATTRIBUTE identifier dataType collateIdentifier? cascadeRestrict?
+    | DROP ATTRIBUTE ifExists? identifier cascadeRestrict?
+    | ALTER ATTRIBUTE identifier (SET DATA)? TYPE dataType collateIdentifier? cascadeRestrict?
     ;
 
-set_def_column
+setDefColumn
     : SET DEFAULT vex
     ;
 
-drop_def
+dropDef
     : DROP DEFAULT
     ;
 
-create_index_statement
-    : UNIQUE? INDEX CONCURRENTLY? if_not_exists? name=identifier? ON ONLY? table_name=schema_qualified_name index_rest
+createIndexStatement
+    : UNIQUE? INDEX CONCURRENTLY? ifNotExists? name=identifier? ON ONLY? tableName=schemaQualifiedName indexRest
     ;
 
-index_rest
-    : (USING method=identifier)? index_sort including_index? with_storage_parameter? table_space? index_where?
+indexRest
+    : (USING method=identifier)? indexSort includingIndex? withStorageParameter? tableSpace? indexWhere?
     ;
 
-index_sort
-    : LEFT_PAREN sort_specifier_list RIGHT_PAREN
+indexSort
+    : LEFT_PAREN sortSpecifierList RIGHT_PAREN
     ;
 
-including_index
+includingIndex
     : INCLUDE LEFT_PAREN identifier (COMMA identifier)* RIGHT_PAREN
     ;
 
-index_where
+indexWhere
     : WHERE vex
     ;
 
- create_extension_statement
-    : EXTENSION if_not_exists? name=identifier 
+ createExtensionStatement
+    : EXTENSION ifNotExists? name=identifier
     WITH?
-    (SCHEMA schema=identifier)? 
-    (VERSION (identifier | character_string))?
-    (FROM (identifier | character_string))?
+    (SCHEMA schema=identifier)?
+    (VERSION (identifier | characterString))?
+    (FROM (identifier | characterString))?
     CASCADE?
     ;
 
-create_language_statement
+createLanguageStatement
     : (OR REPLACE)? TRUSTED? PROCEDURAL? LANGUAGE name=identifier
-    (HANDLER schema_qualified_name (INLINE schema_qualified_name)? (VALIDATOR schema_qualified_name)?)?
+    (HANDLER schemaQualifiedName (INLINE schemaQualifiedName)? (VALIDATOR schemaQualifiedName)?)?
     ;
 
-create_event_trigger
+createEventTrigger
     : EVENT TRIGGER name=identifier ON identifier
-    (WHEN (schema_qualified_name IN LEFT_PAREN character_string (COMMA character_string)* RIGHT_PAREN AND?)+ )?
+    (WHEN (schemaQualifiedName IN LEFT_PAREN characterString (COMMA characterString)* RIGHT_PAREN AND?)+ )?
     EXECUTE (PROCEDURE | FUNCTION) vex
     ;
 
-create_type_statement
-    : TYPE name=schema_qualified_name (AS(
-        LEFT_PAREN (attrs+=table_column_definition (COMMA attrs+=table_column_definition)*)? RIGHT_PAREN
-        | ENUM LEFT_PAREN ( enums+=character_string (COMMA enums+=character_string)* )? RIGHT_PAREN
+createTypeStatement
+    : TYPE name=schemaQualifiedName (AS(
+        LEFT_PAREN (attrs+=tableColumnDefinition (COMMA attrs+=tableColumnDefinition)*)? RIGHT_PAREN
+        | ENUM LEFT_PAREN ( enums+=characterString (COMMA enums+=characterString)* )? RIGHT_PAREN
         | RANGE LEFT_PAREN
-                (SUBTYPE EQUAL subtype_name=data_type
-                | SUBTYPE_OPCLASS EQUAL subtype_operator_class=identifier
-                | COLLATION EQUAL collation=schema_qualified_name
-                | CANONICAL EQUAL canonical_function=schema_qualified_name
-                | SUBTYPE_DIFF EQUAL subtype_diff_function=schema_qualified_name)?
-                (COMMA (SUBTYPE EQUAL subtype_name=data_type
-                | SUBTYPE_OPCLASS EQUAL subtype_operator_class=identifier
-                | COLLATION EQUAL collation=schema_qualified_name
-                | CANONICAL EQUAL canonical_function=schema_qualified_name
-                | SUBTYPE_DIFF EQUAL subtype_diff_function=schema_qualified_name))*
+                (SUBTYPE EQUAL subtypeName=dataType
+                | SUBTYPE_OPCLASS EQUAL subtypeOperatorClass=identifier
+                | COLLATION EQUAL collation=schemaQualifiedName
+                | CANONICAL EQUAL canonicalFunction=schemaQualifiedName
+                | SUBTYPE_DIFF EQUAL subtypeDiffFunction=schemaQualifiedName)?
+                (COMMA (SUBTYPE EQUAL subtypeName=dataType
+                | SUBTYPE_OPCLASS EQUAL subtypeOperatorClass=identifier
+                | COLLATION EQUAL collation=schemaQualifiedName
+                | CANONICAL EQUAL canonicalFunction=schemaQualifiedName
+                | SUBTYPE_DIFF EQUAL subtypeDiffFunction=schemaQualifiedName))*
             RIGHT_PAREN)
     | LEFT_PAREN
-            // pg_dump prints internallength first
-            (INTERNALLENGTH EQUAL (internallength=signed_numerical_literal | VARIABLE) COMMA)?
-            INPUT EQUAL input_function=schema_qualified_name COMMA
-            OUTPUT EQUAL output_function=schema_qualified_name
-            (COMMA (RECEIVE EQUAL receive_function=schema_qualified_name
-            | SEND EQUAL send_function=schema_qualified_name
-            | TYPMOD_IN EQUAL type_modifier_input_function=schema_qualified_name
-            | TYPMOD_OUT EQUAL type_modifier_output_function=schema_qualified_name
-            | ANALYZE EQUAL analyze_function=schema_qualified_name
-            | INTERNALLENGTH EQUAL (internallength=signed_numerical_literal | VARIABLE )
+            // pgDump prints internallength first
+            (INTERNALLENGTH EQUAL (internallength=signedNumericalLiteral | VARIABLE) COMMA)?
+            INPUT EQUAL inputFunction=schemaQualifiedName COMMA
+            OUTPUT EQUAL outputFunction=schemaQualifiedName
+            (COMMA (RECEIVE EQUAL receiveFunction=schemaQualifiedName
+            | SEND EQUAL sendFunction=schemaQualifiedName
+            | TYPMOD_IN EQUAL typeModifierInputFunction=schemaQualifiedName
+            | TYPMOD_OUT EQUAL typeModifierOutputFunction=schemaQualifiedName
+            | ANALYZE EQUAL analyzeFunction=schemaQualifiedName
+            | INTERNALLENGTH EQUAL (internallength=signedNumericalLiteral | VARIABLE )
             | PASSEDBYVALUE
-            | ALIGNMENT EQUAL alignment=data_type
+            | ALIGNMENT EQUAL alignment=dataType
             | STORAGE EQUAL storage=(PLAIN | EXTERNAL | EXTENDED | MAIN)
-            | LIKE EQUAL like_type=data_type
-            | CATEGORY EQUAL category=character_string
-            | PREFERRED EQUAL preferred=truth_value
-            | DEFAULT EQUAL default_value=vex
-            | ELEMENT EQUAL element=data_type
-            | DELIMITER EQUAL delimiter=character_string
-            | COLLATABLE EQUAL collatable=truth_value))*
+            | LIKE EQUAL likeType=dataType
+            | CATEGORY EQUAL category=characterString
+            | PREFERRED EQUAL preferred=truthValue
+            | DEFAULT EQUAL defaultValue=vex
+            | ELEMENT EQUAL element=dataType
+            | DELIMITER EQUAL delimiter=characterString
+            | COLLATABLE EQUAL collatable=truthValue))*
         RIGHT_PAREN)?
     ;
 
-create_domain_statement
-    : DOMAIN name=schema_qualified_name AS? dat_type=data_type
-    (collate_identifier | DEFAULT def_value=vex | dom_constraint+=domain_constraint)*
+createDomainStatement
+    : DOMAIN name=schemaQualifiedName AS? datType=dataType
+    (collateIdentifier | DEFAULT defValue=vex | domConstraint+=domainConstraint)*
     ;
 
-create_server_statement
-    : SERVER if_not_exists? identifier (TYPE character_string)? (VERSION character_string)?
+createServerStatement
+    : SERVER ifNotExists? identifier (TYPE characterString)? (VERSION characterString)?
     FOREIGN DATA WRAPPER identifier
-    define_foreign_options?
+    defineForeignOptions?
     ;
 
-create_fts_dictionary
-    : TEXT SEARCH DICTIONARY name=schema_qualified_name
+createFtsDictionary
+    : TEXT SEARCH DICTIONARY name=schemaQualifiedName
     LEFT_PAREN
-        TEMPLATE EQUAL template=schema_qualified_name (COMMA option_with_value)*
+        TEMPLATE EQUAL template=schemaQualifiedName (COMMA optionWithValue)*
     RIGHT_PAREN
     ;
 
-option_with_value
+optionWithValue
     : identifier EQUAL vex
     ;
 
-create_fts_configuration
-    : TEXT SEARCH CONFIGURATION name=schema_qualified_name
+createFtsConfiguration
+    : TEXT SEARCH CONFIGURATION name=schemaQualifiedName
     LEFT_PAREN
-        (PARSER EQUAL parser_name=schema_qualified_name
-        | COPY EQUAL config_name=schema_qualified_name)
+        (PARSER EQUAL parserName=schemaQualifiedName
+        | COPY EQUAL configName=schemaQualifiedName)
     RIGHT_PAREN
     ;
 
-create_fts_template
-    : TEXT SEARCH TEMPLATE name=schema_qualified_name
+createFtsTemplate
+    : TEXT SEARCH TEMPLATE name=schemaQualifiedName
     LEFT_PAREN
-        (INIT EQUAL init_name=schema_qualified_name COMMA)?
-        LEXIZE EQUAL lexize_name=schema_qualified_name
-        (COMMA INIT EQUAL init_name=schema_qualified_name)?
+        (INIT EQUAL initName=schemaQualifiedName COMMA)?
+        LEXIZE EQUAL lexizeName=schemaQualifiedName
+        (COMMA INIT EQUAL initName=schemaQualifiedName)?
     RIGHT_PAREN
     ;
 
-create_fts_parser
-    : TEXT SEARCH PARSER name=schema_qualified_name
+createFtsParser
+    : TEXT SEARCH PARSER name=schemaQualifiedName
     LEFT_PAREN
-        START EQUAL start_func=schema_qualified_name COMMA
-        GETTOKEN EQUAL gettoken_func=schema_qualified_name COMMA
-        END EQUAL end_func=schema_qualified_name COMMA
-        (HEADLINE EQUAL headline_func=schema_qualified_name COMMA)?
-        LEXTYPES EQUAL lextypes_func=schema_qualified_name
-        (COMMA HEADLINE EQUAL headline_func=schema_qualified_name)?
+        START EQUAL startFunc=schemaQualifiedName COMMA
+        GETTOKEN EQUAL gettokenFunc=schemaQualifiedName COMMA
+        END EQUAL endFunc=schemaQualifiedName COMMA
+        (HEADLINE EQUAL headlineFunc=schemaQualifiedName COMMA)?
+        LEXTYPES EQUAL lextypesFunc=schemaQualifiedName
+        (COMMA HEADLINE EQUAL headlineFunc=schemaQualifiedName)?
     RIGHT_PAREN
     ;
 
-create_collation
-    : COLLATION if_not_exists? name=schema_qualified_name
-    (FROM schema_qualified_name | LEFT_PAREN (collation_option (COMMA collation_option)*)? RIGHT_PAREN)
+createCollation
+    : COLLATION ifNotExists? name=schemaQualifiedName
+    (FROM schemaQualifiedName | LEFT_PAREN (collationOption (COMMA collationOption)*)? RIGHT_PAREN)
     ;
 
-alter_collation
-    : COLLATION name=schema_qualified_name (REFRESH VERSION | rename_to | owner_to | set_schema)
+alterCollation
+    : COLLATION name=schemaQualifiedName (REFRESH VERSION | renameTo | ownerTo | setSchema)
     ;
 
-collation_option
-    : (LOCALE | LC_COLLATE | LC_CTYPE | PROVIDER | VERSION) EQUAL (character_string | identifier)
-    | DETERMINISTIC EQUAL boolean_value
+collationOption
+    : (LOCALE | LC_COLLATE | LC_CTYPE | PROVIDER | VERSION) EQUAL (characterString | identifier)
+    | DETERMINISTIC EQUAL booleanValue
     ;
 
-create_user_mapping
-    : USER MAPPING if_not_exists? FOR (user_name | USER) SERVER identifier define_foreign_options?
+createUserMapping
+    : USER MAPPING ifNotExists? FOR (userName | USER) SERVER identifier defineForeignOptions?
     ;
 
-alter_user_mapping
-    : USER MAPPING FOR (user_name | USER) SERVER identifier define_foreign_options?
+alterUserMapping
+    : USER MAPPING FOR (userName | USER) SERVER identifier defineForeignOptions?
     ;
 
-alter_user_or_role
-    : (USER | ROLE) (alter_user_or_role_set_reset | identifier rename_to | user_name WITH? user_or_role_option_for_alter+)
+alterUserOrRole
+    : (USER | ROLE) (alterUserOrRoleSetReset | identifier renameTo | userName WITH? userOrRoleOptionForAlter+)
     ;
 
-alter_user_or_role_set_reset
-    : (user_name | ALL) (IN DATABASE identifier)? user_or_role_set_reset
+alterUserOrRoleSetReset
+    : (userName | ALL) (IN DATABASE identifier)? userOrRoleSetReset
     ;
 
-user_or_role_set_reset
-    : SET (identifier DOT)? identifier (TO | EQUAL) set_statement_value
+userOrRoleSetReset
+    : SET (identifier DOT)? identifier (TO | EQUAL) setStatementValue
     | SET (identifier DOT)? identifier FROM CURRENT
     | RESET (identifier DOT)? identifier
     | RESET ALL
     ;
 
-alter_group
-    : GROUP alter_group_action
+alterGroup
+    : GROUP alterGroupAction
     ;
 
-alter_group_action
-    : name=identifier rename_to
-    | user_name (ADD | DROP) USER identifier_list
+alterGroupAction
+    : name=identifier renameTo
+    | userName (ADD | DROP) USER identifierList
     ;
 
-alter_tablespace
-    : TABLESPACE name=identifier alter_tablespace_action
+alterTablespace
+    : TABLESPACE name=identifier alterTablespaceAction
     ;
 
-alter_owner
-    : (OPERATOR target_operator
+alterOwner
+    : (OPERATOR targetOperator
         | LARGE OBJECT NUMBER_LITERAL
-        | (FUNCTION | PROCEDURE | AGGREGATE) name=schema_qualified_name function_args
+        | (FUNCTION | PROCEDURE | AGGREGATE) name=schemaQualifiedName functionArgs
         | (TEXT SEARCH DICTIONARY | TEXT SEARCH CONFIGURATION | DOMAIN | SCHEMA | SEQUENCE | TYPE | MATERIALIZED? VIEW)
-        if_exists? name=schema_qualified_name) owner_to
+        ifExists? name=schemaQualifiedName) ownerTo
     ;
 
-alter_tablespace_action
-    : rename_to
-    | owner_to
-    | SET LEFT_PAREN option_with_value (COMMA option_with_value)* RIGHT_PAREN
-    | RESET LEFT_PAREN identifier_list RIGHT_PAREN
+alterTablespaceAction
+    : renameTo
+    | ownerTo
+    | SET LEFT_PAREN optionWithValue (COMMA optionWithValue)* RIGHT_PAREN
+    | RESET LEFT_PAREN identifierList RIGHT_PAREN
     ;
 
-alter_statistics
-    : STATISTICS name=schema_qualified_name (rename_to | set_schema | owner_to)
+alterStatistics
+    : STATISTICS name=schemaQualifiedName (renameTo | setSchema | ownerTo)
     ;
 
-alter_foreign_data_wrapper
-    : FOREIGN DATA WRAPPER name=identifier alter_foreign_data_wrapper_action
+alterForeignDataWrapper
+    : FOREIGN DATA WRAPPER name=identifier alterForeignDataWrapperAction
     ;
 
-alter_foreign_data_wrapper_action
-    : (HANDLER schema_qualified_name_nontype | NO HANDLER )? (VALIDATOR schema_qualified_name_nontype | NO VALIDATOR)? define_foreign_options?
-    | owner_to
-    | rename_to
+alterForeignDataWrapperAction
+    : (HANDLER schemaQualifiedNameNontype | NO HANDLER )? (VALIDATOR schemaQualifiedNameNontype | NO VALIDATOR)? defineForeignOptions?
+    | ownerTo
+    | renameTo
     ;
 
-alter_operator_statement
-    : OPERATOR target_operator alter_operator_action
+alterOperatorStatement
+    : OPERATOR targetOperator alterOperatorAction
     ;
 
-alter_operator_action
-    : set_schema
-    | SET LEFT_PAREN operator_set_restrict_join (COMMA operator_set_restrict_join)* RIGHT_PAREN
+alterOperatorAction
+    : setSchema
+    | SET LEFT_PAREN operatorSetRestrictJoin (COMMA operatorSetRestrictJoin)* RIGHT_PAREN
     ;
 
-operator_set_restrict_join
-    : (RESTRICT | JOIN) EQUAL schema_qualified_name
+operatorSetRestrictJoin
+    : (RESTRICT | JOIN) EQUAL schemaQualifiedName
     ;
 
-drop_user_mapping
-    : USER MAPPING if_exists? FOR (user_name | USER) SERVER identifier
+dropUserMapping
+    : USER MAPPING ifExists? FOR (userName | USER) SERVER identifier
     ;
 
-drop_owned
-    : OWNED BY user_name (COMMA user_name)* cascade_restrict?
+dropOwned
+    : OWNED BY userName (COMMA userName)* cascadeRestrict?
     ;
 
-drop_operator_statement
-    : OPERATOR if_exists? target_operator (COMMA target_operator)* cascade_restrict?
+dropOperatorStatement
+    : OPERATOR ifExists? targetOperator (COMMA targetOperator)* cascadeRestrict?
     ;
 
-target_operator
-    : name=operator_name LEFT_PAREN (left_type=data_type | NONE) COMMA (right_type=data_type | NONE) RIGHT_PAREN
+targetOperator
+    : name=operatorName LEFT_PAREN (leftType=dataType | NONE) COMMA (rightType=dataType | NONE) RIGHT_PAREN
     ;
 
-domain_constraint
+domainConstraint
     : (CONSTRAINT name=identifier)? (CHECK LEFT_PAREN vex RIGHT_PAREN | NOT? NULL)
     ;
 
-create_transform_statement
-    : (OR REPLACE)? TRANSFORM FOR data_type LANGUAGE identifier
+createTransformStatement
+    : (OR REPLACE)? TRANSFORM FOR dataType LANGUAGE identifier
     LEFT_PAREN
-        FROM SQL WITH FUNCTION function_parameters COMMA
-        TO SQL WITH FUNCTION function_parameters
+        FROM SQL WITH FUNCTION functionParameters COMMA
+        TO SQL WITH FUNCTION functionParameters
     RIGHT_PAREN
     ;
 
-create_access_method
-    : ACCESS METHOD identifier TYPE (TABLE | INDEX) HANDLER schema_qualified_name
+createAccessMethod
+    : ACCESS METHOD identifier TYPE (TABLE | INDEX) HANDLER schemaQualifiedName
     ;
 
-create_user_or_role
-    : (USER | ROLE) name=identifier (WITH? user_or_role_option user_or_role_option*)?
+createUserOrRole
+    : (USER | ROLE) name=identifier (WITH? userOrRoleOption userOrRoleOption*)?
     ;
 
-user_or_role_option
-    : user_or_role_or_group_common_option
-    | user_or_role_common_option
-    | user_or_role_or_group_option_for_create
+userOrRoleOption
+    : userOrRoleOrGroupCommonOption
+    | userOrRoleCommonOption
+    | userOrRoleOrGroupOptionForCreate
     ;
 
-user_or_role_option_for_alter
-    : user_or_role_or_group_common_option
-    | user_or_role_common_option
+userOrRoleOptionForAlter
+    : userOrRoleOrGroupCommonOption
+    | userOrRoleCommonOption
     ;
 
-user_or_role_or_group_common_option
+userOrRoleOrGroupCommonOption
     : SUPERUSER | NOSUPERUSER
     | CREATEDB | NOCREATEDB
     | CREATEROLE | NOCREATEROLE
     | INHERIT | NOINHERIT
     | LOGIN | NOLOGIN
     | ENCRYPTED? PASSWORD (password=Character_String_Literal | NULL)
-    | VALID UNTIL date_time=Character_String_Literal
+    | VALID UNTIL dateTime=Character_String_Literal
     ;
 
-user_or_role_common_option
+userOrRoleCommonOption
     : REPLICATION | NOREPLICATION
     | BYPASSRLS | NOBYPASSRLS
-    | CONNECTION LIMIT signed_number_literal
+    | CONNECTION LIMIT signedNumberLiteral
     ;
 
-user_or_role_or_group_option_for_create
+userOrRoleOrGroupOptionForCreate
     : SYSID vex
-    | (IN ROLE | IN GROUP | ROLE | ADMIN | USER) identifier_list
+    | (IN ROLE | IN GROUP | ROLE | ADMIN | USER) identifierList
     ;
 
-create_group
-    : GROUP name=identifier (WITH? group_option+)?
+createGroup
+    : GROUP name=identifier (WITH? groupOption+)?
     ;
 
-group_option
-    : user_or_role_or_group_common_option
-    | user_or_role_or_group_option_for_create
+groupOption
+    : userOrRoleOrGroupCommonOption
+    | userOrRoleOrGroupOptionForCreate
     ;
 
-create_tablespace
-    : TABLESPACE name=identifier (OWNER user_name)?
+createTablespace
+    : TABLESPACE name=identifier (OWNER userName)?
     LOCATION directory=Character_String_Literal
-    (WITH LEFT_PAREN option_with_value (COMMA option_with_value)* RIGHT_PAREN)?
+    (WITH LEFT_PAREN optionWithValue (COMMA optionWithValue)* RIGHT_PAREN)?
     ;
 
-create_statistics
-    : STATISTICS if_not_exists? name=schema_qualified_name
-    (LEFT_PAREN identifier_list RIGHT_PAREN)? 
-    ON identifier COMMA identifier_list
-    FROM schema_qualified_name
+createStatistics
+    : STATISTICS ifNotExists? name=schemaQualifiedName
+    (LEFT_PAREN identifierList RIGHT_PAREN)?
+    ON identifier COMMA identifierList
+    FROM schemaQualifiedName
     ;
 
-create_foreign_data_wrapper
-    : FOREIGN DATA WRAPPER name=identifier (HANDLER schema_qualified_name_nontype | NO HANDLER )?
-    (VALIDATOR schema_qualified_name_nontype | NO VALIDATOR)?
-    (OPTIONS LEFT_PAREN option_without_equal (COMMA option_without_equal)* RIGHT_PAREN )?
+createForeignDataWrapper
+    : FOREIGN DATA WRAPPER name=identifier (HANDLER schemaQualifiedNameNontype | NO HANDLER )?
+    (VALIDATOR schemaQualifiedNameNontype | NO VALIDATOR)?
+    (OPTIONS LEFT_PAREN optionWithoutEqual (COMMA optionWithoutEqual)* RIGHT_PAREN )?
     ;
 
-option_without_equal
+optionWithoutEqual
     : identifier Character_String_Literal
     ;
 
-create_operator_statement
-    : OPERATOR name=operator_name LEFT_PAREN operator_option (COMMA operator_option)* RIGHT_PAREN
+createOperatorStatement
+    : OPERATOR name=operatorName LEFT_PAREN operatorOption (COMMA operatorOption)* RIGHT_PAREN
     ;
 
-operator_name
-    : (schema_name=identifier DOT)? operator=all_simple_op
+operatorName
+    : (schemaName=identifier DOT)? operator=allSimpleOp
     ;
 
-operator_option
-    : (FUNCTION | PROCEDURE) EQUAL func_name=schema_qualified_name
-    | RESTRICT EQUAL restr_name=schema_qualified_name
-    | JOIN EQUAL join_name=schema_qualified_name
-    | (LEFTARG | RIGHTARG) EQUAL type=data_type
-    | (COMMUTATOR | NEGATOR) EQUAL addition_oper_name=all_op_ref
+operatorOption
+    : (FUNCTION | PROCEDURE) EQUAL funcName=schemaQualifiedName
+    | RESTRICT EQUAL restrName=schemaQualifiedName
+    | JOIN EQUAL joinName=schemaQualifiedName
+    | (LEFTARG | RIGHTARG) EQUAL type=dataType
+    | (COMMUTATOR | NEGATOR) EQUAL additionOperName=allOpRef
     | HASHES
     | MERGES
     ;
 
-create_aggregate_statement
-    : (OR REPLACE)? AGGREGATE name=schema_qualified_name function_args? LEFT_PAREN
-    (BASETYPE EQUAL base_type=data_type COMMA)?
-    SFUNC EQUAL sfunc_name=schema_qualified_name COMMA
-    STYPE EQUAL type=data_type
-    (COMMA aggregate_param)*
+createAggregateStatement
+    : (OR REPLACE)? AGGREGATE name=schemaQualifiedName functionArgs? LEFT_PAREN
+    (BASETYPE EQUAL baseType=dataType COMMA)?
+    SFUNC EQUAL sfuncName=schemaQualifiedName COMMA
+    STYPE EQUAL type=dataType
+    (COMMA aggregateParam)*
     RIGHT_PAREN
     ;
 
-aggregate_param
-    : SSPACE EQUAL s_space=NUMBER_LITERAL
-    | FINALFUNC EQUAL final_func=schema_qualified_name
+aggregateParam
+    : SSPACE EQUAL sSpace=NUMBER_LITERAL
+    | FINALFUNC EQUAL finalFunc=schemaQualifiedName
     | FINALFUNC_EXTRA
     | FINALFUNC_MODIFY EQUAL (READ_ONLY | SHAREABLE | READ_WRITE)
-    | COMBINEFUNC EQUAL combine_func=schema_qualified_name
-    | SERIALFUNC EQUAL serial_func=schema_qualified_name
-    | DESERIALFUNC EQUAL deserial_func=schema_qualified_name
-    | INITCOND EQUAL init_cond=vex
-    | MSFUNC EQUAL ms_func=schema_qualified_name
-    | MINVFUNC EQUAL minv_func=schema_qualified_name
-    | MSTYPE EQUAL ms_type=data_type
-    | MSSPACE EQUAL ms_space=NUMBER_LITERAL
-    | MFINALFUNC EQUAL mfinal_func=schema_qualified_name
+    | COMBINEFUNC EQUAL combineFunc=schemaQualifiedName
+    | SERIALFUNC EQUAL serialFunc=schemaQualifiedName
+    | DESERIALFUNC EQUAL deserialFunc=schemaQualifiedName
+    | INITCOND EQUAL initCond=vex
+    | MSFUNC EQUAL msFunc=schemaQualifiedName
+    | MINVFUNC EQUAL minvFunc=schemaQualifiedName
+    | MSTYPE EQUAL msType=dataType
+    | MSSPACE EQUAL msSpace=NUMBER_LITERAL
+    | MFINALFUNC EQUAL mfinalFunc=schemaQualifiedName
     | MFINALFUNC_EXTRA
     | MFINALFUNC_MODIFY EQUAL (READ_ONLY | SHAREABLE | READ_WRITE)
-    | MINITCOND EQUAL minit_cond=vex
-    | SORTOP EQUAL all_op_ref
+    | MINITCOND EQUAL minitCond=vex
+    | SORTOP EQUAL allOpRef
     | PARALLEL EQUAL (SAFE | RESTRICTED | UNSAFE)
     | HYPOTHETICAL
     ;
 
-set_statement
-    : SET set_action
+setStatement
+    : SET setAction
     ;
 
-set_action
-    : CONSTRAINTS (ALL | names_references) (DEFERRED | IMMEDIATE)
-    | TRANSACTION transaction_mode (COMMA transaction_mode)*
+setAction
+    : CONSTRAINTS (ALL | namesReferences) (DEFERRED | IMMEDIATE)
+    | TRANSACTION transactionMode (COMMA transactionMode)*
     | TRANSACTION SNAPSHOT Character_String_Literal
-    | SESSION CHARACTERISTICS AS TRANSACTION transaction_mode (COMMA transaction_mode)*
-    | (SESSION | LOCAL)? session_local_option
+    | SESSION CHARACTERISTICS AS TRANSACTION transactionMode (COMMA transactionMode)*
+    | (SESSION | LOCAL)? sessionLocalOption
     | XML OPTION (DOCUMENT | CONTENT)
     ;
 
-session_local_option
+sessionLocalOption
     : SESSION AUTHORIZATION (Character_String_Literal | identifier | DEFAULT)
-    | TIME ZONE (Character_String_Literal | signed_numerical_literal | LOCAL | DEFAULT)
-    | (identifier DOT)? config_param=identifier (TO | EQUAL) set_statement_value
+    | TIME ZONE (Character_String_Literal | signedNumericalLiteral | LOCAL | DEFAULT)
+    | (identifier DOT)? configParam=identifier (TO | EQUAL) setStatementValue
     | ROLE (identifier | NONE)
     ;
 
-set_statement_value
+setStatementValue
     : vex (COMMA vex)*
     | DEFAULT
     ;
 
-create_rewrite_statement
+createRewriteStatement
     : (OR REPLACE)? RULE name=identifier AS ON event=(SELECT | INSERT | DELETE | UPDATE)
-     TO table_name=schema_qualified_name (WHERE vex)? DO (ALSO | INSTEAD)?
+     TO tableName=schemaQualifiedName (WHERE vex)? DO (ALSO | INSTEAD)?
      (NOTHING
-        | rewrite_command
-        | (LEFT_PAREN (rewrite_command SEMI_COLON)* rewrite_command SEMI_COLON? RIGHT_PAREN)
+        | rewriteCommand
+        | (LEFT_PAREN (rewriteCommand SEMI_COLON)* rewriteCommand SEMI_COLON? RIGHT_PAREN)
      )
     ;
 
-rewrite_command
-    : select_stmt
-    | insert_stmt_for_psql
-    | update_stmt_for_psql
-    | delete_stmt_for_psql
-    | notify_stmt
+rewriteCommand
+    : selectStmt
+    | insertStmtForPsql
+    | updateStmtForPsql
+    | deleteStmtForPsql
+    | notifyStmt
     ;
 
-create_trigger_statement
-    : CONSTRAINT? TRIGGER name=identifier (before_true=BEFORE | (INSTEAD OF) | AFTER)
-    (((insert_true=INSERT | delete_true=DELETE | truncate_true=TRUNCATE) 
-    | update_true=UPDATE (OF identifier_list)?)OR?)+
-    ON table_name=schema_qualified_name
-    (FROM referenced_table_name=schema_qualified_name)?
-    table_deferrable? table_initialy_immed?
-    (REFERENCING trigger_referencing trigger_referencing?)?
-    (for_each_true=FOR EACH? (ROW | STATEMENT))?
-    when_trigger?
-    EXECUTE (FUNCTION | PROCEDURE) func_name=function_call
+createTriggerStatement
+    : CONSTRAINT? TRIGGER name=identifier (beforeTrue=BEFORE | (INSTEAD OF) | AFTER)
+    (((insertTrue=INSERT | deleteTrue=DELETE | truncateTrue=TRUNCATE)
+    | updateTrue=UPDATE (OF identifierList)?)OR?)+
+    ON tableName=schemaQualifiedName
+    (FROM referencedTableName=schemaQualifiedName)?
+    tableDeferrable? tableInitialyImmed?
+    (REFERENCING triggerReferencing triggerReferencing?)?
+    (forEachTrue=FOR EACH? (ROW | STATEMENT))?
+    whenTrigger?
+    EXECUTE (FUNCTION | PROCEDURE) funcName=functionCall
     ;
 
-trigger_referencing
+triggerReferencing
     : (OLD | NEW) TABLE AS? identifier
     ;
 
-when_trigger
+whenTrigger
     : WHEN LEFT_PAREN vex RIGHT_PAREN
     ;
 
-rule_common
-    : (GRANT | REVOKE grant_option_for?)
-    (permissions | columns_permissions)
-    ON rule_member_object
-    (TO | FROM) roles_names (WITH GRANT OPTION | cascade_restrict)?
-    | other_rules
+ruleCommon
+    : (GRANT | REVOKE grantOptionFor?)
+    (permissions | columnsPermissions)
+    ON ruleMemberObject
+    (TO | FROM) rolesNames (WITH GRANT OPTION | cascadeRestrict)?
+    | otherRules
     ;
 
-rule_member_object
-    : TABLE? table_names=names_references
-    | SEQUENCE names_references
-    | DATABASE names_references
-    | DOMAIN names_references
-    | FOREIGN DATA WRAPPER names_references
-    | FOREIGN SERVER names_references
-    | (FUNCTION | PROCEDURE | ROUTINE) func_name+=function_parameters (COMMA func_name+=function_parameters)*
+ruleMemberObject
+    : TABLE? tableNames=namesReferences
+    | SEQUENCE namesReferences
+    | DATABASE namesReferences
+    | DOMAIN namesReferences
+    | FOREIGN DATA WRAPPER namesReferences
+    | FOREIGN SERVER namesReferences
+    | (FUNCTION | PROCEDURE | ROUTINE) funcName+=functionParameters (COMMA funcName+=functionParameters)*
     | LARGE OBJECT NUMBER_LITERAL (COMMA NUMBER_LITERAL)*
-    | LANGUAGE names_references
-    | SCHEMA schema_names=names_references
-    | TABLESPACE names_references
-    | TYPE names_references
-    | ALL (TABLES | SEQUENCES | FUNCTIONS | PROCEDURES | ROUTINES) IN SCHEMA names_references
+    | LANGUAGE namesReferences
+    | SCHEMA schemaNames=namesReferences
+    | TABLESPACE namesReferences
+    | TYPE namesReferences
+    | ALL (TABLES | SEQUENCES | FUNCTIONS | PROCEDURES | ROUTINES) IN SCHEMA namesReferences
     ;
 
-columns_permissions
-    : table_column_privileges (COMMA table_column_privileges)*
+columnsPermissions
+    : tableColumnPrivileges (COMMA tableColumnPrivileges)*
     ;
 
-table_column_privileges
-    : table_column_privilege LEFT_PAREN identifier_list RIGHT_PAREN
+tableColumnPrivileges
+    : tableColumnPrivilege LEFT_PAREN identifierList RIGHT_PAREN
     ;
 
 permissions
@@ -1079,91 +1079,91 @@ permission
     | USAGE
     ;
 
-other_rules
-    : GRANT names_references TO names_references (WITH ADMIN OPTION)?
-    | REVOKE (ADMIN OPTION FOR)? names_references FROM names_references cascade_restrict?
+otherRules
+    : GRANT namesReferences TO namesReferences (WITH ADMIN OPTION)?
+    | REVOKE (ADMIN OPTION FOR)? namesReferences FROM namesReferences cascadeRestrict?
     ;
 
-grant_to_rule
-    : TO roles_names (WITH GRANT OPTION)?
+grantToRule
+    : TO rolesNames (WITH GRANT OPTION)?
     ;
 
-revoke_from_cascade_restrict
-    : FROM roles_names cascade_restrict?
+revokeFromCascadeRestrict
+    : FROM rolesNames cascadeRestrict?
     ;
 
-roles_names
-    : role_name_with_group (COMMA role_name_with_group)*
+rolesNames
+    : roleNameWithGroup (COMMA roleNameWithGroup)*
     ;
 
-role_name_with_group
-    : GROUP? user_name
+roleNameWithGroup
+    : GROUP? userName
     ;
 
-comment_on_statement
-    : COMMENT ON comment_member_object IS (character_string | NULL)
+commentOnStatement
+    : COMMENT ON commentMemberObject IS (characterString | NULL)
     ;
 
-security_label
-    : SECURITY LABEL (FOR (identifier | character_string))? ON label_member_object IS (character_string | NULL)
+securityLabel
+    : SECURITY LABEL (FOR (identifier | characterString))? ON labelMemberObject IS (characterString | NULL)
     ;
 
-comment_member_object
-    : ACCESS METHOD identifier 
-    | (AGGREGATE | PROCEDURE | FUNCTION | ROUTINE) name=schema_qualified_name function_args
-    | CAST LEFT_PAREN source=data_type AS target=data_type RIGHT_PAREN
+commentMemberObject
+    : ACCESS METHOD identifier
+    | (AGGREGATE | PROCEDURE | FUNCTION | ROUTINE) name=schemaQualifiedName functionArgs
+    | CAST LEFT_PAREN source=dataType AS target=dataType RIGHT_PAREN
     | COLLATION identifier
-    | COLUMN name=schema_qualified_name
-    | CONSTRAINT identifier ON DOMAIN? table_name=schema_qualified_name
-    | CONVERSION name=schema_qualified_name
+    | COLUMN name=schemaQualifiedName
+    | CONSTRAINT identifier ON DOMAIN? tableName=schemaQualifiedName
+    | CONVERSION name=schemaQualifiedName
     | DATABASE identifier
-    | DOMAIN name=schema_qualified_name
+    | DOMAIN name=schemaQualifiedName
     | EXTENSION identifier
     | EVENT TRIGGER identifier
     | FOREIGN DATA WRAPPER identifier
-    | FOREIGN? TABLE name=schema_qualified_name
-    | INDEX name=schema_qualified_name
+    | FOREIGN? TABLE name=schemaQualifiedName
+    | INDEX name=schemaQualifiedName
     | LARGE OBJECT NUMBER_LITERAL
-    | MATERIALIZED? VIEW name=schema_qualified_name
-    | OPERATOR target_operator
-    | OPERATOR (FAMILY| CLASS) name=schema_qualified_name USING index_method=identifier
-    | POLICY identifier ON table_name=schema_qualified_name
-    | PROCEDURAL? LANGUAGE name=schema_qualified_name
+    | MATERIALIZED? VIEW name=schemaQualifiedName
+    | OPERATOR targetOperator
+    | OPERATOR (FAMILY| CLASS) name=schemaQualifiedName USING indexMethod=identifier
+    | POLICY identifier ON tableName=schemaQualifiedName
+    | PROCEDURAL? LANGUAGE name=schemaQualifiedName
     | PUBLICATION identifier
     | ROLE identifier
-    | RULE identifier ON table_name=schema_qualified_name
+    | RULE identifier ON tableName=schemaQualifiedName
     | SCHEMA identifier
-    | SEQUENCE name=schema_qualified_name
+    | SEQUENCE name=schemaQualifiedName
     | SERVER identifier
-    | STATISTICS name=schema_qualified_name
+    | STATISTICS name=schemaQualifiedName
     | SUBSCRIPTION identifier
     | TABLESPACE identifier
-    | TEXT SEARCH CONFIGURATION name=schema_qualified_name
-    | TEXT SEARCH DICTIONARY name=schema_qualified_name
-    | TEXT SEARCH PARSER name=schema_qualified_name
-    | TEXT SEARCH TEMPLATE name=schema_qualified_name
-    | TRANSFORM FOR name=schema_qualified_name LANGUAGE identifier
-    | TRIGGER identifier ON table_name=schema_qualified_name
-    | TYPE name=schema_qualified_name
+    | TEXT SEARCH CONFIGURATION name=schemaQualifiedName
+    | TEXT SEARCH DICTIONARY name=schemaQualifiedName
+    | TEXT SEARCH PARSER name=schemaQualifiedName
+    | TEXT SEARCH TEMPLATE name=schemaQualifiedName
+    | TRANSFORM FOR name=schemaQualifiedName LANGUAGE identifier
+    | TRIGGER identifier ON tableName=schemaQualifiedName
+    | TYPE name=schemaQualifiedName
     ;
 
-label_member_object
-    : (AGGREGATE | PROCEDURE | FUNCTION | ROUTINE) schema_qualified_name function_args
-    | COLUMN schema_qualified_name
+labelMemberObject
+    : (AGGREGATE | PROCEDURE | FUNCTION | ROUTINE) schemaQualifiedName functionArgs
+    | COLUMN schemaQualifiedName
     | DATABASE identifier
-    | DOMAIN schema_qualified_name
+    | DOMAIN schemaQualifiedName
     | EVENT TRIGGER identifier
-    | FOREIGN? TABLE schema_qualified_name
+    | FOREIGN? TABLE schemaQualifiedName
     | LARGE OBJECT NUMBER_LITERAL
-    | MATERIALIZED? VIEW schema_qualified_name
-    | PROCEDURAL? LANGUAGE schema_qualified_name
+    | MATERIALIZED? VIEW schemaQualifiedName
+    | PROCEDURAL? LANGUAGE schemaQualifiedName
     | PUBLICATION identifier
     | ROLE identifier
     | SCHEMA identifier
-    | SEQUENCE schema_qualified_name
+    | SEQUENCE schemaQualifiedName
     | SUBSCRIPTION identifier
     | TABLESPACE identifier
-    | TYPE schema_qualified_name
+    | TYPE schemaQualifiedName
     ;
 
 /*
@@ -1171,536 +1171,536 @@ label_member_object
   Function and Procedure Definition
 ===============================================================================
 */
-create_function_statement
-    : (OR REPLACE)? (FUNCTION | PROCEDURE) function_parameters
-    (RETURNS (rettype_data=data_type | ret_table=function_ret_table))?
-    create_funct_params
+createFunctionStatement
+    : (OR REPLACE)? (FUNCTION | PROCEDURE) functionParameters
+    (RETURNS (rettypeData=dataType | retTable=functionRetTable))?
+    createFunctParams
     ;
 
-create_funct_params
-    : function_actions_common+ with_storage_parameter?
+createFunctParams
+    : functionActionsCommon+ withStorageParameter?
     ;
 
-transform_for_type
-    : FOR TYPE data_type
+transformForType
+    : FOR TYPE dataType
     ;
 
-function_ret_table
-    : TABLE LEFT_PAREN function_column_name_type (COMMA function_column_name_type)* RIGHT_PAREN
+functionRetTable
+    : TABLE LEFT_PAREN functionColumnNameType (COMMA functionColumnNameType)* RIGHT_PAREN
     ;
 
-function_column_name_type
-    : identifier data_type
+functionColumnNameType
+    : identifier dataType
     ;
 
-function_parameters
-    : schema_qualified_name function_args
+functionParameters
+    : schemaQualifiedName functionArgs
     ;
 
-function_args
-    : LEFT_PAREN ((function_arguments (COMMA function_arguments)*)? agg_order? | MULTIPLY) RIGHT_PAREN
+functionArgs
+    : LEFT_PAREN ((functionArguments (COMMA functionArguments)*)? aggOrder? | MULTIPLY) RIGHT_PAREN
     ;
 
-agg_order
-    : ORDER BY function_arguments (COMMA function_arguments)*
+aggOrder
+    : ORDER BY functionArguments (COMMA functionArguments)*
     ;
 
-character_string
-    : BeginDollarStringConstant Text_between_Dollar* EndDollarStringConstant
+characterString
+    : BeginDollarStringConstant TextBetween_Dollar* EndDollarStringConstant
     | Character_String_Literal
     ;
 
-function_arguments
-    : argmode? identifier_nontype? data_type ((DEFAULT | EQUAL) vex)?
+functionArguments
+    : argmode? identifierNontype? dataType ((DEFAULT | EQUAL) vex)?
     ;
 
 argmode
     : IN | OUT | INOUT | VARIADIC
     ;
 
-create_sequence_statement
-    : (TEMPORARY | TEMP)? SEQUENCE if_not_exists? name=schema_qualified_name (sequence_body)*
+createSequenceStatement
+    : (TEMPORARY | TEMP)? SEQUENCE ifNotExists? name=schemaQualifiedName (sequenceBody)*
     ;
 
-sequence_body
+sequenceBody
     : AS type=(SMALLINT | INTEGER | BIGINT)
-    | SEQUENCE NAME name=schema_qualified_name
-    | INCREMENT BY? incr=signed_numerical_literal
-    | (MINVALUE minval=signed_numerical_literal | NO MINVALUE)
-    | (MAXVALUE maxval=signed_numerical_literal | NO MAXVALUE)
-    | START WITH? start_val=signed_numerical_literal
-    | CACHE cache_val=signed_numerical_literal
-    | cycle_true=NO? cycle_val=CYCLE
-    | OWNED BY col_name=schema_qualified_name
+    | SEQUENCE NAME name=schemaQualifiedName
+    | INCREMENT BY? incr=signedNumericalLiteral
+    | (MINVALUE minval=signedNumericalLiteral | NO MINVALUE)
+    | (MAXVALUE maxval=signedNumericalLiteral | NO MAXVALUE)
+    | START WITH? startVal=signedNumericalLiteral
+    | CACHE cacheVal=signedNumericalLiteral
+    | cycleTrue=NO? cycleVal=CYCLE
+    | OWNED BY colName=schemaQualifiedName
     ;
 
-signed_number_literal
+signedNumberLiteral
     : sign? NUMBER_LITERAL
     ;
 
-signed_numerical_literal
-    : sign? unsigned_numeric_literal
+signedNumericalLiteral
+    : sign? unsignedNumericLiteral
     ;
 
 sign
     : PLUS | MINUS
     ;
 
-create_schema_statement
-    : SCHEMA if_not_exists? name=identifier? (AUTHORIZATION user_name)?
+createSchemaStatement
+    : SCHEMA ifNotExists? name=identifier? (AUTHORIZATION userName)?
     ;
 
-create_policy_statement
-    : POLICY identifier ON schema_qualified_name 
+createPolicyStatement
+    : POLICY identifier ON schemaQualifiedName
     (AS (PERMISSIVE | RESTRICTIVE))?
     (FOR event=(ALL | SELECT | INSERT | UPDATE | DELETE))?
-    (TO user_name (COMMA user_name)*)?
+    (TO userName (COMMA userName)*)?
     (USING using=vex)? (WITH CHECK check=vex)?
     ;
 
-alter_policy_statement
-    : POLICY identifier ON schema_qualified_name rename_to
-    | POLICY identifier ON schema_qualified_name (TO user_name (COMMA user_name)*)? (USING vex)? (WITH CHECK vex)?
+alterPolicyStatement
+    : POLICY identifier ON schemaQualifiedName renameTo
+    | POLICY identifier ON schemaQualifiedName (TO userName (COMMA userName)*)? (USING vex)? (WITH CHECK vex)?
     ;
 
-drop_policy_statement
-    : POLICY if_exists? identifier ON schema_qualified_name cascade_restrict?
+dropPolicyStatement
+    : POLICY ifExists? identifier ON schemaQualifiedName cascadeRestrict?
     ;
 
-create_subscription_statement
+createSubscriptionStatement
     : SUBSCRIPTION identifier
     CONNECTION Character_String_Literal
-    PUBLICATION identifier_list
-    with_storage_parameter?
+    PUBLICATION identifierList
+    withStorageParameter?
     ;
 
-alter_subscription_statement
-    : SUBSCRIPTION identifier alter_subscription_action
+alterSubscriptionStatement
+    : SUBSCRIPTION identifier alterSubscriptionAction
     ;
 
-alter_subscription_action
-    : CONNECTION character_string
-    | SET PUBLICATION identifier_list with_storage_parameter?
-    | REFRESH PUBLICATION with_storage_parameter?
+alterSubscriptionAction
+    : CONNECTION characterString
+    | SET PUBLICATION identifierList withStorageParameter?
+    | REFRESH PUBLICATION withStorageParameter?
     | ENABLE
     | DISABLE
-    | SET storage_parameter
-    | owner_to
-    | rename_to
+    | SET storageParameter
+    | ownerTo
+    | renameTo
     ;
 
-create_cast_statement
-    : CAST LEFT_PAREN source=data_type AS target=data_type RIGHT_PAREN
-    (WITH FUNCTION func_name=schema_qualified_name function_args | WITHOUT FUNCTION | WITH INOUT)
+createCastStatement
+    : CAST LEFT_PAREN source=dataType AS target=dataType RIGHT_PAREN
+    (WITH FUNCTION funcName=schemaQualifiedName functionArgs | WITHOUT FUNCTION | WITH INOUT)
     (AS ASSIGNMENT | AS IMPLICIT)?
     ;
 
-drop_cast_statement
-    : CAST if_exists? LEFT_PAREN source=data_type AS target=data_type RIGHT_PAREN cascade_restrict?
+dropCastStatement
+    : CAST ifExists? LEFT_PAREN source=dataType AS target=dataType RIGHT_PAREN cascadeRestrict?
     ;
 
-create_operator_family_statement
-    : OPERATOR FAMILY schema_qualified_name USING identifier
+createOperatorFamilyStatement
+    : OPERATOR FAMILY schemaQualifiedName USING identifier
     ;
 
-alter_operator_family_statement
-    : OPERATOR FAMILY schema_qualified_name USING identifier operator_family_action
+alterOperatorFamilyStatement
+    : OPERATOR FAMILY schemaQualifiedName USING identifier operatorFamilyAction
     ;
 
-operator_family_action
-    : rename_to
-    | owner_to
-    | set_schema
-    | ADD add_operator_to_family (COMMA add_operator_to_family)*
-    | DROP drop_operator_from_family (COMMA drop_operator_from_family)*
+operatorFamilyAction
+    : renameTo
+    | ownerTo
+    | setSchema
+    | ADD addOperatorToFamily (COMMA addOperatorToFamily)*
+    | DROP dropOperatorFromFamily (COMMA dropOperatorFromFamily)*
     ;
 
-add_operator_to_family
-    : OPERATOR unsigned_numeric_literal target_operator (FOR SEARCH | FOR ORDER BY schema_qualified_name)?
-    | FUNCTION unsigned_numeric_literal (LEFT_PAREN (data_type | NONE) (COMMA (data_type | NONE))? RIGHT_PAREN)? function_call
+addOperatorToFamily
+    : OPERATOR unsignedNumericLiteral targetOperator (FOR SEARCH | FOR ORDER BY schemaQualifiedName)?
+    | FUNCTION unsignedNumericLiteral (LEFT_PAREN (dataType | NONE) (COMMA (dataType | NONE))? RIGHT_PAREN)? functionCall
     ;
 
-drop_operator_from_family
-    : (OPERATOR | FUNCTION) unsigned_numeric_literal LEFT_PAREN (data_type | NONE) (COMMA (data_type | NONE))? RIGHT_PAREN
+dropOperatorFromFamily
+    : (OPERATOR | FUNCTION) unsignedNumericLiteral LEFT_PAREN (dataType | NONE) (COMMA (dataType | NONE))? RIGHT_PAREN
     ;
 
-drop_operator_family_statement
-    : OPERATOR FAMILY if_exists? schema_qualified_name USING identifier cascade_restrict?
+dropOperatorFamilyStatement
+    : OPERATOR FAMILY ifExists? schemaQualifiedName USING identifier cascadeRestrict?
     ;
 
-create_operator_class_statement
-    : OPERATOR CLASS schema_qualified_name DEFAULT? FOR TYPE data_type 
-    USING identifier (FAMILY schema_qualified_name)? AS
-    create_operator_class_option (COMMA create_operator_class_option)*
+createOperatorClassStatement
+    : OPERATOR CLASS schemaQualifiedName DEFAULT? FOR TYPE dataType
+    USING identifier (FAMILY schemaQualifiedName)? AS
+    createOperatorClassOption (COMMA createOperatorClassOption)*
     ;
 
-create_operator_class_option
-    : OPERATOR unsigned_numeric_literal name=operator_name 
-        (LEFT_PAREN (data_type | NONE) COMMA (data_type | NONE) RIGHT_PAREN)?
-        (FOR SEARCH | FOR ORDER BY schema_qualified_name)?
-    | FUNCTION unsigned_numeric_literal 
-        (LEFT_PAREN (data_type | NONE) (COMMA (data_type | NONE))? RIGHT_PAREN)? 
-        function_call
-    | STORAGE data_type
+createOperatorClassOption
+    : OPERATOR unsignedNumericLiteral name=operatorName
+        (LEFT_PAREN (dataType | NONE) COMMA (dataType | NONE) RIGHT_PAREN)?
+        (FOR SEARCH | FOR ORDER BY schemaQualifiedName)?
+    | FUNCTION unsignedNumericLiteral
+        (LEFT_PAREN (dataType | NONE) (COMMA (dataType | NONE))? RIGHT_PAREN)?
+        functionCall
+    | STORAGE dataType
     ;
 
-alter_operator_class_statement
-    : OPERATOR CLASS schema_qualified_name USING identifier (rename_to | owner_to | set_schema)
+alterOperatorClassStatement
+    : OPERATOR CLASS schemaQualifiedName USING identifier (renameTo | ownerTo | setSchema)
     ;
 
-drop_operator_class_statement
-    : OPERATOR CLASS if_exists? schema_qualified_name USING identifier cascade_restrict?
+dropOperatorClassStatement
+    : OPERATOR CLASS ifExists? schemaQualifiedName USING identifier cascadeRestrict?
     ;
 
-create_conversion_statement
-    : DEFAULT? CONVERSION schema_qualified_name FOR Character_String_Literal TO Character_String_Literal FROM schema_qualified_name
+createConversionStatement
+    : DEFAULT? CONVERSION schemaQualifiedName FOR Character_String_Literal TO Character_String_Literal FROM schemaQualifiedName
     ;
 
-alter_conversion_statement
-    : CONVERSION schema_qualified_name (rename_to | owner_to | set_schema)
+alterConversionStatement
+    : CONVERSION schemaQualifiedName (renameTo | ownerTo | setSchema)
     ;
 
-create_publication_statement
-    : PUBLICATION identifier 
-    (FOR TABLE only_table_multiply (COMMA only_table_multiply)* | FOR ALL TABLES)?
-    with_storage_parameter?
+createPublicationStatement
+    : PUBLICATION identifier
+    (FOR TABLE onlyTableMultiply (COMMA onlyTableMultiply)* | FOR ALL TABLES)?
+    withStorageParameter?
     ;
 
-alter_publication_statement
-    : PUBLICATION identifier alter_publication_action
+alterPublicationStatement
+    : PUBLICATION identifier alterPublicationAction
     ;
 
-alter_publication_action
-    : rename_to
-    | owner_to
-    | SET storage_parameter
-    | (ADD | DROP | SET) TABLE only_table_multiply (COMMA only_table_multiply)*
+alterPublicationAction
+    : renameTo
+    | ownerTo
+    | SET storageParameter
+    | (ADD | DROP | SET) TABLE onlyTableMultiply (COMMA onlyTableMultiply)*
     ;
 
-only_table_multiply
-    : ONLY? schema_qualified_name MULTIPLY?
+onlyTableMultiply
+    : ONLY? schemaQualifiedName MULTIPLY?
     ;
 
-alter_trigger_statement
-    : TRIGGER identifier ON schema_qualified_name (rename_to | DEPENDS ON EXTENSION identifier)
+alterTriggerStatement
+    : TRIGGER identifier ON schemaQualifiedName (renameTo | DEPENDS ON EXTENSION identifier)
     ;
 
-alter_rule_statement
-    : RULE identifier ON schema_qualified_name rename_to
+alterRuleStatement
+    : RULE identifier ON schemaQualifiedName renameTo
     ;
 
-copy_statement
-    : copy_to_statement 
-    | copy_from_statement
+copyStatement
+    : copyToStatement
+    | copyFromStatement
     ;
 
-copy_from_statement
-    : COPY table_cols
-    FROM (PROGRAM? Character_String_Literal | STDIN) 
-    (WITH? (LEFT_PAREN copy_option_list RIGHT_PAREN | copy_option_list))?
+copyFromStatement
+    : COPY tableCols
+    FROM (PROGRAM? Character_String_Literal | STDIN)
+    (WITH? (LEFT_PAREN copyOptionList RIGHT_PAREN | copyOptionList))?
     (WHERE vex)?
     ;
 
-copy_to_statement
-    : COPY (table_cols | LEFT_PAREN data_statement RIGHT_PAREN)
+copyToStatement
+    : COPY (tableCols | LEFT_PAREN dataStatement RIGHT_PAREN)
     TO (PROGRAM? Character_String_Literal | STDOUT)
-    (WITH? (LEFT_PAREN copy_option_list RIGHT_PAREN | copy_option_list))?
+    (WITH? (LEFT_PAREN copyOptionList RIGHT_PAREN | copyOptionList))?
     ;
 
-copy_option_list
-    : copy_option (COMMA? copy_option)*
+copyOptionList
+    : copyOption (COMMA? copyOption)*
     ;
 
-copy_option
+copyOption
     : FORMAT? (TEXT | CSV | BINARY)
-    | OIDS truth_value?
-    | FREEZE truth_value?
+    | OIDS truthValue?
+    | FREEZE truthValue?
     | DELIMITER AS? Character_String_Literal
     | NULL AS? Character_String_Literal
-    | HEADER truth_value?
+    | HEADER truthValue?
     | QUOTE Character_String_Literal
     | ESCAPE Character_String_Literal
-    | FORCE QUOTE (MULTIPLY | identifier_list)
-    | FORCE_QUOTE (MULTIPLY | LEFT_PAREN identifier_list RIGHT_PAREN)
-    | FORCE NOT NULL identifier_list
-    | FORCE_NOT_NULL LEFT_PAREN identifier_list RIGHT_PAREN
-    | FORCE_NULL LEFT_PAREN identifier_list RIGHT_PAREN
+    | FORCE QUOTE (MULTIPLY | identifierList)
+    | FORCE_QUOTE (MULTIPLY | LEFT_PAREN identifierList RIGHT_PAREN)
+    | FORCE NOT NULL identifierList
+    | FORCE_NOT_NULL LEFT_PAREN identifierList RIGHT_PAREN
+    | FORCE_NULL LEFT_PAREN identifierList RIGHT_PAREN
     | ENCODING Character_String_Literal
     ;
 
-create_view_statement
-    : (OR REPLACE)? (TEMP | TEMPORARY)? RECURSIVE? MATERIALIZED? VIEW 
-    if_not_exists? name=schema_qualified_name column_names=view_columns?
+createViewStatement
+    : (OR REPLACE)? (TEMP | TEMPORARY)? RECURSIVE? MATERIALIZED? VIEW
+    ifNotExists? name=schemaQualifiedName columnNames=viewColumns?
     (USING identifier)?
-    (WITH storage_parameter)?
-    table_space?
-    AS v_query=select_stmt
-    with_check_option?
+    (WITH storageParameter)?
+    tableSpace?
+    AS vQuery=selectStmt
+    withCheckOption?
     (WITH NO? DATA)?
     ;
 
-if_exists
+ifExists
     : IF EXISTS
     ;
 
-if_not_exists
+ifNotExists
     : IF NOT EXISTS
     ;
 
-view_columns
+viewColumns
     : LEFT_PAREN identifier (COMMA identifier)* RIGHT_PAREN
     ;
 
-with_check_option
+withCheckOption
     : WITH (CASCADED|LOCAL)? CHECK OPTION
     ;
 
-create_table_statement
-    : ((GLOBAL | LOCAL)? (TEMPORARY | TEMP) | UNLOGGED)? TABLE if_not_exists? name=schema_qualified_name
-    define_table
-    partition_by?
+createTableStatement
+    : ((GLOBAL | LOCAL)? (TEMPORARY | TEMP) | UNLOGGED)? TABLE ifNotExists? name=schemaQualifiedName
+    defineTable
+    partitionBy?
     (USING identifier)?
-    storage_parameter_oid?
-    on_commit?
-    table_space?
+    storageParameterOid?
+    onCommit?
+    tableSpace?
     ;
 
-create_table_as_statement
-    : ((GLOBAL | LOCAL)? (TEMPORARY | TEMP) | UNLOGGED)? TABLE if_not_exists? name=schema_qualified_name
-    names_in_parens?
+createTableAsStatement
+    : ((GLOBAL | LOCAL)? (TEMPORARY | TEMP) | UNLOGGED)? TABLE ifNotExists? name=schemaQualifiedName
+    namesInParens?
     (USING identifier)?
-    storage_parameter_oid?
-    on_commit?
-    table_space?
-    AS (select_stmt | EXECUTE function_call)
+    storageParameterOid?
+    onCommit?
+    tableSpace?
+    AS (selectStmt | EXECUTE functionCall)
     (WITH NO? DATA)?
     ;
 
-create_foreign_table_statement
-    : FOREIGN TABLE if_not_exists? name=schema_qualified_name
-    (define_columns | define_partition)
-    define_server
+createForeignTableStatement
+    : FOREIGN TABLE ifNotExists? name=schemaQualifiedName
+    (defineColumns | definePartition)
+    defineServer
     ;
 
-define_table
-    : define_columns
-    | define_type
-    | define_partition
+defineTable
+    : defineColumns
+    | defineType
+    | definePartition
     ;
 
-define_partition
-    : PARTITION OF parent_table=schema_qualified_name
-    list_of_type_column_def?
-    for_values_bound
+definePartition
+    : PARTITION OF parentTable=schemaQualifiedName
+    listOfTypeColumnDef?
+    forValuesBound
     ;
 
-for_values_bound
-    : FOR VALUES partition_bound_spec
+forValuesBound
+    : FOR VALUES partitionBoundSpec
     | DEFAULT
     ;
 
-partition_bound_spec
+partitionBoundSpec
     : IN LEFT_PAREN vex (COMMA vex)* RIGHT_PAREN
-    | FROM partition_bound_part TO partition_bound_part
+    | FROM partitionBoundPart TO partitionBoundPart
     | WITH LEFT_PAREN MODULUS NUMBER_LITERAL COMMA REMAINDER NUMBER_LITERAL RIGHT_PAREN
     ;
 
-partition_bound_part
+partitionBoundPart
     : LEFT_PAREN vex (COMMA vex)* RIGHT_PAREN
     ;
 
-define_columns
-    : LEFT_PAREN (table_column_def (COMMA table_column_def)*)? RIGHT_PAREN (INHERITS names_in_parens)?
+defineColumns
+    : LEFT_PAREN (tableColumnDef (COMMA tableColumnDef)*)? RIGHT_PAREN (INHERITS namesInParens)?
     ;
 
-define_type
-    : OF type_name=data_type list_of_type_column_def?
+defineType
+    : OF typeName=dataType listOfTypeColumnDef?
     ;
 
-partition_by
-    : PARTITION BY partition_method
+partitionBy
+    : PARTITION BY partitionMethod
     ;
 
-partition_method
-    : (RANGE | LIST | HASH) LEFT_PAREN partition_column (COMMA partition_column)* RIGHT_PAREN
+partitionMethod
+    : (RANGE | LIST | HASH) LEFT_PAREN partitionColumn (COMMA partitionColumn)* RIGHT_PAREN
     ;
 
-partition_column
+partitionColumn
     : vex identifier?
     ;
 
-define_server
-    : SERVER identifier define_foreign_options?
+defineServer
+    : SERVER identifier defineForeignOptions?
     ;
 
-define_foreign_options
-    : OPTIONS LEFT_PAREN (foreign_option (COMMA foreign_option)*) RIGHT_PAREN
+defineForeignOptions
+    : OPTIONS LEFT_PAREN (foreignOption (COMMA foreignOption)*) RIGHT_PAREN
     ;
 
-foreign_option
-    : (ADD | SET | DROP)? foreign_option_name character_string?
+foreignOption
+    : (ADD | SET | DROP)? foreignOptionName characterString?
     ;
 
-foreign_option_name
+foreignOptionName
     : identifier
     | USER
     ;
 
-list_of_type_column_def
-    : LEFT_PAREN (table_of_type_column_def (COMMA table_of_type_column_def)*) RIGHT_PAREN
+listOfTypeColumnDef
+    : LEFT_PAREN (tableOfTypeColumnDef (COMMA tableOfTypeColumnDef)*) RIGHT_PAREN
     ;
 
-table_column_def
-    : table_column_definition
-    | tabl_constraint=constraint_common
-    | LIKE schema_qualified_name like_option*
+tableColumnDef
+    : tableColumnDefinition
+    | tablConstraint=constraintCommon
+    | LIKE schemaQualifiedName likeOption*
     ;
 
-table_of_type_column_def
-    : identifier (WITH OPTIONS)? constraint_common*
-    | tabl_constraint=constraint_common
+tableOfTypeColumnDef
+    : identifier (WITH OPTIONS)? constraintCommon*
+    | tablConstraint=constraintCommon
     ;
 
-table_column_definition
-    : identifier data_type define_foreign_options? collate_identifier? constraint_common*
+tableColumnDefinition
+    : identifier dataType defineForeignOptions? collateIdentifier? constraintCommon*
     ;
 
-like_option
+likeOption
     : (INCLUDING | EXCLUDING) (COMMENTS | CONSTRAINTS | DEFAULTS | GENERATED | IDENTITY | INDEXES | STORAGE | ALL)
     ;
 /** NULL, DEFAULT - column constraint
-* EXCLUDE, FOREIGN KEY - table_constraint
+* EXCLUDE, FOREIGN KEY - tableConstraint
 */
-constraint_common
-    : (CONSTRAINT identifier)? constr_body table_deferrable? table_initialy_immed?
+constraintCommon
+    : (CONSTRAINT identifier)? constrBody tableDeferrable? tableInitialyImmed?
     ;
 
-constr_body
-    : EXCLUDE (USING index_method=identifier)?
-            LEFT_PAREN sort_specifier WITH all_op (COMMA sort_specifier WITH all_op)* RIGHT_PAREN
-            index_parameters (where=WHERE exp=vex)?
-    | (FOREIGN KEY names_in_parens)? REFERENCES schema_qualified_name ref=names_in_parens?
+constrBody
+    : EXCLUDE (USING indexMethod=identifier)?
+            LEFT_PAREN sortSpecifier WITH allOp (COMMA sortSpecifier WITH allOp)* RIGHT_PAREN
+            indexParameters (where=WHERE exp=vex)?
+    | (FOREIGN KEY namesInParens)? REFERENCES schemaQualifiedName ref=namesInParens?
         (MATCH (FULL | PARTIAL | SIMPLE) | ON (DELETE | UPDATE) action)*
     | CHECK LEFT_PAREN expression=vex RIGHT_PAREN (NO INHERIT)?
     | NOT? NULL
-    | (UNIQUE | PRIMARY KEY) col=names_in_parens? index_parameters
-    | DEFAULT default_expr=vex
-    | identity_body
+    | (UNIQUE | PRIMARY KEY) col=namesInParens? indexParameters
+    | DEFAULT defaultExpr=vex
+    | identityBody
     | GENERATED ALWAYS AS LEFT_PAREN vex RIGHT_PAREN STORED
     ;
 
-all_op
+allOp
     : op
     | EQUAL | NOT_EQUAL | LTH | LEQ | GTH | GEQ
     | PLUS | MINUS | MULTIPLY | DIVIDE | MODULAR | EXP
     ;
 
-all_simple_op
-    : op_chars
+allSimpleOp
+    : opChars
     | EQUAL | NOT_EQUAL | LTH | LEQ | GTH | GEQ
     | PLUS | MINUS | MULTIPLY | DIVIDE | MODULAR | EXP
     ;
 
-op_chars
+opChars
     : OP_CHARS
     | LESS_LESS
     | GREATER_GREATER
     | HASH_SIGN
     ;
 
-index_parameters
-    : including_index? with_storage_parameter? (USING INDEX (table_space | schema_qualified_name))?
+indexParameters
+    : includingIndex? withStorageParameter? (USING INDEX (tableSpace | schemaQualifiedName))?
     ;
 
-names_in_parens
-    : LEFT_PAREN names_references RIGHT_PAREN
+namesInParens
+    : LEFT_PAREN namesReferences RIGHT_PAREN
     ;
 
-names_references
-    : schema_qualified_name (COMMA schema_qualified_name)*
+namesReferences
+    : schemaQualifiedName (COMMA schemaQualifiedName)*
     ;
 
-storage_parameter
-    : LEFT_PAREN storage_parameter_option (COMMA storage_parameter_option)* RIGHT_PAREN
+storageParameter
+    : LEFT_PAREN storageParameterOption (COMMA storageParameterOption)* RIGHT_PAREN
     ;
 
-storage_parameter_option
-    : storage_parameter_name (EQUAL vex)?
+storageParameterOption
+    : storageParameterName (EQUAL vex)?
     ;
 
-storage_parameter_name
-    : col_label (DOT col_label)?
+storageParameterName
+    : colLabel (DOT colLabel)?
     ;
 
-with_storage_parameter
-    : WITH storage_parameter
+withStorageParameter
+    : WITH storageParameter
     ;
 
-storage_parameter_oid
-    : with_storage_parameter | (WITH OIDS) | (WITHOUT OIDS)
+storageParameterOid
+    : withStorageParameter | (WITH OIDS) | (WITHOUT OIDS)
     ;
 
-on_commit
+onCommit
     : ON COMMIT (PRESERVE ROWS | DELETE ROWS | DROP)
     ;
 
-table_space
+tableSpace
     : TABLESPACE identifier
     ;
 
 action
-    : cascade_restrict
+    : cascadeRestrict
     | SET (NULL | DEFAULT)
     | NO ACTION
     ;
 
-owner_to
+ownerTo
     : OWNER TO (name=identifier | CURRENT_USER | SESSION_USER)
     ;
 
-rename_to
+renameTo
     : RENAME TO name=identifier
     ;
 
-set_schema
+setSchema
     : SET SCHEMA identifier
     ;
 
-table_column_privilege
+tableColumnPrivilege
     : SELECT | INSERT | UPDATE | DELETE | TRUNCATE | REFERENCES | TRIGGER | ALL PRIVILEGES?
     ;
 
-usage_select_update
+usageSelectUpdate
     : USAGE | SELECT | UPDATE
     ;
 
-partition_by_columns
+partitionByColumns
     : PARTITION BY vex (COMMA vex)*
     ;
 
-cascade_restrict
+cascadeRestrict
     : CASCADE | RESTRICT
     ;
 
-collate_identifier
-    : COLLATE collation=schema_qualified_name
+collateIdentifier
+    : COLLATE collation=schemaQualifiedName
     ;
 
-indirection_var
-    : (identifier | dollar_number) indirection_list?
+indirectionVar
+    : (identifier | dollarNumber) indirectionList?
     ;
 
-dollar_number
+dollarNumber
     : DOLLAR_NUMBER
     ;
 
-indirection_list
-    : indirection+ 
+indirectionList
+    : indirection+
     | indirection* DOT MULTIPLY
     ;
 
 indirection
-    : DOT col_label
+    : DOT colLabel
     | LEFT_BRACKET vex RIGHT_BRACKET
     | LEFT_BRACKET vex? COLON vex? RIGHT_BRACKET
     ;
@@ -1711,19 +1711,19 @@ indirection
 ===============================================================================
 */
 
-drop_function_statement
-    : (FUNCTION | PROCEDURE | AGGREGATE) if_exists? name=schema_qualified_name function_args? cascade_restrict?
+dropFunctionStatement
+    : (FUNCTION | PROCEDURE | AGGREGATE) ifExists? name=schemaQualifiedName functionArgs? cascadeRestrict?
     ;
 
-drop_trigger_statement
-    : TRIGGER if_exists? name=identifier ON table_name=schema_qualified_name cascade_restrict?
+dropTriggerStatement
+    : TRIGGER ifExists? name=identifier ON tableName=schemaQualifiedName cascadeRestrict?
     ;
 
-drop_rule_statement
-    : RULE if_exists? name=identifier ON schema_qualified_name cascade_restrict?
+dropRuleStatement
+    : RULE ifExists? name=identifier ON schemaQualifiedName cascadeRestrict?
     ;
 
-drop_statements
+dropStatements
     : (ACCESS METHOD
     | COLLATION
     | CONVERSION
@@ -1747,11 +1747,11 @@ drop_statements
     | TABLESPACE
     | TYPE
     | TEXT SEARCH (CONFIGURATION | DICTIONARY | PARSER | TEMPLATE)
-    | USER) if_exist_names_restrict_cascade
+    | USER) ifExistNamesRestrictCascade
     ;
 
-if_exist_names_restrict_cascade
-    : if_exists? names_references cascade_restrict?
+ifExistNamesRestrictCascade
+    : ifExists? namesReferences cascadeRestrict?
     ;
 /*
 ===============================================================================
@@ -1761,38 +1761,38 @@ if_exist_names_restrict_cascade
 ===============================================================================
 */
 
-id_token
-  : Identifier | QuotedIdentifier | tokens_nonkeyword;
+idToken
+  : Identifier | QuotedIdentifier | tokensNonkeyword;
 
 /*
   old rule for default old identifier behavior
   includes types
 */
 identifier
-    : id_token
-    | tokens_nonreserved
-    | tokens_nonreserved_except_function_type
+    : idToken
+    | tokensNonreserved
+    | tokensNonreservedExceptFunctionType
     ;
 
-identifier_nontype
-    : id_token
-    | tokens_nonreserved
-    | tokens_reserved_except_function_type
+identifierNontype
+    : idToken
+    | tokensNonreserved
+    | tokensReservedExceptFunctionType
     ;
 
-col_label
-    : id_token
-    | tokens_reserved
-    | tokens_nonreserved
-    | tokens_reserved_except_function_type
-    | tokens_nonreserved_except_function_type
+colLabel
+    : idToken
+    | tokensReserved
+    | tokensNonreserved
+    | tokensReservedExceptFunctionType
+    | tokensNonreservedExceptFunctionType
     ;
 
 /*
  * These rules should be generated using code in the Keyword class.
  * Word tokens that are not keywords should be added to nonreserved list.
  */
-tokens_nonreserved
+tokensNonreserved
     : ABORT
     | ABSOLUTE
     | ACCESS
@@ -2087,7 +2087,7 @@ tokens_nonreserved
     | ZONE
     ;
 
-tokens_nonreserved_except_function_type
+tokensNonreservedExceptFunctionType
     : BETWEEN
     | BIGINT
     | BIT
@@ -2140,7 +2140,7 @@ tokens_nonreserved_except_function_type
     | XMLTABLE
     ;
 
-tokens_reserved_except_function_type
+tokensReservedExceptFunctionType
     : AUTHORIZATION
     | BINARY
     | COLLATION
@@ -2166,7 +2166,7 @@ tokens_reserved_except_function_type
     | VERBOSE
     ;
 
-tokens_reserved
+tokensReserved
     : ALL
     | ANALYSE
     | ANALYZE
@@ -2246,7 +2246,7 @@ tokens_reserved
     | WITH
     ;
 
-tokens_nonkeyword
+tokensNonkeyword
     : ALIGNMENT
     | BASETYPE
     | BUFFERS
@@ -2283,12 +2283,12 @@ tokens_nonkeyword
     | INTERNALLENGTH
     | JSON
     | LC_COLLATE
-    | LC_CTYPE 
+    | LC_CTYPE
     | LEFTARG
     | LEXIZE
     | LEXTYPES
     | LIST
-    | LOCALE 
+    | LOCALE
     | LOGIN
     | MAIN
     | MERGES
@@ -2389,46 +2389,46 @@ tokens_nonkeyword
 ===============================================================================
 */
 
-schema_qualified_name_nontype
-    : identifier_nontype
-    | schema=identifier DOT identifier_nontype
+schemaQualifiedNameNontype
+    : identifierNontype
+    | schema=identifier DOT identifierNontype
     ;
 
-type_list
-    : data_type (COMMA data_type)*
+typeList
+    : dataType (COMMA dataType)*
     ;
 
-data_type
-    : SETOF? predefined_type (ARRAY array_type? | array_type+)?
+dataType
+    : SETOF? predefinedType (ARRAY arrayType? | arrayType+)?
     ;
 
-array_type
+arrayType
     : LEFT_BRACKET NUMBER_LITERAL? RIGHT_BRACKET
     ;
 
-predefined_type
+predefinedType
     : BIGINT
-    | BIT VARYING? type_length?
+    | BIT VARYING? typeLength?
     | BOOLEAN
-    | DEC precision_param?
-    | DECIMAL precision_param?
+    | DEC precisionParam?
+    | DECIMAL precisionParam?
     | DOUBLE PRECISION
-    | FLOAT precision_param?
+    | FLOAT precisionParam?
     | INT
     | INTEGER
-    | INTERVAL interval_field? type_length?
-    | NATIONAL? (CHARACTER | CHAR) VARYING? type_length?
-    | NCHAR VARYING? type_length?
-    | NUMERIC precision_param?
+    | INTERVAL intervalField? typeLength?
+    | NATIONAL? (CHARACTER | CHAR) VARYING? typeLength?
+    | NCHAR VARYING? typeLength?
+    | NUMERIC precisionParam?
     | REAL
     | SMALLINT
-    | TIME type_length? ((WITH | WITHOUT) TIME ZONE)?
-    | TIMESTAMP type_length? ((WITH | WITHOUT) TIME ZONE)?
-    | VARCHAR type_length?
-    | schema_qualified_name_nontype (LEFT_PAREN vex (COMMA vex)* RIGHT_PAREN)?
+    | TIME typeLength? ((WITH | WITHOUT) TIME ZONE)?
+    | TIMESTAMP typeLength? ((WITH | WITHOUT) TIME ZONE)?
+    | VARCHAR typeLength?
+    | schemaQualifiedNameNontype (LEFT_PAREN vex (COMMA vex)* RIGHT_PAREN)?
     ;
 
-interval_field
+intervalField
     : YEAR
     | MONTH
     | DAY
@@ -2444,11 +2444,11 @@ interval_field
     | MINUTE TO SECOND
     ;
 
-type_length
+typeLength
     : LEFT_PAREN NUMBER_LITERAL RIGHT_PAREN
     ;
 
-precision_param
+precisionParam
     : LEFT_PAREN precision=NUMBER_LITERAL (COMMA scale=NUMBER_LITERAL)? RIGHT_PAREN
     ;
 
@@ -2459,10 +2459,10 @@ precision_param
 */
 
 vex
-  : vex CAST_EXPRESSION data_type
-  | LEFT_PAREN vex RIGHT_PAREN indirection_list?
+  : vex CAST_EXPRESSION dataType
+  | LEFT_PAREN vex RIGHT_PAREN indirectionList?
   | LEFT_PAREN vex (COMMA vex)+ RIGHT_PAREN
-  | vex collate_identifier
+  | vex collateIdentifier
   | <assoc=right> (PLUS | MINUS) vex
   | vex AT TIME ZONE vex
   | vex EXP vex
@@ -2472,118 +2472,118 @@ vex
   | vex op vex
   | op vex
   | vex op
-  | vex NOT? IN LEFT_PAREN (select_stmt_no_parens | vex (COMMA vex)*) RIGHT_PAREN
-  | vex NOT? BETWEEN (ASYMMETRIC | SYMMETRIC)? vex_b AND vex
+  | vex NOT? IN LEFT_PAREN (selectStmtNoParens | vex (COMMA vex)*) RIGHT_PAREN
+  | vex NOT? BETWEEN (ASYMMETRIC | SYMMETRIC)? vexB AND vex
   | vex NOT? (LIKE | ILIKE | SIMILAR TO) vex
   | vex NOT? (LIKE | ILIKE | SIMILAR TO) vex ESCAPE vex
   | vex (LTH | GTH | LEQ | GEQ | EQUAL | NOT_EQUAL) vex
-  | vex IS NOT? (truth_value | NULL)
+  | vex IS NOT? (truthValue | NULL)
   | vex IS NOT? DISTINCT FROM vex
   | vex IS NOT? DOCUMENT
   | vex IS NOT? UNKNOWN
-  | vex IS NOT? OF LEFT_PAREN type_list RIGHT_PAREN
+  | vex IS NOT? OF LEFT_PAREN typeList RIGHT_PAREN
   | vex ISNULL
   | vex NOTNULL
   | <assoc=right> NOT vex
   | vex AND vex
   | vex OR vex
-  | value_expression_primary
+  | valueExpressionPrimary
   | PLACEHOLDER
   ;
 
 // partial copy of vex
 // resolves (vex BETWEEN vex AND vex) vs. (vex AND vex) ambiguity
 // vex references that are not at alternative edge are referencing the full rule
-// see postgres' b_expr (src/backend/parser/gram.y)
-vex_b
-  : vex_b CAST_EXPRESSION data_type
-  | LEFT_PAREN vex RIGHT_PAREN indirection_list?
+// see postgres' bExpr (src/backend/parser/gram.y)
+vexB
+  : vexB CAST_EXPRESSION dataType
+  | LEFT_PAREN vex RIGHT_PAREN indirectionList?
   | LEFT_PAREN vex (COMMA vex)+ RIGHT_PAREN
-  | <assoc=right> (PLUS | MINUS) vex_b
-  | vex_b EXP vex_b
-  | vex_b (MULTIPLY | DIVIDE | MODULAR) vex_b
-  | vex_b (PLUS | MINUS) vex_b
-  | vex_b op vex_b
-  | op vex_b
-  | vex_b op
-  | vex_b (LTH | GTH | LEQ | GEQ | EQUAL | NOT_EQUAL) vex_b
-  | vex_b IS NOT? DISTINCT FROM vex_b
-  | vex_b IS NOT? DOCUMENT
-  | vex_b IS NOT? UNKNOWN
-  | vex_b IS NOT? OF LEFT_PAREN type_list RIGHT_PAREN
-  | value_expression_primary
+  | <assoc=right> (PLUS | MINUS) vexB
+  | vexB EXP vexB
+  | vexB (MULTIPLY | DIVIDE | MODULAR) vexB
+  | vexB (PLUS | MINUS) vexB
+  | vexB op vexB
+  | op vexB
+  | vexB op
+  | vexB (LTH | GTH | LEQ | GEQ | EQUAL | NOT_EQUAL) vexB
+  | vexB IS NOT? DISTINCT FROM vexB
+  | vexB IS NOT? DOCUMENT
+  | vexB IS NOT? UNKNOWN
+  | vexB IS NOT? OF LEFT_PAREN typeList RIGHT_PAREN
+  | valueExpressionPrimary
   ;
 
 op
-  : op_chars
-  | OPERATOR LEFT_PAREN identifier DOT all_simple_op RIGHT_PAREN
+  : opChars
+  | OPERATOR LEFT_PAREN identifier DOT allSimpleOp RIGHT_PAREN
   ;
 
-all_op_ref
-  : all_simple_op
-  | OPERATOR LEFT_PAREN identifier DOT all_simple_op RIGHT_PAREN
+allOpRef
+  : allSimpleOp
+  | OPERATOR LEFT_PAREN identifier DOT allSimpleOp RIGHT_PAREN
   ;
 
-datetime_overlaps
+datetimeOverlaps
   : LEFT_PAREN vex COMMA vex RIGHT_PAREN OVERLAPS LEFT_PAREN vex COMMA vex RIGHT_PAREN
   ;
 
-value_expression_primary
-  : unsigned_value_specification
-  | LEFT_PAREN select_stmt_no_parens RIGHT_PAREN indirection_list?
-  | case_expression
+valueExpressionPrimary
+  : unsignedValueSpecification
+  | LEFT_PAREN selectStmtNoParens RIGHT_PAREN indirectionList?
+  | caseExpression
   | NULL
   | MULTIPLY
   // technically incorrect since ANY cannot be value expression
   // but fixing this would require to write a vex rule duplicating all operators
-  // like vex (op|op|op|...) comparison_mod
-  | comparison_mod
-  | EXISTS table_subquery
-  | function_call
-  | indirection_var
-  | array_expression
-  | type_coercion
-  | datetime_overlaps
+  // like vex (op|op|op|...) comparisonMod
+  | comparisonMod
+  | EXISTS tableSubquery
+  | functionCall
+  | indirectionVar
+  | arrayExpression
+  | typeCoercion
+  | datetimeOverlaps
   ;
 
-unsigned_value_specification
-  : unsigned_numeric_literal
-  | character_string
-  | truth_value
+unsignedValueSpecification
+  : unsignedNumericLiteral
+  | characterString
+  | truthValue
   ;
 
-unsigned_numeric_literal
+unsignedNumericLiteral
   : NUMBER_LITERAL
   | REAL_NUMBER
   ;
 
-truth_value
+truthValue
   : TRUE | FALSE | ON // on is reserved but is required by SET statements
   ;
 
-case_expression
+caseExpression
   : CASE vex? (WHEN vex THEN r+=vex)+ (ELSE r+=vex)? END
   ;
 
-cast_specification
-  : (CAST | TREAT) LEFT_PAREN vex AS data_type RIGHT_PAREN
+castSpecification
+  : (CAST | TREAT) LEFT_PAREN vex AS dataType RIGHT_PAREN
   ;
 
-// using data_type for function name because keyword-named functions
+// using dataType for function name because keyword-named functions
 // use the same category of keywords as keyword-named types
-function_call
-    : schema_qualified_name_nontype LEFT_PAREN (set_qualifier? vex_or_named_notation (COMMA vex_or_named_notation)* orderby_clause?)? RIGHT_PAREN
-        (WITHIN GROUP LEFT_PAREN orderby_clause RIGHT_PAREN)?
-        filter_clause? (OVER (identifier | window_definition))?
-    | function_construct
-    | extract_function
-    | system_function
-    | date_time_function
-    | string_value_function
-    | xml_function
+functionCall
+    : schemaQualifiedNameNontype LEFT_PAREN (setQualifier? vexOrNamedNotation (COMMA vexOrNamedNotation)* orderbyClause?)? RIGHT_PAREN
+        (WITHIN GROUP LEFT_PAREN orderbyClause RIGHT_PAREN)?
+        filterClause? (OVER (identifier | windowDefinition))?
+    | functionConstruct
+    | extractFunction
+    | systemFunction
+    | dateTimeFunction
+    | stringValueFunction
+    | xmlFunction
     ;
 
-vex_or_named_notation
+vexOrNamedNotation
     : VARIADIC? (argname=identifier pointer)? vex
     ;
 
@@ -2591,43 +2591,43 @@ pointer
     : EQUAL_GTH | COLON_EQUAL
     ;
 
-function_construct
+functionConstruct
     : (COALESCE | GREATEST | GROUPING | LEAST | NULLIF | XMLCONCAT) LEFT_PAREN vex (COMMA vex)* RIGHT_PAREN
     | ROW LEFT_PAREN (vex (COMMA vex)*)? RIGHT_PAREN
-    ;                       
-
-extract_function
-    : EXTRACT LEFT_PAREN (identifier | character_string) FROM vex RIGHT_PAREN
     ;
 
-system_function
+extractFunction
+    : EXTRACT LEFT_PAREN (identifier | characterString) FROM vex RIGHT_PAREN
+    ;
+
+systemFunction
     : CURRENT_CATALOG
     // parens are handled by generic function call
-    // since current_schema is defined as reserved(can be function) keyword
+    // since currentSchema is defined as reserved(can be function) keyword
     | CURRENT_SCHEMA /*(LEFT_PAREN RIGHT_PAREN)?*/
     | CURRENT_USER
     | SESSION_USER
     | USER
-    | cast_specification
+    | castSpecification
     ;
 
-date_time_function
+dateTimeFunction
     : CURRENT_DATE
-    | CURRENT_TIME type_length?
-    | CURRENT_TIMESTAMP type_length?
-    | LOCALTIME type_length?
-    | LOCALTIMESTAMP type_length?
+    | CURRENT_TIME typeLength?
+    | CURRENT_TIMESTAMP typeLength?
+    | LOCALTIME typeLength?
+    | LOCALTIMESTAMP typeLength?
     ;
 
-string_value_function
+stringValueFunction
     : TRIM LEFT_PAREN (LEADING | TRAILING | BOTH)? (chars=vex FROM str=vex | FROM? str=vex (COMMA chars=vex)?) RIGHT_PAREN
     | SUBSTRING LEFT_PAREN vex (COMMA vex)* (FROM vex)? (FOR vex)? RIGHT_PAREN
-    | POSITION LEFT_PAREN vex_b IN vex RIGHT_PAREN
+    | POSITION LEFT_PAREN vexB IN vex RIGHT_PAREN
     | OVERLAY LEFT_PAREN vex PLACING vex FROM vex (FOR vex)? RIGHT_PAREN
     | COLLATION FOR LEFT_PAREN vex RIGHT_PAREN
     ;
 
-xml_function
+xmlFunction
     : XMLELEMENT LEFT_PAREN NAME name=identifier
         (COMMA XMLATTRIBUTES LEFT_PAREN vex (AS attname=identifier)? (COMMA vex (AS attname=identifier)?)* RIGHT_PAREN)?
         (COMMA vex)* RIGHT_PAREN
@@ -2636,51 +2636,51 @@ xml_function
     | XMLROOT LEFT_PAREN vex COMMA VERSION (vex | NO VALUE) (COMMA STANDALONE (YES | NO | NO VALUE))? RIGHT_PAREN
     | XMLEXISTS LEFT_PAREN vex PASSING (BY REF)? vex (BY REF)? RIGHT_PAREN
     | XMLPARSE LEFT_PAREN (DOCUMENT | CONTENT) vex RIGHT_PAREN
-    | XMLSERIALIZE LEFT_PAREN (DOCUMENT | CONTENT) vex AS data_type RIGHT_PAREN
-    | XMLTABLE LEFT_PAREN 
+    | XMLSERIALIZE LEFT_PAREN (DOCUMENT | CONTENT) vex AS dataType RIGHT_PAREN
+    | XMLTABLE LEFT_PAREN
         (XMLNAMESPACES LEFT_PAREN vex AS name=identifier (COMMA vex AS name=identifier)* RIGHT_PAREN COMMA)?
         vex PASSING (BY REF)? vex (BY REF)?
-        COLUMNS xml_table_column (COMMA xml_table_column)*
+        COLUMNS xmlTableColumn (COMMA xmlTableColumn)*
         RIGHT_PAREN
     ;
 
-xml_table_column
-    : name=identifier (data_type (PATH vex)? (DEFAULT vex)? (NOT? NULL)? | FOR ORDINALITY)
+xmlTableColumn
+    : name=identifier (dataType (PATH vex)? (DEFAULT vex)? (NOT? NULL)? | FOR ORDINALITY)
     ;
 
-comparison_mod
-    : (ALL | ANY | SOME) LEFT_PAREN (vex | select_stmt_no_parens) RIGHT_PAREN
+comparisonMod
+    : (ALL | ANY | SOME) LEFT_PAREN (vex | selectStmtNoParens) RIGHT_PAREN
     ;
 
-filter_clause
+filterClause
     : FILTER LEFT_PAREN WHERE vex RIGHT_PAREN
     ;
 
-window_definition
-    : LEFT_PAREN identifier? partition_by_columns? orderby_clause? frame_clause? RIGHT_PAREN
+windowDefinition
+    : LEFT_PAREN identifier? partitionByColumns? orderbyClause? frameClause? RIGHT_PAREN
     ;
 
-frame_clause
-    : (RANGE | ROWS | GROUPS) (frame_bound | BETWEEN frame_bound AND frame_bound)
+frameClause
+    : (RANGE | ROWS | GROUPS) (frameBound | BETWEEN frameBound AND frameBound)
     (EXCLUDE (CURRENT ROW | GROUP | TIES | NO OTHERS))?
     ;
 
-frame_bound
+frameBound
     : vex (PRECEDING | FOLLOWING)
     | CURRENT ROW
     ;
 
-array_expression
-    : ARRAY (array_elements | table_subquery)
+arrayExpression
+    : ARRAY (arrayElements | tableSubquery)
     ;
 
-array_elements
-    : LEFT_BRACKET ((vex | array_elements) (COMMA (vex | array_elements))*)? RIGHT_BRACKET
+arrayElements
+    : LEFT_BRACKET ((vex | arrayElements) (COMMA (vex | arrayElements))*)? RIGHT_BRACKET
     ;
 
-type_coercion
-    : data_type character_string
-    | INTERVAL character_string interval_field type_length?
+typeCoercion
+    : dataType characterString
+    | INTERVAL characterString intervalField typeLength?
     ;
 
 /*
@@ -2688,234 +2688,234 @@ type_coercion
   7.13 <query expression>
 ===============================================================================
 */
-schema_qualified_name
+schemaQualifiedName
     : identifier ( DOT identifier ( DOT identifier )? )?
     ;
- 
-set_qualifier
+
+setQualifier
     : DISTINCT | ALL
     ;
 
-table_subquery
-    : LEFT_PAREN select_stmt RIGHT_PAREN
+tableSubquery
+    : LEFT_PAREN selectStmt RIGHT_PAREN
     ;
 
-select_stmt
-    : with_clause? select_ops after_ops*
+selectStmt
+    : withClause? selectOps afterOps*
     ;
 
-after_ops
-    : orderby_clause
+afterOps
+    : orderbyClause
     | LIMIT (vex | ALL)
     | OFFSET vex (ROW | ROWS)?
     | FETCH (FIRST | NEXT) vex? (ROW | ROWS) ONLY?
-    | FOR (UPDATE | NO KEY UPDATE | SHARE | KEY SHARE) (OF schema_qualified_name (COMMA schema_qualified_name)*)? (NOWAIT | SKIP_ LOCKED)?
+    | FOR (UPDATE | NO KEY UPDATE | SHARE | KEY SHARE) (OF schemaQualifiedName (COMMA schemaQualifiedName)*)? (NOWAIT | SKIP_ LOCKED)?
     ;
 
-// select_stmt copy that doesn't consume external parens
+// selectStmt copy that doesn't consume external parens
 // for use in vex
 // we let the vex rule to consume as many parens as it can
-select_stmt_no_parens
-    : with_clause? select_ops_no_parens after_ops*
+selectStmtNoParens
+    : withClause? selectOpsNoParens afterOps*
     ;
 
-with_clause
-    : WITH RECURSIVE? with_query (COMMA with_query)*
+withClause
+    : WITH RECURSIVE? withQuery (COMMA withQuery)*
     ;
 
-with_query
-    : query_name=identifier (LEFT_PAREN column_name+=identifier (COMMA column_name+=identifier)* RIGHT_PAREN)?
-    AS (NOT? MATERIALIZED)? LEFT_PAREN data_statement RIGHT_PAREN
+withQuery
+    : queryName=identifier (LEFT_PAREN columnName+=identifier (COMMA columnName+=identifier)* RIGHT_PAREN)?
+    AS (NOT? MATERIALIZED)? LEFT_PAREN dataStatement RIGHT_PAREN
     ;
 
-select_ops
-    : LEFT_PAREN select_stmt RIGHT_PAREN // parens can be used to apply "global" clauses (WITH etc) to a particular select in UNION expr
-    | select_ops (INTERSECT | UNION | EXCEPT) set_qualifier? select_ops
-    | select_primary
+selectOps
+    : LEFT_PAREN selectStmt RIGHT_PAREN // parens can be used to apply "global" clauses (WITH etc) to a particular select in UNION expr
+    | selectOps (INTERSECT | UNION | EXCEPT) setQualifier? selectOps
+    | selectPrimary
     ;
 
-// version of select_ops for use in select_stmt_no_parens
-select_ops_no_parens
-    : select_ops (INTERSECT | UNION | EXCEPT) set_qualifier? (select_primary | LEFT_PAREN select_stmt RIGHT_PAREN)
-    | select_primary
+// version of selectOps for use in selectStmtNoParens
+selectOpsNoParens
+    : selectOps (INTERSECT | UNION | EXCEPT) setQualifier? (selectPrimary | LEFT_PAREN selectStmt RIGHT_PAREN)
+    | selectPrimary
     ;
 
-select_primary
+selectPrimary
     : SELECT
-        (set_qualifier (ON LEFT_PAREN vex (COMMA vex)* RIGHT_PAREN)?)?
-        select_list? into_table?
-        (FROM from_item (COMMA from_item)*)?
+        (setQualifier (ON LEFT_PAREN vex (COMMA vex)* RIGHT_PAREN)?)?
+        selectList? intoTable?
+        (FROM fromItem (COMMA fromItem)*)?
         (WHERE vex)?
-        groupby_clause?
+        groupbyClause?
         (HAVING vex)?
-        (WINDOW identifier AS window_definition (COMMA identifier AS window_definition)*)?
-    | TABLE ONLY? schema_qualified_name MULTIPLY?
-    | values_stmt
+        (WINDOW identifier AS windowDefinition (COMMA identifier AS windowDefinition)*)?
+    | TABLE ONLY? schemaQualifiedName MULTIPLY?
+    | valuesStmt
     ;
 
-select_list
-  : select_sublist (COMMA select_sublist)*
+selectList
+  : selectSublist (COMMA selectSublist)*
   ;
 
-select_sublist
-  : vex (AS col_label | id_token)?
+selectSublist
+  : vex (AS colLabel | idToken)?
   ;
 
-into_table
-    : INTO (TEMPORARY | TEMP | UNLOGGED)? TABLE? schema_qualified_name
+intoTable
+    : INTO (TEMPORARY | TEMP | UNLOGGED)? TABLE? schemaQualifiedName
     ;
 
-from_item
-    : LEFT_PAREN from_item RIGHT_PAREN alias_clause?
-    | from_item CROSS JOIN from_item
-    | from_item (INNER | (LEFT | RIGHT | FULL) OUTER?)? JOIN from_item ON vex
-    | from_item (INNER | (LEFT | RIGHT | FULL) OUTER?)? JOIN from_item USING names_in_parens
-    | from_item NATURAL (INNER | (LEFT | RIGHT | FULL) OUTER?)? JOIN from_item
-    | from_primary
+fromItem
+    : LEFT_PAREN fromItem RIGHT_PAREN aliasClause?
+    | fromItem CROSS JOIN fromItem
+    | fromItem (INNER | (LEFT | RIGHT | FULL) OUTER?)? JOIN fromItem ON vex
+    | fromItem (INNER | (LEFT | RIGHT | FULL) OUTER?)? JOIN fromItem USING namesInParens
+    | fromItem NATURAL (INNER | (LEFT | RIGHT | FULL) OUTER?)? JOIN fromItem
+    | fromPrimary
     ;
 
-from_primary
-    : ONLY? schema_qualified_name MULTIPLY? alias_clause? (TABLESAMPLE method=identifier LEFT_PAREN vex (COMMA vex)* RIGHT_PAREN (REPEATABLE vex)?)?
-    | LATERAL? table_subquery alias_clause
-    | LATERAL? function_call (WITH ORDINALITY)?
-        (AS from_function_column_def
-        | AS? alias=identifier (LEFT_PAREN column_alias+=identifier (COMMA column_alias+=identifier)* RIGHT_PAREN | from_function_column_def)?
+fromPrimary
+    : ONLY? schemaQualifiedName MULTIPLY? aliasClause? (TABLESAMPLE method=identifier LEFT_PAREN vex (COMMA vex)* RIGHT_PAREN (REPEATABLE vex)?)?
+    | LATERAL? tableSubquery aliasClause
+    | LATERAL? functionCall (WITH ORDINALITY)?
+        (AS fromFunctionColumnDef
+        | AS? alias=identifier (LEFT_PAREN columnAlias+=identifier (COMMA columnAlias+=identifier)* RIGHT_PAREN | fromFunctionColumnDef)?
         )?
-    | LATERAL? ROWS FROM LEFT_PAREN function_call (AS from_function_column_def)? (COMMA function_call (AS from_function_column_def)?)* RIGHT_PAREN
-    (WITH ORDINALITY)? (AS? alias=identifier (LEFT_PAREN column_alias+=identifier (COMMA column_alias+=identifier)* RIGHT_PAREN)?)?
+    | LATERAL? ROWS FROM LEFT_PAREN functionCall (AS fromFunctionColumnDef)? (COMMA functionCall (AS fromFunctionColumnDef)?)* RIGHT_PAREN
+    (WITH ORDINALITY)? (AS? alias=identifier (LEFT_PAREN columnAlias+=identifier (COMMA columnAlias+=identifier)* RIGHT_PAREN)?)?
     ;
 
-alias_clause
-    : AS? alias=identifier (LEFT_PAREN column_alias+=identifier (COMMA column_alias+=identifier)* RIGHT_PAREN)?
+aliasClause
+    : AS? alias=identifier (LEFT_PAREN columnAlias+=identifier (COMMA columnAlias+=identifier)* RIGHT_PAREN)?
     ;
 
-from_function_column_def
-    : LEFT_PAREN column_alias+=identifier data_type (COMMA column_alias+=identifier data_type)* RIGHT_PAREN
+fromFunctionColumnDef
+    : LEFT_PAREN columnAlias+=identifier dataType (COMMA columnAlias+=identifier dataType)* RIGHT_PAREN
     ;
 
-groupby_clause
-  : GROUP BY grouping_element_list
+groupbyClause
+  : GROUP BY groupingElementList
   ;
 
-grouping_element_list
-  : grouping_element (COMMA grouping_element)*
+groupingElementList
+  : groupingElement (COMMA groupingElement)*
   ;
 
-grouping_element
+groupingElement
   : vex
   | LEFT_PAREN RIGHT_PAREN
-  | (ROLLUP | CUBE | GROUPING SETS) LEFT_PAREN grouping_element_list RIGHT_PAREN
+  | (ROLLUP | CUBE | GROUPING SETS) LEFT_PAREN groupingElementList RIGHT_PAREN
   ;
 
-values_stmt
-    : VALUES values_values (COMMA values_values)*
+valuesStmt
+    : VALUES valuesValues (COMMA valuesValues)*
     ;
 
-values_values
+valuesValues
     : LEFT_PAREN (vex | DEFAULT) (COMMA (vex | DEFAULT))* RIGHT_PAREN
     ;
 
-orderby_clause
-    : ORDER BY sort_specifier_list
+orderbyClause
+    : ORDER BY sortSpecifierList
     ;
 
-sort_specifier_list
-    : sort_specifier (COMMA sort_specifier)*
+sortSpecifierList
+    : sortSpecifier (COMMA sortSpecifier)*
     ;
 
-sort_specifier
+sortSpecifier
     : key=vex
-    opclass=schema_qualified_name? // this allows to share this rule with create_index; technically invalid syntax
-    order=order_specification?
-    null_order=null_ordering?
+    opclass=schemaQualifiedName? // this allows to share this rule with createIndex; technically invalid syntax
+    order=orderSpecification?
+    nullOrder=nullOrdering?
     ;
 
-order_specification
-    : ASC | DESC | USING all_op_ref
+orderSpecification
+    : ASC | DESC | USING allOpRef
     ;
 
-null_ordering
+nullOrdering
     : NULLS (FIRST | LAST)
     ;
 
-insert_stmt_for_psql
-    : with_clause? INSERT INTO insert_table_name=schema_qualified_name (AS alias=identifier)?
-    (OVERRIDING (SYSTEM | USER) VALUE)? insert_columns?
-    (select_stmt | DEFAULT VALUES)
-    (ON CONFLICT conflict_object? conflict_action)?
-    (RETURNING select_list)?
+insertStmtForPsql
+    : withClause? INSERT INTO insertTableName=schemaQualifiedName (AS alias=identifier)?
+    (OVERRIDING (SYSTEM | USER) VALUE)? insertColumns?
+    (selectStmt | DEFAULT VALUES)
+    (ON CONFLICT conflictObject? conflictAction)?
+    (RETURNING selectList)?
     ;
 
-insert_columns
-    : LEFT_PAREN indirection_identifier (COMMA indirection_identifier)* RIGHT_PAREN
+insertColumns
+    : LEFT_PAREN indirectionIdentifier (COMMA indirectionIdentifier)* RIGHT_PAREN
     ;
 
-indirection_identifier
-    : identifier indirection_list?
+indirectionIdentifier
+    : identifier indirectionList?
     ;
 
-conflict_object
-    : index_sort index_where?
+conflictObject
+    : indexSort indexWhere?
     | ON CONSTRAINT identifier
     ;
 
-conflict_action
+conflictAction
     : DO NOTHING
-    | DO UPDATE SET update_set (COMMA update_set)* (WHERE vex)?
+    | DO UPDATE SET updateSet (COMMA updateSet)* (WHERE vex)?
     ;
 
-delete_stmt_for_psql
-    : with_clause? DELETE FROM ONLY? delete_table_name=schema_qualified_name MULTIPLY? (AS? alias=identifier)?
-    (USING from_item (COMMA from_item)*)?
+deleteStmtForPsql
+    : withClause? DELETE FROM ONLY? deleteTableName=schemaQualifiedName MULTIPLY? (AS? alias=identifier)?
+    (USING fromItem (COMMA fromItem)*)?
     (WHERE (vex | CURRENT OF cursor=identifier))?
-    (RETURNING select_list)?
+    (RETURNING selectList)?
     ;
 
-update_stmt_for_psql
-    : with_clause? UPDATE ONLY? update_table_name=schema_qualified_name MULTIPLY? (AS? alias=identifier)?
-    SET update_set (COMMA update_set)*
-    (FROM from_item (COMMA from_item)*)?
+updateStmtForPsql
+    : withClause? UPDATE ONLY? updateTableName=schemaQualifiedName MULTIPLY? (AS? alias=identifier)?
+    SET updateSet (COMMA updateSet)*
+    (FROM fromItem (COMMA fromItem)*)?
     (WHERE (vex | CURRENT OF cursor=identifier))?
-    (RETURNING select_list)?
+    (RETURNING selectList)?
     ;
 
-update_set
-    : column+=indirection_identifier EQUAL (value+=vex | DEFAULT)
-    | LEFT_PAREN column+=indirection_identifier (COMMA column+=indirection_identifier)* RIGHT_PAREN EQUAL ROW?
-    (LEFT_PAREN (value+=vex | DEFAULT) (COMMA (value+=vex | DEFAULT))* RIGHT_PAREN | table_subquery)
+updateSet
+    : column+=indirectionIdentifier EQUAL (value+=vex | DEFAULT)
+    | LEFT_PAREN column+=indirectionIdentifier (COMMA column+=indirectionIdentifier)* RIGHT_PAREN EQUAL ROW?
+    (LEFT_PAREN (value+=vex | DEFAULT) (COMMA (value+=vex | DEFAULT))* RIGHT_PAREN | tableSubquery)
     ;
 
-notify_stmt
-    : NOTIFY channel=identifier (COMMA payload=character_string)?
+notifyStmt
+    : NOTIFY channel=identifier (COMMA payload=characterString)?
     ;
 
-truncate_stmt
-    : TRUNCATE TABLE? only_table_multiply (COMMA only_table_multiply)*
-    ((RESTART | CONTINUE) IDENTITY)? cascade_restrict?
+truncateStmt
+    : TRUNCATE TABLE? onlyTableMultiply (COMMA onlyTableMultiply)*
+    ((RESTART | CONTINUE) IDENTITY)? cascadeRestrict?
     ;
 
-identifier_list
+identifierList
     : identifier (COMMA identifier)*
     ;
 
-anonymous_block
-    : DO (LANGUAGE (identifier | character_string))? character_string
-    | DO character_string LANGUAGE (identifier | character_string)
+anonymousBlock
+    : DO (LANGUAGE (identifier | characterString))? characterString
+    | DO characterString LANGUAGE (identifier | characterString)
     ;
 
 // plpgsql rules
 
-comp_options
-    : HASH_SIGN identifier (identifier | truth_value)
+compOptions
+    : HASH_SIGN identifier (identifier | truthValue)
     ;
 
-function_block
-    : start_label? declarations?
-    BEGIN function_statements exception_statement?
-    END end_label=identifier?
+functionBlock
+    : startLabel? declarations?
+    BEGIN functionStatements exceptionStatement?
+    END endLabel=identifier?
     ;
 
-start_label
+startLabel
     : LESS_LESS identifier GREATER_GREATER
     ;
 
@@ -2924,94 +2924,94 @@ declarations
     ;
 
 declaration
-    : DECLARE* identifier type_declaration SEMI_COLON
+    : DECLARE* identifier typeDeclaration SEMI_COLON
     ;
 
-type_declaration
-    : CONSTANT? data_type_dec collate_identifier? (NOT NULL)? ((DEFAULT | COLON_EQUAL | EQUAL) vex)?
+typeDeclaration
+    : CONSTANT? dataTypeDec collateIdentifier? (NOT NULL)? ((DEFAULT | COLON_EQUAL | EQUAL) vex)?
     | ALIAS FOR (identifier | DOLLAR_NUMBER)
-    | (NO? SCROLL)? CURSOR (LEFT_PAREN arguments_list RIGHT_PAREN)? (FOR | IS) select_stmt
+    | (NO? SCROLL)? CURSOR (LEFT_PAREN argumentsList RIGHT_PAREN)? (FOR | IS) selectStmt
     ;
 
-arguments_list
-    : identifier data_type (COMMA identifier data_type)*
+argumentsList
+    : identifier dataType (COMMA identifier dataType)*
     ;
 
-data_type_dec
-    : data_type
-    | schema_qualified_name MODULAR TYPE
-    | schema_qualified_name_nontype MODULAR ROWTYPE
+dataTypeDec
+    : dataType
+    | schemaQualifiedName MODULAR TYPE
+    | schemaQualifiedNameNontype MODULAR ROWTYPE
     ;
 
-exception_statement
-    : EXCEPTION (WHEN vex THEN function_statements)+
+exceptionStatement
+    : EXCEPTION (WHEN vex THEN functionStatements)+
     ;
 
-function_statements
-    : (function_statement SEMI_COLON)*
+functionStatements
+    : (functionStatement SEMI_COLON)*
     ;
 
-function_statement
-    : function_block
-    | base_statement
-    | control_statement
-    | transaction_statement
-    | cursor_statement
-    | message_statement
-    | schema_statement
-    | plpgsql_query
-    | additional_statement
+functionStatement
+    : functionBlock
+    | baseStatement
+    | controlStatement
+    | transactionStatement
+    | cursorStatement
+    | messageStatement
+    | schemaStatement
+    | plpgsqlQuery
+    | additionalStatement
     ;
 
-base_statement
-    : assign_stmt
-    | PERFORM perform_stmt
-    | GET (CURRENT | STACKED)? DIAGNOSTICS diagnostic_option (COMMA diagnostic_option)*
+baseStatement
+    : assignStmt
+    | PERFORM performStmt
+    | GET (CURRENT | STACKED)? DIAGNOSTICS diagnosticOption (COMMA diagnosticOption)*
     | NULL
     ;
 
 var
-    : (schema_qualified_name | DOLLAR_NUMBER) (LEFT_BRACKET vex RIGHT_BRACKET)*
+    : (schemaQualifiedName | DOLLAR_NUMBER) (LEFT_BRACKET vex RIGHT_BRACKET)*
     ;
 
-diagnostic_option
+diagnosticOption
     : var (COLON_EQUAL | EQUAL) identifier
     ;
 
-// keep this in sync with select_primary (except intended differences)
-perform_stmt
-    : (set_qualifier (ON LEFT_PAREN vex (COMMA vex)* RIGHT_PAREN)?)?
-    select_list
-    (FROM from_item (COMMA from_item)*)?
+// keep this in sync with selectPrimary (except intended differences)
+performStmt
+    : (setQualifier (ON LEFT_PAREN vex (COMMA vex)* RIGHT_PAREN)?)?
+    selectList
+    (FROM fromItem (COMMA fromItem)*)?
     (WHERE vex)?
-    groupby_clause?
+    groupbyClause?
     (HAVING vex)?
-    (WINDOW identifier AS window_definition (COMMA identifier AS window_definition)*)?
-    ((INTERSECT | UNION | EXCEPT) set_qualifier? select_ops)?
-    after_ops*
+    (WINDOW identifier AS windowDefinition (COMMA identifier AS windowDefinition)*)?
+    ((INTERSECT | UNION | EXCEPT) setQualifier? selectOps)?
+    afterOps*
     ;
 
-assign_stmt
-    : var (COLON_EQUAL | EQUAL) (select_stmt_no_parens | perform_stmt)
+assignStmt
+    : var (COLON_EQUAL | EQUAL) (selectStmtNoParens | performStmt)
     ;
 
-execute_stmt
-    : EXECUTE vex using_vex?
+executeStmt
+    : EXECUTE vex usingVex?
     ;
 
-control_statement
-    : return_stmt
-    | CALL function_call
-    | if_statement
-    | case_statement
-    | loop_statement
+controlStatement
+    : returnStmt
+    | CALL functionCall
+    | ifStatement
+    | caseStatement
+    | loopStatement
     ;
 
-cursor_statement
-    : OPEN var (NO? SCROLL)? FOR plpgsql_query
+cursorStatement
+    : OPEN var (NO? SCROLL)? FOR plpgsqlQuery
     | OPEN var (LEFT_PAREN option (COMMA option)* RIGHT_PAREN)?
-    | FETCH fetch_move_direction? (FROM | IN)? var
-    | MOVE fetch_move_direction? (FROM | IN)? var
+    | FETCH fetchMoveDirection? (FROM | IN)? var
+    | MOVE fetchMoveDirection? (FROM | IN)? var
     | CLOSE var
     ;
 
@@ -3019,19 +3019,19 @@ option
     : (identifier COLON_EQUAL)? vex
     ;
 
-transaction_statement
+transactionStatement
     : (COMMIT | ROLLBACK) (AND NO? CHAIN)?
-    | lock_table
+    | lockTable
     ;
 
-message_statement
-    : RAISE log_level? (character_string (COMMA vex)*)? raise_using?
-    | RAISE log_level? identifier raise_using?
-    | RAISE log_level? SQLSTATE character_string raise_using?
+messageStatement
+    : RAISE logLevel? (characterString (COMMA vex)*)? raiseUsing?
+    | RAISE logLevel? identifier raiseUsing?
+    | RAISE logLevel? SQLSTATE characterString raiseUsing?
     | ASSERT vex (COMMA vex)?
     ;
 
-log_level
+logLevel
     : DEBUG
     | LOG
     | INFO
@@ -3040,11 +3040,11 @@ log_level
     | EXCEPTION
     ;
 
-raise_using
-    : USING raise_param EQUAL vex (COMMA raise_param EQUAL vex)*
+raiseUsing
+    : USING raiseParam EQUAL vex (COMMA raiseParam EQUAL vex)*
     ;
 
-raise_param
+raiseParam
     : MESSAGE
     | DETAIL
     | HINT
@@ -3056,41 +3056,41 @@ raise_param
     | SCHEMA
     ;
 
-return_stmt
-    : RETURN perform_stmt?
+returnStmt
+    : RETURN performStmt?
     | RETURN NEXT vex
-    | RETURN QUERY plpgsql_query
+    | RETURN QUERY plpgsqlQuery
     ;
 
-loop_statement
-    : start_label? loop_start? LOOP function_statements END LOOP identifier?
+loopStatement
+    : startLabel? loopStart? LOOP functionStatements END LOOP identifier?
     | (EXIT | CONTINUE) identifier? (WHEN vex)?
     ;
 
-loop_start
+loopStart
     : WHILE vex
     | FOR alias=identifier IN REVERSE? vex DOUBLE_DOT vex (BY vex)?
-    | FOR identifier_list IN plpgsql_query
+    | FOR identifierList IN plpgsqlQuery
     | FOR cursor=identifier IN identifier (LEFT_PAREN option (COMMA option)* RIGHT_PAREN)? // cursor loop
-    | FOREACH identifier_list (SLICE NUMBER_LITERAL)? IN ARRAY vex
+    | FOREACH identifierList (SLICE NUMBER_LITERAL)? IN ARRAY vex
     ;
 
-using_vex
+usingVex
     : USING vex (COMMA vex)*
     ;
 
-if_statement
-    : IF vex THEN function_statements ((ELSIF | ELSEIF) vex THEN function_statements)* (ELSE function_statements)? END IF
+ifStatement
+    : IF vex THEN functionStatements ((ELSIF | ELSEIF) vex THEN functionStatements)* (ELSE functionStatements)? END IF
     ;
 
 // plpgsql case
-case_statement
-    : CASE vex? (WHEN vex (COMMA vex)* THEN function_statements)+ (ELSE function_statements)? END CASE
+caseStatement
+    : CASE vex? (WHEN vex (COMMA vex)* THEN functionStatements)+ (ELSE functionStatements)? END CASE
     ;
 
-plpgsql_query
-    : data_statement
-    | execute_stmt
-    | show_statement
-    | explain_statement
+plpgsqlQuery
+    : dataStatement
+    | executeStmt
+    | showStatement
+    | explainStatement
     ;
