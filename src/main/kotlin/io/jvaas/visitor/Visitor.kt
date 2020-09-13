@@ -6,7 +6,7 @@ import io.jvaas.type.Column
 import io.jvaas.type.Model
 import io.jvaas.type.Table
 
-class CreateVisitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
+class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 	override fun visitCreate_table_statement(ctx: SQLParser.Create_table_statementContext?) {
 		var createTableVisited = false
@@ -52,7 +52,18 @@ class CreateVisitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			}
 			super.visitDefine_columns(ctx)
 		}
-
-
 	}
+
+	override fun visitInsert_stmt_for_psql(ctx: SQLParser.Insert_stmt_for_psqlContext?) {
+
+		ctx?.children?.forEach { child ->
+			println(child.payload.javaClass)
+			println(child.text)
+		}
+
+		println(ctx?.children)
+
+		super.visitInsert_stmt_for_psql(ctx)
+	}
+
 }
