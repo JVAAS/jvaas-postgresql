@@ -1,4 +1,4 @@
-package io.jvaas.types
+package io.jvaas.type
 
 data class Column(
 	val name: String,

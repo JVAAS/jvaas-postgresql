@@ -1,4 +1,4 @@
-package io.jvaas.types
+package io.jvaas.type
 
 class Model(
 	val tables: MutableList<Table> = mutableListOf()
