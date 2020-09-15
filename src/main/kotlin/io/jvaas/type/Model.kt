@@ -1,7 +1,8 @@
 package io.jvaas.type
 
 class Model(
-	val tables: MutableList<Table> = mutableListOf()
+	val tables: MutableList<Table> = mutableListOf(),
+	val queries: MutableList<Query> = mutableListOf(),
 ) {
 
 	val lastTable
@@ -10,5 +11,7 @@ class Model(
 	val lastColumn
 		get() = tables.last().columns.last()
 
+	val lastQuery
+		get() = queries.last()
 
 }

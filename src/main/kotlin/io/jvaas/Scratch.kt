@@ -31,6 +31,10 @@ object Scratch {
 			println("")
 		}
 
+		model.queries.forEach { query ->
+			println(query)
+		}
+
 
 	}
 }
