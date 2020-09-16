@@ -16,6 +16,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 	override fun visitLineComment(ctx: SQLParser.LineCommentContext?) {
 		println("LINE COMMENT")
+		println(ctx?.text)
 		super.visitLineComment(ctx)
 	}
 
