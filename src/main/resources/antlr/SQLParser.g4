@@ -3096,5 +3096,5 @@ plpgsqlQuery
     ;
 
 lineComment
-	: LINE_COMMENT (((Name | Type | Schema | Owner) Value)+ SEMI_COLON*)*
+	: LINE_COMMENT
 	;

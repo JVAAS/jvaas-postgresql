@@ -806,14 +806,8 @@ BlockComment
 //    ;
 
 LINE_COMMENT
-    : '--'
+	: '--'[.A-Za-z0-9_:; ]*[\r\n]*
     ;
-
-Name: 'Name:';
-Type: 'Type:';
-Schema: 'Schema:';
-Owner: 'Owner:';
-Value: ('a'..'z' | 'A'..'Z' | '0'..'9')+;
 
 // must follow all explicitly defined operators and comments
 // so that they are matched first
