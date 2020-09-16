@@ -7,16 +7,26 @@ import io.jvaas.type.Model
 import io.jvaas.type.Query
 import io.jvaas.type.Table
 import org.antlr.v4.runtime.tree.ParseTree
+import java.util.*
 
 class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
+
+	var lastFun: String? = null
 
 	fun getSQL(children: List<ParseTree>? = null): String {
 		return children?.map { it.text }?.joinToString(" ") ?: ""
 	}
 
 	override fun visitLineComment(ctx: SQLParser.LineCommentContext?) {
-		println("LINE COMMENT")
-		println(ctx?.text)
+		val parts = ctx?.text?.split(" ")
+		var foundFun = false
+		parts?.forEach { part ->
+			if (part.trim() == "fun") {
+				foundFun = true
+			} else if (foundFun) {
+				lastFun = part.trim()
+			}
+		}
 		super.visitLineComment(ctx)
 	}
 
@@ -84,7 +94,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 	// UPDATE
 	override fun visitUpdateStmtForPsql(ctx: SQLParser.UpdateStmtForPsqlContext?) {
 		model.queries.add(Query(
-			sql = getSQL(ctx?.children)
+			sql = getSQL(ctx?.children),
+			name = lastFun ?: UUID.randomUUID().toString().replace("-", "")
 		))
 		super.visitUpdateStmtForPsql(ctx)
 	}
