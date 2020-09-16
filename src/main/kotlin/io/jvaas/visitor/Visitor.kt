@@ -14,6 +14,11 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		return children?.map { it.text }?.joinToString(" ") ?: ""
 	}
 
+	override fun visitLineComment(ctx: SQLParser.LineCommentContext?) {
+		println("LINE COMMENT")
+		super.visitLineComment(ctx)
+	}
+
 	override fun visitCreateTableStatement(ctx: SQLParser.CreateTableStatementContext?) {
 		var createTableVisited = false
 		ctx?.children?.forEach { child ->

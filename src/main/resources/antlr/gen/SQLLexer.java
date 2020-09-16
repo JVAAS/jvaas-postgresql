@@ -1,5 +1,4 @@
 // Generated from /home/vlad/Code/jvaas-platform/jvaas-postgresql/src/main/resources/antlr/SQLLexer.g4 by ANTLR 4.8
-package io.jvaas.gen;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

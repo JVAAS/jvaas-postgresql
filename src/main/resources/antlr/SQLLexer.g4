@@ -801,9 +801,19 @@ BlockComment
     :   '/*' (BlockComment |.)*? '*/' -> channel(HIDDEN)
     ;
 
-LineComment
-    :   '--' ~[\r\n]* -> channel(HIDDEN)
+//LineComment
+//    :   '--' ~[\r\n]* -> channel(HIDDEN)
+//    ;
+
+LINE_COMMENT
+    : '--'
     ;
+
+Name: 'Name:';
+Type: 'Type:';
+Schema: 'Schema:';
+Owner: 'Owner:';
+Value: ('a'..'z' | 'A'..'Z' | '0'..'9')+;
 
 // must follow all explicitly defined operators and comments
 // so that they are matched first
@@ -918,7 +928,7 @@ Single_String
 
 fragment
 String_Joiner
-    :  ((Space | Tab | White_Space | LineComment)* New_Line)+ (Space | Tab | White_Space)*
+    :  ((Space | Tab | White_Space)* New_Line)+ (Space | Tab | White_Space)*
     ;
 
 fragment

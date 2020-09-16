@@ -3807,4 +3807,14 @@ public interface SQLParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPlpgsqlQuery(SQLParser.PlpgsqlQueryContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SQLParser#lineComment}.
+	 * @param ctx the parse tree
+	 */
+	void enterLineComment(SQLParser.LineCommentContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SQLParser#lineComment}.
+	 * @param ctx the parse tree
+	 */
+	void exitLineComment(SQLParser.LineCommentContext ctx);
 }

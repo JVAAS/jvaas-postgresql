@@ -4571,6 +4571,18 @@ public class SQLParserBaseListener implements SQLParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitPlpgsqlQuery(SQLParser.PlpgsqlQueryContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLineComment(SQLParser.LineCommentContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLineComment(SQLParser.LineCommentContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

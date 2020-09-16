@@ -12,7 +12,7 @@ options {
 /******* Start symbols *******/
 
 sql
-    : BOM? SEMI_COLON* (statement (SEMI_COLON+ | EOF))* EOF
+    : BOM? SEMI_COLON* (lineComment | statement (SEMI_COLON+ | EOF))* EOF
     ;
 
 qnameParser
@@ -3094,3 +3094,7 @@ plpgsqlQuery
     | showStatement
     | explainStatement
     ;
+
+lineComment
+	: LINE_COMMENT (((Name | Type | Schema | Owner) Value)+ SEMI_COLON*)*
+	;

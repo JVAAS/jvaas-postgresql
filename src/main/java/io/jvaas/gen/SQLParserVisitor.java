@@ -2290,4 +2290,10 @@ public interface SQLParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPlpgsqlQuery(SQLParser.PlpgsqlQueryContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SQLParser#lineComment}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLineComment(SQLParser.LineCommentContext ctx);
 }
