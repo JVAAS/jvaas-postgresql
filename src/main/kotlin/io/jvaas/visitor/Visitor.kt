@@ -97,18 +97,19 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			sql = getSQL(ctx?.children),
 			name = lastFun ?: UUID.randomUUID().toString().replace("-", "")
 		))
+		lastFun = null
 		super.visitUpdateStmtForPsql(ctx)
 	}
 
 	// UPDATE SET
-	override fun visitUpdateSet(ctx: SQLParser.UpdateSetContext?) {
-		println("SET")
-		ctx?.children?.forEach {
-			println(it.payload::class.java)
-			println(it.text)
-			println()
-		}
-		super.visitUpdateSet(ctx)
-	}
+	//override fun visitUpdateSet(ctx: SQLParser.UpdateSetContext?) {
+	//	println("SET")
+	//	ctx?.children?.forEach {
+	//		println(it.payload::class.java)
+	//		println(it.text)
+	//		println()
+	//	}
+	//	super.visitUpdateSet(ctx)
+	//}
 
 }
