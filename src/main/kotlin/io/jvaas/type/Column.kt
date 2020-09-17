@@ -5,7 +5,8 @@ data class Column(
 	var type: String = "",
 	var default: String? = null,
 	var nullable: Boolean = true,
-	var table: Table
+	var table: Table,
+	var kotlinType: String? = "Any?",
 ) {
 
 
@@ -25,6 +26,9 @@ data class Column(
 				s.append("")
 			}
 		}
+
+		s.append(" -> $kotlinType")
+
 		return s.toString()
 	}
 

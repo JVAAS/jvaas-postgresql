@@ -2,6 +2,7 @@ package io.jvaas.visitor
 
 import io.jvaas.gen.SQLParser
 import io.jvaas.gen.SQLParserBaseVisitor
+import io.jvaas.mapper.SQLToKotlinTypeMapper
 import io.jvaas.type.Column
 import io.jvaas.type.Model
 import io.jvaas.type.Query
@@ -84,8 +85,13 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 					}
 				}
 			}
-			super.visitDefineColumns(ctx)
 		}
+
+		lastTable.columns.forEach {  column ->
+			column.kotlinType = SQLToKotlinTypeMapper.map(column.type, column.nullable)
+		}
+
+		super.visitDefineColumns(ctx)
 	}
 
 
