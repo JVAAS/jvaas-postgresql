@@ -3,7 +3,7 @@
 INSERT INTO listing (id, created, modified) VALUES (?, now(), now());
 
 -- fun demoQuery
-UPDATE listing SET modified = now() WHERE id = ? AND version = ? AND title    LIKE       ?;
+UPDATE listing SET modified = now(), title = ?, title_url = ? WHERE id = ? AND version = ? AND title    LIKE       ?;
 
 -- fun updateModified
 UPDATE listing SET modified = now() WHERE id = ?;

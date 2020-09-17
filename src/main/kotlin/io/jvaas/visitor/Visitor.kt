@@ -1,6 +1,7 @@
 package io.jvaas.visitor
 
 import io.jvaas.gen.SQLParser
+import io.jvaas.gen.SQLParser.*
 import io.jvaas.gen.SQLParserBaseVisitor
 import io.jvaas.mapper.SQLToKotlinTypeMapper
 import io.jvaas.mapper.StringMapper.snakeToLowerCamelCase
@@ -63,7 +64,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 						columnDefContext.getChild(it)
 					}.forEach { columnDefContextToken ->
 						when (columnDefContextToken) {
-							is SQLParser.IdentifierContext -> {
+							is IdentifierContext -> {
 								lastTable.columns.add(Column(
 									name = columnDefContextToken.text,
 									kotlinName = columnDefContextToken.text.snakeToLowerCamelCase(),
@@ -122,7 +123,14 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 		println("========================")
 		println(lastSQL)
-		println(Extractor(ctx).extract<SQLParser.IdentifierContext>())
+		println(Extractor(ctx).extract(IdentifierContext::class))
+		println(Extractor(ctx).extract(
+			UpdateSetContext::class
+//			ValueExpressionPrimaryContext::class,
+//			VexContext::class,
+		))
+		println()
+		Extractor(ctx).dumpTree()
 		println("========================")
 
 //		println("========================")

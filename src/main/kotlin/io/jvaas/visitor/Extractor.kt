@@ -2,6 +2,7 @@ package io.jvaas.visitor
 
 import io.jvaas.gen.SQLParser
 import org.antlr.v4.runtime.tree.ParseTree
+import kotlin.reflect.KClass
 
 class Extractor(tree: ParseTree? = null) {
 
@@ -46,18 +47,33 @@ class Extractor(tree: ParseTree? = null) {
 		return sql
 	}
 
-	inline fun <reified T> extract(): List<String> {
+	fun extract(vararg clazz: KClass<*>): List<String> {
 		val result = mutableListOf<String>()
 		walkLeaves {  leave ->
 			var branch = leave
 			while(branch.parent != null) {
-				if (branch.payload is T) {
-					result.add(branch.text)
+				clazz.forEach { clazz ->
+					if (branch.payload::class == clazz) {
+						result.add(branch.text)
+						return@walkLeaves
+					}
 				}
+
 				branch = branch.parent
 			}
 		}
 		return result
+	}
+
+	fun dumpTree() {
+		walkLeaves { leave ->
+			var branch = leave
+			while(branch.parent != null) {
+				println(branch.text + "\n\t" + branch.payload::class)
+				branch = branch.parent
+			}
+			println()
+		}
 	}
 
 
