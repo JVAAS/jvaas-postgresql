@@ -102,11 +102,29 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 	// UPDATE
 	override fun visitUpdateStmtForPsql(ctx: SQLParser.UpdateStmtForPsqlContext?) {
+
 		model.queries.add(Query(
 			sql = getSQL(ctx?.children),
 			name = lastFun ?: UUID.randomUUID().toString().replace("-", "")
 		))
 		lastFun = null
+
+		ctx?.children?.forEach {
+			when (it) {
+				is SQLParser.SchemaQualifiedNameContext -> {
+					println("tableName:${it.text}")
+				}
+				is SQLParser.UpdateSetContext -> {
+					println("set:${it.text}")
+				}
+				is SQLParser.VexContext -> {
+					println("vex:${it.text}")
+				}
+			}
+		}
+		println()
+
+
 		super.visitUpdateStmtForPsql(ctx)
 	}
 
