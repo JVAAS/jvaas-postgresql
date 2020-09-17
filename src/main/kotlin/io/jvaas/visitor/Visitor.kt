@@ -86,7 +86,6 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 	}
 
 
-
 	override fun visitInsertStmtForPsql(ctx: SQLParser.InsertStmtForPsqlContext?) {
 
 
@@ -109,20 +108,31 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		))
 		lastFun = null
 
-		ctx?.children?.forEach {
-			when (it) {
+		var tableScope: Table? = null
+		ctx?.children?.forEach { child ->
+			when (child) {
 				is SQLParser.SchemaQualifiedNameContext -> {
-					println("tableName:${it.text}")
+					model.tables.forEach { table ->
+						if (table.name.equals(child.text, ignoreCase = true)) {
+							tableScope = table
+						}
+					}
+					println("tableName:${child.text}")
 				}
 				is SQLParser.UpdateSetContext -> {
-					println("set:${it.text}")
+					println("set:${child.text}")
 				}
 				is SQLParser.VexContext -> {
-					println("vex:${it.text}")
+					println("vex:${child.text}")
 				}
 			}
 		}
-		println()
+		if (tableScope == null) {
+			throw Exception("""
+				Not a valid table name for query: ${lastQuery.sql}"
+				Available table names are: ${model.tables.joinToString { it.name }}
+			""".trimIndent())
+		}
 
 
 		super.visitUpdateStmtForPsql(ctx)
