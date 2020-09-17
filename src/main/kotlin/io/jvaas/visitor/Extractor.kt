@@ -8,27 +8,33 @@ class Extractor(tree: ParseTree? = null) {
 	private val internalTree: ParseTree = tree ?: throw Exception("Can't parse null tree")
 
 	fun walkLeaves(
+		debug: Boolean = false,
 		childTree: ParseTree = internalTree,
-		leave: (childTree: ParseTree) -> Unit) {
+		leave: (childTree: ParseTree) -> Unit,
+	) {
 
 		if (childTree.childCount == 0) {
-			//println(childTree.text)
 			if (!childTree.text?.trim().isNullOrBlank()) {
 				leave(childTree)
 			}
 		} else {
 			for (i in 0 until childTree.childCount) {
-				walkLeaves(childTree = childTree.getChild(i), leave = leave)
+				walkLeaves(
+					debug = debug,
+					leave = leave,
+					childTree = childTree.getChild(i),
+				)
 			}
 		}
 	}
 
 	fun extractSQL(
 		childTree: ParseTree = internalTree,
-		parts: MutableList<String> = mutableListOf()
+		parts: MutableList<String> = mutableListOf(),
+		debug: Boolean = false,
 	): String {
 
-		walkLeaves { leave ->
+		walkLeaves(debug = debug) { leave ->
 			parts.add(leave.text)
 		}
 		var sql = parts.joinToString(" ")
@@ -40,39 +46,20 @@ class Extractor(tree: ParseTree? = null) {
 		return sql
 	}
 
-	fun extractColumns(
-		childTree: ParseTree = internalTree,
-		columns: MutableList<String> = mutableListOf()
-	): MutableList<String> {
-
-		walkLeaves {
-			println(it.text)
-			println(it.javaClass)
-			println()
+	inline fun <reified T> extract(): List<String> {
+		val result = mutableListOf<String>()
+		walkLeaves {  leave ->
+			var branch = leave
+			while(branch.parent != null) {
+				if (branch.payload is T) {
+					result.add(branch.text)
+				}
+				branch = branch.parent
+			}
 		}
-
-
-//		if (childTree.childCount == 1) {
-//			if (childTree is SQLParser.IndirectionIdentifierContext) {
-//				columns.add(childTree.text)
-//			} else {
-//				println(childTree.childCount)
-//				println(childTree.javaClass)
-//				println(childTree.text)
-//				println()
-//
-//			}
-//
-//
-//		} else {
-//			for (i in 0 until childTree.childCount) {
-//				val child = childTree.getChild(i)
-//				extractColumns(child, columns)
-//			}
-//		}
-
-		return columns
+		return result
 	}
+
 
 
 }

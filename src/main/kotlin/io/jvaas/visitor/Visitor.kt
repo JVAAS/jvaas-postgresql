@@ -25,7 +25,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 
 	override fun visitStatement(ctx: SQLParser.StatementContext?) {
-		lastSQL = Extractor(ctx).extractSQL()
+		lastSQL = Extractor(ctx).extractSQL(debug = false)
 		super.visitStatement(ctx)
 	}
 
@@ -121,7 +121,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		lastFun = null
 
 		println("========================")
-		println(Extractor(ctx).extractColumns())
+		println(lastSQL)
+		println(Extractor(ctx).extract<SQLParser.IdentifierContext>())
 		println("========================")
 
 //		println("========================")
