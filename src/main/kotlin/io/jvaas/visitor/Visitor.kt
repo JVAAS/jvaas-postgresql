@@ -6,7 +6,10 @@ import io.jvaas.gen.SQLParser.IdentifierContext
 import io.jvaas.gen.SQLParserBaseVisitor
 import io.jvaas.mapper.SQLToKotlinTypeMapper
 import io.jvaas.mapper.StringMapper.snakeToLowerCamelCase
-import io.jvaas.type.*
+import io.jvaas.type.Column
+import io.jvaas.type.Model
+import io.jvaas.type.Query
+import io.jvaas.type.Table
 import io.jvaas.visitor.Extractor.Companion.walkFamilyTree
 import java.util.*
 
@@ -134,16 +137,36 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 			if (leaf.text == "WHERE") {
 				where = true
+				setColumn = null
+				setValue = null
 			}
 
 			if (where) {
-				// ignore for now
+				if (leaf.text == "?") {
+					// validate column
+					val column = table?.columns?.firstOrNull {
+						it.name.equals(setColumn, ignoreCase = true)
+					} ?: throw Exception("Invalid Column '$setColumn' for sql\n\t$lastSQL\n")
+
+					lastQuery.columns.add(column)
+				} else {
+					leaf.walkFamilyTree { fam ->
+						if (fam.payload is IdentifierContext) {
+
+							setColumn = fam.text
+							println(">>>> $setColumn")
+
+							return@walkLeaves
+						}
+
+					}
+				}
 			} else if (tableName == null) {
 
 				// extract table name
 
 				leaf.walkFamilyTree { fam ->
-					if (fam.payload::class == IdTokenContext::class) {
+					if (fam.payload is IdTokenContext) {
 						tableName = fam.text
 
 						// validate table name
