@@ -38,6 +38,10 @@ object Scratch {
 		model.queries.forEach { query ->
 			println(query.name)
 			println(query.sql)
+			println(query.columns.map {
+				"""${it.column.name}=${it.value}"""
+			})
+			println()
 		}
 		println("=================================================")
 

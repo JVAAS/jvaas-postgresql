@@ -6,6 +6,8 @@ data class Column(
 	var default: String? = null,
 	var nullable: Boolean = true,
 	var table: Table,
+
+	var kotlinName: String? = "???",
 	var kotlinType: String? = "Any?",
 ) {
 

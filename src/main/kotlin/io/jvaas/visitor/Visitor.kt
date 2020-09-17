@@ -3,10 +3,7 @@ package io.jvaas.visitor
 import io.jvaas.gen.SQLParser
 import io.jvaas.gen.SQLParserBaseVisitor
 import io.jvaas.mapper.SQLToKotlinTypeMapper
-import io.jvaas.type.Column
-import io.jvaas.type.Model
-import io.jvaas.type.Query
-import io.jvaas.type.Table
+import io.jvaas.type.*
 import org.antlr.v4.runtime.tree.ParseTree
 import java.util.*
 
@@ -87,7 +84,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			}
 		}
 
-		lastTable.columns.forEach {  column ->
+		lastTable.columns.forEach { column ->
 			column.kotlinType = SQLToKotlinTypeMapper.map(column.type, column.nullable)
 		}
 
@@ -118,6 +115,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		lastFun = null
 
 		var tableScope: Table? = null
+		var columnScope: Column? = null
+
 		ctx?.children?.forEach { child ->
 			when (child) {
 				is SQLParser.SchemaQualifiedNameContext -> {
@@ -126,13 +125,40 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 							tableScope = table
 						}
 					}
-					println("tableName:${child.text}")
 				}
 				is SQLParser.UpdateSetContext -> {
-					println("set:${child.text}")
+					@Suppress("NAME_SHADOWING")
+					child.children.forEach { child ->
+						when (child) {
+							is SQLParser.IndirectionIdentifierContext -> {
+								tableScope?.columns?.filter { column ->
+									column.name.equals(child.text, ignoreCase = true)
+								}?.firstOrNull()?.let { column ->
+									columnScope = column
+								}
+							}
+							is SQLParser.VexContext -> {
+								columnScope?.let {
+									lastQuery.columns.add(ColumnWithValue(
+										column = it,
+										value = child.text
+									))
+								} ?: run {
+									throw Exception("ColumnScope is null for value ${child.text}")
+								}
+							}
+							else -> {
+								println(child.javaClass)
+							}
+						}
+
+
+					}
+					//println("set:${child.text}")
+					println("======")
 				}
 				is SQLParser.VexContext -> {
-					println("vex:${child.text}")
+					//println("vex:${child.text}")
 				}
 			}
 		}
