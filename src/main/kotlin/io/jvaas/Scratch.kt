@@ -40,6 +40,21 @@ object Scratch {
 			println(query.getKotlinFunctionHeader())
 			println(query.sql)
 			println()
+
+			println("${query.getKotlinFunctionHeader()} {")
+			println("\tcon.execute(")
+			println("\t\t// language=SQL")
+			println("\t\t\"\"\"")
+			println("\t\t${query.sql}")
+			println("\t\t\"\"\".trimIndent(),")
+			query.columns.forEach { column ->
+				println("\t\t${column.kotlinName},")
+			}
+			println("\t)")
+			println("}\n")
+
+
+
 		}
 		println("=================================================")
 
