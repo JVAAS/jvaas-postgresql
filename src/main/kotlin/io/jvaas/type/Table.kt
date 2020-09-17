@@ -12,21 +12,7 @@ data class Table(
 
 		s.append("$name {\n")
 		columns.forEach {  column ->
-			s.append("\t${column.name} : ${column.type}")
-			if (column.default != null) {
-				if (column.nullable) {
-					s.append("? = ${column.default}")
-				} else {
-					s.append(" = ${column.default}")
-				}
-			} else {
-				if (column.nullable) {
-					s.append("?")
-				} else {
-					s.append("")
-				}
-			}
-			s.append("\n")
+			s.append("\t$column\n")
 		}
 		s.append("}\n")
 		return s.toString()

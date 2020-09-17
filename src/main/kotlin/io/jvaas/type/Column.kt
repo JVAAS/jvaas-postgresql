@@ -9,6 +9,24 @@ data class Column(
 ) {
 
 
+	override fun toString(): String {
+		val s = StringBuilder()
+		s.append("$name : $type")
+		if (default != null) {
+			if (nullable) {
+				s.append("? = $default")
+			} else {
+				s.append(" = $default")
+			}
+		} else {
+			if (nullable) {
+				s.append("?")
+			} else {
+				s.append("")
+			}
+		}
+		return s.toString()
+	}
 
 
 }
