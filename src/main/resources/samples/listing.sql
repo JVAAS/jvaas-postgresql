@@ -1,5 +1,5 @@
 
--- fun insertListing
+-- fun insertListingId
 INSERT INTO listing (id, created, modified) VALUES (?, now(), now());
 
 -- fun demoQuery

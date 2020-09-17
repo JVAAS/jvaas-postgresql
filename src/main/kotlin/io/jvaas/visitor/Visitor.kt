@@ -11,7 +11,6 @@ import io.jvaas.type.Model
 import io.jvaas.type.Query
 import io.jvaas.type.Table
 import io.jvaas.visitor.Extractor.Companion.walkFamilyTree
-import java.util.*
 
 class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
@@ -27,6 +26,27 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 	val lastQuery
 		get() = model.queries.last()
 
+	fun getTableFromString(tableName: String?): Table {
+
+		if (tableName == null || tableName.isEmpty()) {
+			throw Exception("Empty tableName received")
+		}
+
+		return model.tables.firstOrNull {
+			it.name.equals(tableName, ignoreCase = true)
+		} ?: throw Exception("Invalid Table '$tableName' for sql\n\t$lastSQL\n")
+	}
+
+	fun getColumnFromString(table: Table?, columnName: String?): Column {
+
+		if (columnName == null || columnName.isEmpty()) {
+			throw Exception("Empty columnName received")
+		}
+
+		return table?.columns?.firstOrNull {
+			it.name.equals(columnName, ignoreCase = true)
+		} ?: throw Exception("Invalid Column '$columnName' for sql\n\t$lastSQL\n")
+	}
 
 	override fun visitStatement(ctx: SQLParser.StatementContext?) {
 		lastSQL = Extractor(ctx).extractSQL(debug = false)
@@ -104,13 +124,49 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 	override fun visitInsertStmtForPsql(ctx: SQLParser.InsertStmtForPsqlContext?) {
 
+		model.queries.add(Query(
+			sql = lastSQL ?: "",
+			name = lastFun ?: "unknown"
+		))
+		lastFun = null
 
-//		ctx?.children?.forEach { child ->
-//			println(child.payload.javaClass)
-//			println(child.text)
-//		}
-//
-//		println(ctx?.children)
+		var tableName: String? = null
+		var table: Table? = null
+		var insertValues: Boolean = false
+		val columns = mutableListOf<Column>()
+		val values = mutableListOf<String>()
+
+		Extractor(ctx).walkLeaves walkLeaves@{ leaf ->
+
+			if (leaf.text == "VALUES") {
+				insertValues = true
+				return@walkLeaves
+			}
+
+			if (table == null) {
+				leaf.walkFamilyTree { fam ->
+					if (fam.payload is IdTokenContext) {
+						tableName = fam.text
+						table = getTableFromString(tableName)
+						return@walkLeaves
+					}
+				}
+			} else if (!insertValues) {
+				leaf.walkFamilyTree { fam ->
+					if (fam.payload is IdTokenContext) {
+						columns.add(getColumnFromString(table, fam.text))
+					}
+				}
+			} else {
+				leaf.walkFamilyTree { fam ->
+					println(fam.text)
+					println(fam::class)
+				}
+			}
+
+
+			println()
+		}
 
 		super.visitInsertStmtForPsql(ctx)
 	}
@@ -120,7 +176,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 		model.queries.add(Query(
 			sql = lastSQL ?: "",
-			name = lastFun ?: UUID.randomUUID().toString().replace("-", "")
+			name = lastFun ?: "unknown"
 		))
 		lastFun = null
 
@@ -143,11 +199,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 			if (where) {
 				if (leaf.text == "?") {
-					// validate column
-					val column = table?.columns?.firstOrNull {
-						it.name.equals(setColumn, ignoreCase = true)
-					} ?: throw Exception("Invalid Column '$setColumn' for sql\n\t$lastSQL\n")
-
+					val column = getColumnFromString(table, setColumn)
 					lastQuery.columns.add(column)
 				} else {
 					leaf.walkFamilyTree { fam ->
@@ -169,11 +221,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 					if (fam.payload is IdTokenContext) {
 						tableName = fam.text
 
-						// validate table name
-						table = model.tables.firstOrNull {
-							it.name.equals(tableName, ignoreCase = true)
-						} ?: throw Exception("Invalid Table '$tableName' for sql\n\t$lastSQL\n")
-
+						table = getTableFromString(tableName)
 						return@walkLeaves
 					}
 				}
@@ -197,11 +245,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 				}
 			} else if (setColumn != null && setToken != null && setValue == null) {
 
-				// validate column
-				val column = table?.columns?.firstOrNull {
-					it.name.equals(setColumn, ignoreCase = true)
-				} ?: throw Exception("Invalid Column '$setColumn' for sql\n\t$lastSQL\n")
-
+				val column = getColumnFromString(table, setColumn)
 				if (leaf.text == "?") {
 					lastQuery.columns.add(column)
 					columnValues.add(setColumn ?: "setColumn can't be null")
