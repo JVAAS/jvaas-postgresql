@@ -61,7 +61,10 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 					}.forEach { columnDefContextToken ->
 						when (columnDefContextToken) {
 							is SQLParser.IdentifierContext -> {
-								lastTable.columns.add(Column(name = columnDefContextToken.text))
+								lastTable.columns.add(Column(
+									name = columnDefContextToken.text,
+									table = lastTable
+								))
 							}
 							is SQLParser.DataTypeContext -> {
 								lastColumn.type = columnDefContextToken.text
@@ -137,16 +140,5 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 		super.visitUpdateStmtForPsql(ctx)
 	}
-
-	// UPDATE SET
-	//override fun visitUpdateSet(ctx: SQLParser.UpdateSetContext?) {
-	//	println("SET")
-	//	ctx?.children?.forEach {
-	//		println(it.payload::class.java)
-	//		println(it.text)
-	//		println()
-	//	}
-	//	super.visitUpdateSet(ctx)
-	//}
 
 }

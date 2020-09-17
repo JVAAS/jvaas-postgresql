@@ -26,16 +26,20 @@ object Scratch {
 		}
 
 		// confirm that model contains all the data
+		println("=================================================")
+		println("\ttables")
+		println("=================================================")
 		model.tables.forEach { table ->
 			println(table)
-			println("")
 		}
-
+		println("=================================================")
+		println("\tqueries")
+		println("=================================================")
 		model.queries.forEach { query ->
 			println(query.name)
 			println(query.sql)
 		}
-
+		println("=================================================")
 
 	}
 }
