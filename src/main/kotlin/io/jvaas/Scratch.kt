@@ -37,9 +37,9 @@ object Scratch {
 		println("\tqueries")
 		println("=================================================")
 		model.queries.forEach { query ->
-			println(query.getKotlinFunctionHeader())
-			println(query.sql)
-			println()
+			//println(query.getKotlinFunctionHeader())
+			//println(query.sql)
+			//println()
 
 			println("${query.getKotlinFunctionHeader()} {")
 			println("\tcon.execute(")

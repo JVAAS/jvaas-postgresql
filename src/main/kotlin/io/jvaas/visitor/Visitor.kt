@@ -154,7 +154,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 						if (fam.payload is IdentifierContext) {
 
 							setColumn = fam.text
-							println(">>>> $setColumn")
+							//println(">>>> $setColumn")
 
 							return@walkLeaves
 						}
@@ -215,98 +215,9 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			}
 		}
 
-
 		//lastQuery.columns.add(columnValues)
-		println(columnValues)
-		Extractor(ctx).dumpTree()
-
-
-//
-//
-//		println("========================")
-//		println(lastSQL)
-//		println(Extractor(ctx).extract(IdentifierContext::class))
-//		println(Extractor(ctx).extract(
-//			UpdateSetContext::class
-////			ValueExpressionPrimaryContext::class,
-////			VexContext::class,
-//		))
-//		println()
-//		Extractor(ctx).dumpTree()
-//		println("========================")
-
-//		println("========================")
-//		println(ctx?.let { Extractor(it).extractSQL() })
-//		println("---------------------")
-//		println(model.queries.last().sql)
-//		println(ctx?.let { Extractor(it).extractColumns() })
-//		println("========================")
-
-//		var tableScope: Table? = null
-//		var columnScope: Column? = null
-//
-//		ctx?.children?.forEach { child ->
-//			when (child) {
-//				is SQLParser.SchemaQualifiedNameContext -> {
-//					model.tables.forEach { table ->
-//						if (table.name.equals(child.text, ignoreCase = true)) {
-//							tableScope = table
-//						}
-//					}
-//				}
-//				is SQLParser.UpdateSetContext -> {
-//					@Suppress("NAME_SHADOWING")
-//					child.children.forEach { child ->
-//						when (child) {
-//							is SQLParser.IndirectionIdentifierContext -> {
-//								tableScope?.columns?.filter { column ->
-//									column.name.equals(child.text, ignoreCase = true)
-//								}?.firstOrNull()?.let { column ->
-//									columnScope = column
-//								}
-//							}
-//							is SQLParser.VexContext -> {
-//								columnScope?.let {
-//									lastQuery.columns.add(ColumnWithValue(
-//										column = it,
-//										value = child.text
-//									))
-//								} ?: run {
-//									throw Exception("ColumnScope is null for value ${child.text}")
-//								}
-//							}
-//							else -> {
-//								println(child.javaClass)
-//							}
-//						}
-//
-//
-//					}
-//					//println("set:${child.text}")
-//					println("======")
-//				}
-//				is SQLParser.VexContext -> {
-//					@Suppress("NAME_SHADOWING")
-//					child.children.forEach { child ->
-//						when (child) {
-//							is SQLParser.VexContext -> {
-//								println(child.text)
-//							}
-//							else -> {
-//								println(child.javaClass)
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
-//		if (tableScope == null) {
-//			throw Exception("""
-//				Not a valid table name for query: ${lastQuery.sql}"
-//				Available table names are: ${model.tables.joinToString { it.name }}
-//			""".trimIndent())
-//		}
-
+		//println(columnValues)
+		//Extractor(ctx).dumpTree()
 
 		super.visitUpdateStmtForPsql(ctx)
 	}
