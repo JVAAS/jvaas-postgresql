@@ -1,12 +1,13 @@
 package io.jvaas.visitor
 
 import io.jvaas.gen.SQLParser
-import io.jvaas.gen.SQLParser.*
+import io.jvaas.gen.SQLParser.IdTokenContext
+import io.jvaas.gen.SQLParser.IdentifierContext
 import io.jvaas.gen.SQLParserBaseVisitor
 import io.jvaas.mapper.SQLToKotlinTypeMapper
 import io.jvaas.mapper.StringMapper.snakeToLowerCamelCase
 import io.jvaas.type.*
-import org.antlr.v4.runtime.tree.ParseTree
+import io.jvaas.visitor.Extractor.Companion.walkFamilyTree
 import java.util.*
 
 class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
@@ -22,7 +23,6 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 	val lastQuery
 		get() = model.queries.last()
-
 
 
 	override fun visitStatement(ctx: SQLParser.StatementContext?) {
@@ -121,17 +121,96 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		))
 		lastFun = null
 
-		println("========================")
-		println(lastSQL)
-		println(Extractor(ctx).extract(IdentifierContext::class))
-		println(Extractor(ctx).extract(
-			UpdateSetContext::class
-//			ValueExpressionPrimaryContext::class,
-//			VexContext::class,
-		))
-		println()
+		var tableName: String? = null
+		var table: Table? = null
+
+		var setColumn: String? = null
+		var setToken: String? = null
+		var setValue: String? = null
+		var where: Boolean = false
+		val columnValues = mutableListOf<String>()
+
+		Extractor(ctx).walkLeaves walkLeaves@{ leaf ->
+
+			if (leaf.text == "WHERE") {
+				where = true
+			}
+
+			if (where) {
+				// ignore for now
+			} else if (tableName == null) {
+
+				// extract table name
+
+				leaf.walkFamilyTree { fam ->
+					if (fam.payload::class == IdTokenContext::class) {
+						tableName = fam.text
+
+						// validate table name
+						table = model.tables.firstOrNull {
+							it.name.equals(tableName, ignoreCase = true)
+						} ?: throw Exception("Invalid Table '$tableName' for sql\n\t$lastSQL\n")
+
+						return@walkLeaves
+					}
+				}
+			} else if (setColumn == null) {
+
+				// extract column name
+
+				leaf.walkFamilyTree { fam ->
+					if (fam.payload::class in listOf(
+							IdTokenContext::class,
+							IdentifierContext::class,
+						)
+					) {
+						setColumn = fam.text
+						return@walkLeaves
+					}
+				}
+			} else if (setColumn != null && setToken == null) {
+				if (leaf.text == "=") {
+					setToken = "="
+				}
+			} else if (setColumn != null && setToken != null && setValue == null) {
+
+				// validate column
+				val column = table?.columns?.firstOrNull {
+					it.name.equals(setColumn, ignoreCase = true)
+				} ?: throw Exception("Invalid Column '$setColumn' for sql\n\t$lastSQL\n")
+
+				if (leaf.text == "?") {
+					lastQuery.columns.add(column)
+					columnValues.add(setColumn ?: "setColumn can't be null")
+				}
+
+				setColumn = null
+				setToken = null
+				setValue = null
+
+				return@walkLeaves
+			}
+		}
+
+
+		//lastQuery.columns.add(columnValues)
+		println(columnValues)
 		Extractor(ctx).dumpTree()
-		println("========================")
+
+
+//
+//
+//		println("========================")
+//		println(lastSQL)
+//		println(Extractor(ctx).extract(IdentifierContext::class))
+//		println(Extractor(ctx).extract(
+//			UpdateSetContext::class
+////			ValueExpressionPrimaryContext::class,
+////			VexContext::class,
+//		))
+//		println()
+//		Extractor(ctx).dumpTree()
+//		println("========================")
 
 //		println("========================")
 //		println(ctx?.let { Extractor(it).extractSQL() })

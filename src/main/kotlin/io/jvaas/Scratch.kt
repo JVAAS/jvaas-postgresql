@@ -39,9 +39,6 @@ object Scratch {
 		model.queries.forEach { query ->
 			println(query.getKotlinFunctionHeader())
 			println(query.sql)
-			println(query.columns.map {
-				"""${it.column.name}=${it.value}"""
-			})
 			println()
 		}
 		println("=================================================")

@@ -1,6 +1,5 @@
 package io.jvaas.visitor
 
-import io.jvaas.gen.SQLParser
 import org.antlr.v4.runtime.tree.ParseTree
 import kotlin.reflect.KClass
 
@@ -11,22 +10,32 @@ class Extractor(tree: ParseTree? = null) {
 	fun walkLeaves(
 		debug: Boolean = false,
 		childTree: ParseTree = internalTree,
-		leave: (childTree: ParseTree) -> Unit,
+		walker: (childTree: ParseTree) -> Unit,
 	) {
 
 		if (childTree.childCount == 0) {
 			if (!childTree.text?.trim().isNullOrBlank()) {
-				leave(childTree)
+				walker(childTree)
 			}
 		} else {
 			for (i in 0 until childTree.childCount) {
 				walkLeaves(
 					debug = debug,
-					leave = leave,
+					walker = walker,
 					childTree = childTree.getChild(i),
 				)
 			}
 		}
+	}
+
+	fun extractLeaves(
+		childTree: ParseTree = internalTree
+	): MutableList<ParseTree> {
+		val parts = mutableListOf<ParseTree>()
+		walkLeaves {
+			parts.add(it)
+		}
+		return parts
 	}
 
 	fun extractSQL(
@@ -35,8 +44,8 @@ class Extractor(tree: ParseTree? = null) {
 		debug: Boolean = false,
 	): String {
 
-		walkLeaves(debug = debug) { leave ->
-			parts.add(leave.text)
+		walkLeaves(debug = debug) { leaf ->
+			parts.add(leaf.text)
 		}
 		var sql = parts.joinToString(" ")
 		sql = sql.replace(" = ", "=")
@@ -49,13 +58,12 @@ class Extractor(tree: ParseTree? = null) {
 
 	fun extract(vararg clazz: KClass<*>): List<String> {
 		val result = mutableListOf<String>()
-		walkLeaves {  leave ->
-			var branch = leave
-			while(branch.parent != null) {
+		walkLeaves { leaf ->
+			var branch = leaf
+			while (branch.parent != null) {
 				clazz.forEach { clazz ->
 					if (branch.payload::class == clazz) {
 						result.add(branch.text)
-						return@walkLeaves
 					}
 				}
 
@@ -66,9 +74,9 @@ class Extractor(tree: ParseTree? = null) {
 	}
 
 	fun dumpTree() {
-		walkLeaves { leave ->
-			var branch = leave
-			while(branch.parent != null) {
+		walkLeaves { leaf ->
+			var branch = leaf
+			while (branch.parent != null) {
 				println(branch.text + "\n\t" + branch.payload::class)
 				branch = branch.parent
 			}
@@ -76,6 +84,15 @@ class Extractor(tree: ParseTree? = null) {
 		}
 	}
 
+	companion object {
+		inline fun ParseTree.walkFamilyTree(walker: (ParseTree) -> Unit) {
+			var branch = this
+			while (branch.parent != null) {
+				walker(branch)
+				branch = branch.parent
+			}
+		}
+	}
 
 
 }

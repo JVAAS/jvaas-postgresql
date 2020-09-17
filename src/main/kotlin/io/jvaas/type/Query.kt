@@ -1,22 +1,18 @@
 package io.jvaas.type
 
-import java.lang.StringBuilder
-
 data class Query(
 	val sql: String,
 	val name: String,
-	val columns: MutableList<ColumnWithValue> = mutableListOf()
+	val columns: MutableList<Column> = mutableListOf()
 ) {
 
 	fun getKotlinFunctionHeader(): String {
 		val sb = StringBuilder()
 		sb.append("fun $name(")
 
-		columns.filter {
-			it.value == "?"
-		}.map {  columnValue ->
+		columns.map { column ->
 			"""
-				${columnValue.column.kotlinName}: ${columnValue.column.kotlinType}
+				${column.kotlinName}: ${column.kotlinType}
 			""".trimIndent()
 
 		}.joinToString().let {
