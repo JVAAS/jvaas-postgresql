@@ -5,13 +5,6 @@ class Model(
 	val queries: MutableList<Query> = mutableListOf(),
 ) {
 
-	val lastTable
-		get() = tables.last()
 
-	val lastColumn
-		get() = tables.last().columns.last()
-
-	val lastQuery
-		get() = queries.last()
 
 }

@@ -13,6 +13,15 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 	var lastFun: String? = null
 
+	val lastTable
+		get() = model.tables.last()
+
+	val lastColumn
+		get() = model.tables.last().columns.last()
+
+	val lastQuery
+		get() = model.queries.last()
+
 	fun getSQL(children: List<ParseTree>? = null): String {
 		return children?.map { it.text }?.joinToString(" ") ?: ""
 	}
@@ -52,17 +61,17 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 					}.forEach { columnDefContextToken ->
 						when (columnDefContextToken) {
 							is SQLParser.IdentifierContext -> {
-								model.lastTable.columns.add(Column(name = columnDefContextToken.text))
+								lastTable.columns.add(Column(name = columnDefContextToken.text))
 							}
 							is SQLParser.DataTypeContext -> {
-								model.lastColumn.type = columnDefContextToken.text
+								lastColumn.type = columnDefContextToken.text
 							}
 							is SQLParser.ConstraintCommonContext -> {
 								columnDefContextToken.children.forEach { columnDefContextTokenConstraint ->
 									if (columnDefContextTokenConstraint.text == "notnull") {
-										model.lastColumn.nullable = false
+										lastColumn.nullable = false
 									} else if (columnDefContextTokenConstraint.text.startsWith("default")) {
-										model.lastColumn.default =
+										lastColumn.default =
 											columnDefContextTokenConstraint.text.replaceFirst("default", "")
 									}
 								}
