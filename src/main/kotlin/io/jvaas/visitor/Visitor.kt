@@ -71,7 +71,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 							}
 							is SQLParser.ConstraintCommonContext -> {
 								columnDefContextToken.children.forEach { columnDefContextTokenConstraint ->
-									if (columnDefContextTokenConstraint.text == "notnull") {
+									if (columnDefContextTokenConstraint.text.equals("notnull", ignoreCase = true)) {
 										lastColumn.nullable = false
 									} else if (columnDefContextTokenConstraint.text.startsWith("default")) {
 										lastColumn.default =
