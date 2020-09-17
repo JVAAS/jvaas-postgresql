@@ -3,11 +3,12 @@ package io.jvaas.visitor
 import io.jvaas.gen.SQLParser
 import org.antlr.v4.runtime.tree.ParseTree
 
-class Extractor(val tree: ParseTree) {
+class Extractor(tree: ParseTree? = null) {
 
+	private val internalTree: ParseTree = tree ?: throw Exception("Can't parse null tree")
 
 	fun walkLeaves(
-		childTree: ParseTree = tree,
+		childTree: ParseTree = internalTree,
 		leave: (childTree: ParseTree) -> Unit) {
 
 		if (childTree.childCount == 0) {
@@ -23,7 +24,7 @@ class Extractor(val tree: ParseTree) {
 	}
 
 	fun extractSQL(
-		childTree: ParseTree = tree,
+		childTree: ParseTree = internalTree,
 		parts: MutableList<String> = mutableListOf()
 	): String {
 
@@ -40,9 +41,16 @@ class Extractor(val tree: ParseTree) {
 	}
 
 	fun extractColumns(
-		childTree: ParseTree = tree,
+		childTree: ParseTree = internalTree,
 		columns: MutableList<String> = mutableListOf()
 	): MutableList<String> {
+
+		walkLeaves {
+			println(it.text)
+			println(it.javaClass)
+			println()
+		}
+
 
 //		if (childTree.childCount == 1) {
 //			if (childTree is SQLParser.IndirectionIdentifierContext) {
