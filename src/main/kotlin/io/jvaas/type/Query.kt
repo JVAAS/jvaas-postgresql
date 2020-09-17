@@ -16,7 +16,7 @@ data class Query(
 			it.value == "?"
 		}.map {  columnValue ->
 			"""
-				${columnValue.column.name}: ${columnValue.column.kotlinType}
+				${columnValue.column.kotlinName}: ${columnValue.column.kotlinType}
 			""".trimIndent()
 
 		}.joinToString().let {

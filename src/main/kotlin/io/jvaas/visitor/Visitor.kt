@@ -3,6 +3,7 @@ package io.jvaas.visitor
 import io.jvaas.gen.SQLParser
 import io.jvaas.gen.SQLParserBaseVisitor
 import io.jvaas.mapper.SQLToKotlinTypeMapper
+import io.jvaas.mapper.StringMapper.snakeToLowerCamelCase
 import io.jvaas.type.*
 import org.antlr.v4.runtime.tree.ParseTree
 import java.util.*
@@ -61,6 +62,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 							is SQLParser.IdentifierContext -> {
 								lastTable.columns.add(Column(
 									name = columnDefContextToken.text,
+									kotlinName = columnDefContextToken.text.snakeToLowerCamelCase(),
 									table = lastTable
 								))
 							}

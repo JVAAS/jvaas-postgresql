@@ -2,6 +2,7 @@ package io.jvaas
 
 import io.jvaas.gen.SQLLexer
 import io.jvaas.gen.SQLParser
+import io.jvaas.mapper.StringMapper.snakeToLowerCamelCase
 import io.jvaas.type.Model
 import io.jvaas.visitor.Visitor
 import org.antlr.v4.runtime.CharStreams
