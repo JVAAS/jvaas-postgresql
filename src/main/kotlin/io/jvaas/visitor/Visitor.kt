@@ -52,6 +52,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		super.visitStatement(ctx)
 	}
 
+	// COMMENT
 	override fun visitLineComment(ctx: SQLParser.LineCommentContext?) {
 		val parts = ctx?.text?.split(" ")
 		var foundFun = false
@@ -65,6 +66,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		super.visitLineComment(ctx)
 	}
 
+	// CREATE
 	override fun visitCreateTableStatement(ctx: SQLParser.CreateTableStatementContext?) {
 		var createTableVisited = false
 		ctx?.children?.forEach { child ->
@@ -76,6 +78,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		super.visitCreateTableStatement(ctx)
 	}
 
+	// COLUMN
 	override fun visitDefineColumns(ctx: SQLParser.DefineColumnsContext?) {
 		ctx?.children?.forEach { columnDefinition ->
 			if (columnDefinition.payload.javaClass == SQLParser.TableColumnDefContext::class.java) {
@@ -120,7 +123,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		super.visitDefineColumns(ctx)
 	}
 
-
+	// INSERT
 	override fun visitInsertStmtForPsql(ctx: SQLParser.InsertStmtForPsqlContext?) {
 
 		model.queries.add(Query(
@@ -183,8 +186,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			}
 		}
 
-		println(columns)
-		println(values)
+		//println(columns)
+		//println(values)
 
 		super.visitInsertStmtForPsql(ctx)
 	}
@@ -283,5 +286,17 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 		super.visitUpdateStmtForPsql(ctx)
 	}
+
+	override fun visitSelectStmt(ctx: SelectStmtContext?) {
+
+		println("========")
+		println(lastSQL)
+		println(ctx?.text)
+		println("========")
+		//println("SELECT => $lastSQL")
+
+		super.visitSelectStmt(ctx)
+	}
+
 
 }
