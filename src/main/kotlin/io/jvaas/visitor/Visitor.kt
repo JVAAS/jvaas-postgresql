@@ -1,8 +1,7 @@
 package io.jvaas.visitor
 
 import io.jvaas.gen.SQLParser
-import io.jvaas.gen.SQLParser.IdTokenContext
-import io.jvaas.gen.SQLParser.IdentifierContext
+import io.jvaas.gen.SQLParser.*
 import io.jvaas.gen.SQLParserBaseVisitor
 import io.jvaas.mapper.SQLToKotlinTypeMapper
 import io.jvaas.mapper.StringMapper.snakeToLowerCamelCase
@@ -135,6 +134,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		var insertValues: Boolean = false
 		val columns = mutableListOf<Column>()
 		val values = mutableListOf<String>()
+		var currentValue = ""
 
 		Extractor(ctx).walkLeaves walkLeaves@{ leaf ->
 
@@ -157,16 +157,34 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 						columns.add(getColumnFromString(table, fam.text))
 					}
 				}
-			} else {
-				leaf.walkFamilyTree { fam ->
-					println(fam.text)
-					println(fam::class)
+			} else if (insertValues) {
+
+				//println(leaf.text)
+				//println(leaf.parent.payload::class)
+
+				if (leaf.parent.payload is ValuesValuesContext) {
+					if (currentValue.isNotEmpty()) {
+						values.add(currentValue)
+						currentValue = ""
+					}
+				} else {
+					currentValue += leaf.text
 				}
 			}
-
-
-			println()
 		}
+
+		if (columns.size != values.size) {
+			throw Exception("Columns.size == ${columns.size} AND Values.size == ${values.size} for query\n$lastSQL")
+		}
+
+		values.forEachIndexed { i, value ->
+			if (value == "?") {
+				lastQuery.columns.add(columns[i])
+			}
+		}
+
+		println(columns)
+		println(values)
 
 		super.visitInsertStmtForPsql(ctx)
 	}
