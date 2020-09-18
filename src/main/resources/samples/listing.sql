@@ -49,3 +49,16 @@ UPDATE listing SET modified = now(), section = ? WHERE id = ?;
 
 -- fun selectAllWhereIdIs1
 SELECT id FROM listing WHERE id = 1;
+
+-- fun complexSelectWithJoin
+SELECT
+    l.id, l.title, title_url,
+    li.id, li.width, li.height, li.name
+FROM listing AS l
+LEFT JOIN listing_image AS li
+ON l.id = li.listing_id
+WHERE l.id = ?
+
+
+
+
