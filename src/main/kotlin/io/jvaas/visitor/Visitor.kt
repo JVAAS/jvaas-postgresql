@@ -299,40 +299,60 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 		val both = mutableListOf<String>()
 
+		var selectSublistContext: Boolean = false
+		var selectColumn: String? = null
+		val selectColumns = mutableListOf<String>()
+
+		var selectScope: Boolean = false
+		var fromScope: Boolean = false
+
 		Extractor(ctx).walkLeaves { leaf ->
 
-			var selectPrimaryContext = false
-			var identifierConext = false
-			var idTokenContext = false
+			if (leaf.text.equals("SELECT", ignoreCase = true)) {
+				selectScope = true
+			} else if (leaf.text.equals("FROM", ignoreCase = true)) {
+				selectScope = false
+				fromScope = true
+			}
 
 			println(leaf.text)
-			leaf.walkFamilyTree {  fam ->
-				if (fam.payload is SelectPrimaryContext) {
-					selectPrimaryContext = true
-					println("????????????")
-				} else if (fam.payload is IdentifierContext) {
-					identifierConext = true
-					println("====")
-				} else if (fam.payload is IdTokenContext) {
-					idTokenContext = true
-					println("====")
+			leaf.walkFamilyTree { fam ->
+				if (fam.payload is SelectSublistContext) {
+					selectSublistContext = true
 				}
-
 				println(fam.payload::class)
 			}
 
-			if (idTokenContext) {
-				both.add(leaf.text)
+			if (selectScope) {
+				if (selectSublistContext) {
+					if (selectColumn == null) {
+						selectColumn = leaf.text
+					} else {
+						selectColumn += leaf.text
+					}
+				} else if (selectColumn != null) {
+					selectColumns.add(selectColumn ?: "")
+					selectColumn = null
+				}
+			} else if (fromScope) {
+
 			}
-
 			println()
-
 
 
 		}
 
+		if (selectScope) {
+			if (selectColumn != null) {
+				selectColumns.add(selectColumn ?: "")
+			}
+		} else if (fromScope) {
+
+		}
+
 		println("==================")
-		println(both)
+		println(selectColumn)
+		println(selectColumns)
 		println("==================")
 
 		super.visitSelectStmt(ctx)
