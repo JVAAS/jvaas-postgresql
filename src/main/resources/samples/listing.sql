@@ -48,7 +48,7 @@ UPDATE listing SET modified = now(), published = ? WHERE id = ?;
 UPDATE listing SET modified = now(), section = ? WHERE id = ?;
 
 -- fun selectAllWhereIdIs1
-SELECT id FROM listing WHERE id = 1;
+SELECT l.id, title FROM listing AS l WHERE l.id = 1;
 
 -- fun complexSelectWithJoin
 SELECT
@@ -57,7 +57,7 @@ SELECT
 FROM listing AS l
 LEFT JOIN listing_image AS li
 ON l.id = li.listing_id
-WHERE l.id = ?
+WHERE l.id = ? AND created < now() AND li.width > ? AND li.height > ?
 
 
 

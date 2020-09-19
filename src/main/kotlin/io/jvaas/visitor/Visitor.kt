@@ -287,13 +287,53 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		super.visitUpdateStmtForPsql(ctx)
 	}
 
+	// SELECT
 	override fun visitSelectStmt(ctx: SelectStmtContext?) {
 
-		println("========")
-		println(lastSQL)
-		println(ctx?.text)
-		println("========")
-		//println("SELECT => $lastSQL")
+		// make sure we're extracting a valid SELECT query
+		// and not a VALUES query
+		if (lastFun == null) {
+			super.visitSelectStmt(ctx)
+			return
+		}
+
+		val both = mutableListOf<String>()
+
+		Extractor(ctx).walkLeaves { leaf ->
+
+			var selectPrimaryContext = false
+			var identifierConext = false
+			var idTokenContext = false
+
+			println(leaf.text)
+			leaf.walkFamilyTree {  fam ->
+				if (fam.payload is SelectPrimaryContext) {
+					selectPrimaryContext = true
+					println("????????????")
+				} else if (fam.payload is IdentifierContext) {
+					identifierConext = true
+					println("====")
+				} else if (fam.payload is IdTokenContext) {
+					idTokenContext = true
+					println("====")
+				}
+
+				println(fam.payload::class)
+			}
+
+			if (idTokenContext) {
+				both.add(leaf.text)
+			}
+
+			println()
+
+
+
+		}
+
+		println("==================")
+		println(both)
+		println("==================")
 
 		super.visitSelectStmt(ctx)
 	}
