@@ -299,12 +299,14 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 		var selectColumn: String? = null
 		val selectColumns = mutableListOf<String>()
+		val tableColumns = mutableListOf<String>()
 		var selectScope: Boolean = false
 		var fromScope: Boolean = false
 
 		Extractor(ctx).walkLeaves { leaf ->
 
 			var selectSublistContext: Boolean = false
+			var schemaQualifiedNameContext: Boolean = false
 
 			if (leaf.text.equals("SELECT", ignoreCase = true)) {
 				selectScope = true
@@ -317,6 +319,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			leaf.walkFamilyTree { fam ->
 				if (fam.payload is SelectSublistContext) {
 					selectSublistContext = true
+				} else if (fam.payload is SchemaQualifiedNameContext) {
+					schemaQualifiedNameContext = true
 				}
 				println(fam.payload::class)
 			}
@@ -333,7 +337,9 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 					selectColumn = null
 				}
 			} else if (fromScope) {
-
+				if (schemaQualifiedNameContext) {
+					tableColumns.add(leaf.text)
+				}
 			}
 			println()
 
@@ -347,7 +353,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		println("==================")
 		//println(selectColumn)
 		//println(selectColumns)
-		println(selectColumns.joinToString(separator = "|"))
+		println(selectColumns.joinToString(separator = " | "))
+		println(tableColumns.joinToString(separator = " | "))
 		println("==================")
 
 		super.visitSelectStmt(ctx)
