@@ -297,16 +297,14 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			return
 		}
 
-		val both = mutableListOf<String>()
-
-		var selectSublistContext: Boolean = false
 		var selectColumn: String? = null
 		val selectColumns = mutableListOf<String>()
-
 		var selectScope: Boolean = false
 		var fromScope: Boolean = false
 
 		Extractor(ctx).walkLeaves { leaf ->
+
+			var selectSublistContext: Boolean = false
 
 			if (leaf.text.equals("SELECT", ignoreCase = true)) {
 				selectScope = true
@@ -342,17 +340,14 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 		}
 
-		if (selectScope) {
-			if (selectColumn != null) {
-				selectColumns.add(selectColumn ?: "")
-			}
-		} else if (fromScope) {
-
+		if (selectColumn != null) {
+			selectColumns.add(selectColumn ?: "")
 		}
 
 		println("==================")
-		println(selectColumn)
-		println(selectColumns)
+		//println(selectColumn)
+		//println(selectColumns)
+		println(selectColumns.joinToString(separator = "|"))
 		println("==================")
 
 		super.visitSelectStmt(ctx)
