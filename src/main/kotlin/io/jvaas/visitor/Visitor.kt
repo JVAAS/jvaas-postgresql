@@ -182,7 +182,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 		values.forEachIndexed { i, value ->
 			if (value == "?") {
-				lastQuery.columns.add(columns[i])
+				lastQuery.inputColumns.add(columns[i])
 			}
 		}
 
@@ -221,7 +221,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			if (where) {
 				if (leaf.text == "?") {
 					val column = getColumnFromString(table, setColumn)
-					lastQuery.columns.add(column)
+					lastQuery.inputColumns.add(column)
 				} else {
 					leaf.walkFamilyTree { fam ->
 						if (fam.payload is IdentifierContext) {
@@ -268,7 +268,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 				val column = getColumnFromString(table, setColumn)
 				if (leaf.text == "?") {
-					lastQuery.columns.add(column)
+					lastQuery.inputColumns.add(column)
 					columnValues.add(setColumn ?: "setColumn can't be null")
 				}
 
@@ -300,7 +300,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		var selectColumn: String? = null
 		val selectColumns = mutableListOf<String>()
 		val tableNames = mutableListOf<String>()
-		val tableAliases = mutableMapOf<String, String>()
+		val tableNameAliases = mutableMapOf<String, String>()
 		var selectScope: Boolean = false
 		var fromScope: Boolean = false
 
@@ -331,7 +331,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 			if (aliasClauseContext) {
 				if (identifierContext) {
-					tableAliases[leaf.text] = tableNames.last()
+					tableNameAliases[leaf.text] = tableNames.last()
 				}
 			} else {
 				if (selectScope) {
@@ -361,12 +361,39 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			selectColumns.add(selectColumn ?: "")
 		}
 
+		selectColumns.forEach {  column ->
+			var tableName: String? = null
+			var columnName: String? = null
+			if (column.contains(".")) {
+				val parts = column.split(".").toMutableList()
+				columnName = parts.removeLast()
+				tableName = parts.removeLast()
+			} else {
+				columnName = column
+				if (tableNames.size != 1) {
+					throw Exception("""
+						Not sure which table column=${column} matches with,
+						aliases=${tableNameAliases},
+						query=${lastSQL}
+					""".trimIndent())
+				}
+				tableName = tableNames.first()
+			}
+
+			println("=======")
+			println(tableName)
+			println(columnName)
+			println("=======")
+
+		}
+
+
 		println("==================")
 		//println(selectColumn)
 		//println(selectColumns)
 		println(selectColumns.joinToString(separator = " | "))
 		println(tableNames.joinToString(separator = " | "))
-		println(tableAliases)
+		println(tableNameAliases)
 		println("==================")
 
 		super.visitSelectStmt(ctx)

@@ -52,7 +52,7 @@ SELECT l.id, title FROM listing AS l WHERE l.id = 1;
 
 -- fun complexSelectWithJoin
 SELECT
-    l.id, l.title, title_url,
+    l.id, l.title, l.title_url,
     li.id, li.width, li.height, li.name
 FROM listing AS l
 LEFT JOIN listing_image AS li

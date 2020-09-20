@@ -47,7 +47,7 @@ object Scratch {
 			println("\t\t\"\"\"")
 			println("\t\t${query.sql}")
 			println("\t\t\"\"\".trimIndent(),")
-			query.columns.forEach { column ->
+			query.inputColumns.forEach { column ->
 				println("\t\t${column.kotlinName},")
 			}
 			println("\t)")
