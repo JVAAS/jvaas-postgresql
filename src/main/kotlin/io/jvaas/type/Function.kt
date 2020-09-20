@@ -1,6 +1,6 @@
 package io.jvaas.type
 
-class Function(val builder: (Function.() -> Unit)? = null) {
+class Lines(val builder: (Lines.() -> Unit)? = null) {
 
 	private val lines = mutableListOf<String>()
 
@@ -12,15 +12,15 @@ class Function(val builder: (Function.() -> Unit)? = null) {
 		lines.add(this)
 	}
 
-	operator fun Function.plus(function: Function): Function {
-		return Function().apply {
+	operator fun Lines.plus(function: Lines): Lines {
+		return Lines().apply {
 			lines.addAll(this.lines)
 			lines.addAll(function.lines)
 		}
 	}
 
-	fun indent(tabs: Int = 0, spaces: Int = 0): Function {
-		return Function().apply {
+	fun indent(tabs: Int = 0, spaces: Int = 0): Lines {
+		return Lines().apply {
 			lines.clear()
 			lines.addAll(lines.map {
 				" ".repeat(spaces) + "\t".repeat(tabs) + it

@@ -11,8 +11,8 @@ data class Query(
 		return name.capitalize() + "Result"
 	}
 
-	fun getKotlinResultClass(): Function {
-		return Function {
+	fun getKotlinResultClass(): Lines {
+		return Lines {
 			+"data class ${getResultClassName()}("
 			outputColumns.map {
 				it.table.kotlinName + it.kotlinName.capitalize() + " : " + it.kotlinType
@@ -23,8 +23,8 @@ data class Query(
 		}
 	}
 
-	fun getKotlinFunctionHeader(): Function {
-		return Function {
+	fun getKotlinFunctionHeader(): Lines {
+		return Lines {
 			+"suspend fun $name("
 
 			// add some params
