@@ -57,6 +57,8 @@ SELECT
 FROM listing AS l
 LEFT JOIN listing_image AS li
 ON l.id = li.listing_id
+LEFT JOIN account AS a
+ON a.id = l.id
 WHERE l.id = ? AND created < now() AND li.width > ? AND li.height > ?
 
 
