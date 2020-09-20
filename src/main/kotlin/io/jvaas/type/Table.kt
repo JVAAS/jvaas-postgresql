@@ -15,7 +15,7 @@ data class Table(
 		return Lines {
 			+"$name {"
 			columns.forEach {  column ->
-				+"\t$column"
+				+column.lines().indent(tabs = 1)
 			}
 			+"}"
 		}

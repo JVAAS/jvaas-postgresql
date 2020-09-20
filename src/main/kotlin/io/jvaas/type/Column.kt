@@ -2,6 +2,7 @@ package io.jvaas.type
 
 import io.jvaas.mapper.SQLToKotlinTypeMapper
 import io.jvaas.mapper.StringMapper.snakeToLowerCamelCase
+import io.jvaas.mapper.StringMapper.snakeToUpperCamelCase
 
 data class Column(
 	val name: String,
@@ -12,28 +13,29 @@ data class Column(
 ) {
 
 	val kotlinName: String
-		get() = name.snakeToLowerCamelCase()
+		get() = table.kotlinName + name.snakeToUpperCamelCase()
 
 	val kotlinType: String
 		get() = SQLToKotlinTypeMapper.map(type, nullable)
 
 	fun lines(): Lines {
 		return Lines {
+			+name
 			if (default != null) {
 				if (nullable) {
-					+"? = $default"
+					-"? = $default"
 				} else {
-					+" = $default"
+					-" = $default"
 				}
 			} else {
 				if (nullable) {
-					+"?"
+					-"?"
 				} else {
-					+""
+					-""
 				}
 			}
 
-			+" -> $kotlinType"
+			-" -> $kotlinName : $kotlinType"
 		}
 	}
 
