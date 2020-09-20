@@ -17,26 +17,28 @@ data class Column(
 	val kotlinType: String
 		get() = SQLToKotlinTypeMapper.map(type, nullable)
 
-	override fun toString(): String {
-		val s = StringBuilder()
-		s.append("$name : $type")
-		if (default != null) {
-			if (nullable) {
-				s.append("? = $default")
+	fun lines(): Lines {
+		return Lines {
+			if (default != null) {
+				if (nullable) {
+					+"? = $default"
+				} else {
+					+" = $default"
+				}
 			} else {
-				s.append(" = $default")
+				if (nullable) {
+					+"?"
+				} else {
+					+""
+				}
 			}
-		} else {
-			if (nullable) {
-				s.append("?")
-			} else {
-				s.append("")
-			}
+
+			+" -> $kotlinType"
 		}
+	}
 
-		s.append(" -> $kotlinType")
-
-		return s.toString()
+	override fun toString(): String {
+		return lines().toString()
 	}
 
 

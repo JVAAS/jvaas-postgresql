@@ -7,18 +7,22 @@ data class Table(
 	val name: String,
 	val columns: MutableList<Column> = mutableListOf()
 ) {
+
 	val kotlinName: String
 		get() = name.snakeToLowerCamelCase()
 
-	override fun toString(): String {
-		val s = StringBuilder()
-
-		s.append("$name {\n")
-		columns.forEach {  column ->
-			s.append("\t$column\n")
+	fun lines(): Lines {
+		return Lines {
+			+"$name {"
+			columns.forEach {  column ->
+				+"\t$column"
+			}
+			+"}"
 		}
-		s.append("}\n")
-		return s.toString()
+	}
+
+	override fun toString(): String {
+		return lines().toString()
 	}
 
 }

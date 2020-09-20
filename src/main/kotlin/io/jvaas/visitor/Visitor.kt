@@ -320,7 +320,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 				fromScope = true
 			}
 
-			println(leaf.text)
+			//println(leaf.text)
 			leaf.walkFamilyTree { fam ->
 				when (fam.payload) {
 					is SelectSublistContext -> selectSublistContext = true
@@ -328,7 +328,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 					is AliasClauseContext -> aliasClauseContext = true
 					is IdentifierContext -> identifierContext = true
 				}
-				println(fam.payload::class)
+				//println(fam.payload::class)
 			}
 
 			if (aliasClauseContext) {
@@ -354,7 +354,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 				}
 			}
 
-			println()
+			//println()
 
 
 		}
@@ -394,15 +394,15 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 		//println(selectColumn)
 		//println(selectColumns)
-		println("==================")
-		lastQuery.outputColumns.forEach {
-			println(it.table.name + " + " + it.name + " = " + it.kotlinName + ":" + it.kotlinType)
-		}
-		println("==================")
-		println(selectColumns.joinToString(separator = " | "))
-		println(tableNames.joinToString(separator = " | "))
-		println(tableNameAliases)
-		println("==================")
+		//println("==================")
+		//lastQuery.outputColumns.forEach {
+		//	println(it.table.name + " + " + it.name + " = " + it.kotlinName + ":" + it.kotlinType)
+		//}
+		//println("==================")
+		//println(selectColumns.joinToString(separator = " | "))
+		//println(tableNames.joinToString(separator = " | "))
+		//println(tableNameAliases)
+		//println("==================")
 
 		super.visitSelectStmt(ctx)
 	}

@@ -43,5 +43,26 @@ data class Query(
 		}
 	}
 
+	fun lines(): Lines {
+		return Lines {
+			//println(query.getKotlinFunctionHeader())
+			//println(query.sql)
+			//println()
+
+			+getKotlinResultClass()
+			+"${getKotlinFunctionHeader()} {"
+			+"con.execute("
+			+"\t// language=SQL"
+			+"\t\"\"\""
+			+"\t${sql}"
+			+"\t\"\"\".trimIndent(),"
+			inputColumns.forEach { column ->
+				+("\t\t${column.kotlinName},")
+			}
+			+"\t)"
+			+"}\n"
+		}
+	}
+
 }
 
