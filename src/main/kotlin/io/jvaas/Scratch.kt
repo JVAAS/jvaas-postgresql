@@ -41,6 +41,7 @@ object Scratch {
 			//println(query.sql)
 			//println()
 
+			println(query.getKotlinResultClass())
 			println("${query.getKotlinFunctionHeader()} {")
 			println("\tcon.execute(")
 			println("\t\t// language=SQL")
