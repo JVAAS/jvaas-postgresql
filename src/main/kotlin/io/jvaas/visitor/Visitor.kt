@@ -92,7 +92,6 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 							is IdentifierContext -> {
 								lastTable.columns.add(Column(
 									name = columnDefContextToken.text,
-									kotlinName = columnDefContextToken.text.snakeToLowerCamelCase(),
 									table = lastTable
 								))
 							}
@@ -114,10 +113,6 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 					}
 				}
 			}
-		}
-
-		lastTable.columns.forEach { column ->
-			column.kotlinType = SQLToKotlinTypeMapper.map(column.type, column.nullable)
 		}
 
 		super.visitDefineColumns(ctx)
@@ -297,6 +292,13 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			return
 		}
 
+		// add new query
+		model.queries.add(Query(
+			sql = lastSQL ?: "",
+			name = lastFun ?: "unknown"
+		))
+		lastFun = null
+
 		var selectColumn: String? = null
 		val selectColumns = mutableListOf<String>()
 		val tableNames = mutableListOf<String>()
@@ -367,7 +369,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			if (column.contains(".")) {
 				val parts = column.split(".").toMutableList()
 				columnName = parts.removeLast()
-				tableName = parts.removeLast()
+				tableName = tableNameAliases[parts.removeLast()]
 			} else {
 				columnName = column
 				if (tableNames.size != 1) {
@@ -380,17 +382,23 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 				tableName = tableNames.first()
 			}
 
-			println("=======")
-			println(tableName)
-			println(columnName)
-			println("=======")
+			// extract tables and columns
+			lastQuery.outputColumns.add(getColumnFromString(
+				table = getTableFromString(tableName),
+				columnName = columnName
+			))
 
 		}
 
 
-		println("==================")
+
 		//println(selectColumn)
 		//println(selectColumns)
+		println("==================")
+		lastQuery.outputColumns.forEach {
+			println(it.table.name + " + " + it.name + " = " + it.kotlinName + ":" + it.kotlinType)
+		}
+		println("==================")
 		println(selectColumns.joinToString(separator = " | "))
 		println(tableNames.joinToString(separator = " | "))
 		println(tableNameAliases)

@@ -42,18 +42,30 @@ class Extractor(tree: ParseTree? = null) {
 		childTree: ParseTree = internalTree,
 		parts: MutableList<String> = mutableListOf(),
 		debug: Boolean = false,
+		indent: Int = 2
 	): String {
 
 		walkLeaves(debug = debug) { leaf ->
 			parts.add(leaf.text)
 		}
-		var sql = parts.joinToString(" ")
-		sql = sql.replace(" = ", "=")
-		sql = sql.replace(" , ", ", ")
-		sql = sql.replace(" (", "(")
-		sql = sql.replace("( ", "(")
-		sql = sql.replace(" )", ")")
-		return sql
+
+		var len = 0
+		val sb = buildString {
+			parts.forEach {
+				len += it.length
+				if (len > 60 - (indent * 4)) {
+					this.appendLine()
+					(1..indent).forEach { _ ->
+						this.append("\t")
+					}
+					len = 0
+				}
+				this.append(it)
+				this.append(" ")
+			}
+		}
+
+		return sb
 	}
 
 	fun extract(vararg clazz: KClass<*>): List<String> {

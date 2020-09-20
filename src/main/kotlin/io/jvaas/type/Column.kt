@@ -1,16 +1,21 @@
 package io.jvaas.type
 
+import io.jvaas.mapper.SQLToKotlinTypeMapper
+import io.jvaas.mapper.StringMapper.snakeToLowerCamelCase
+
 data class Column(
 	val name: String,
 	var type: String = "",
 	var default: String? = null,
 	var nullable: Boolean = true,
 	var table: Table,
-
-	var kotlinName: String? = "???",
-	var kotlinType: String? = "Any?",
 ) {
 
+	val kotlinName: String
+		get() = name.snakeToLowerCamelCase()
+
+	val kotlinType: String
+		get() = SQLToKotlinTypeMapper.map(type, nullable)
 
 	override fun toString(): String {
 		val s = StringBuilder()
