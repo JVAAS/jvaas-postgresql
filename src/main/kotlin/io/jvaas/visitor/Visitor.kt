@@ -299,7 +299,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 		var selectColumn: String? = null
 		val selectColumns = mutableListOf<String>()
-		val tableColumns = mutableListOf<String>()
+		val tableNames = mutableListOf<String>()
+		val tableAliases = mutableMapOf<String, String>()
 		var selectScope: Boolean = false
 		var fromScope: Boolean = false
 
@@ -307,6 +308,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 			var selectSublistContext: Boolean = false
 			var schemaQualifiedNameContext: Boolean = false
+			var aliasClauseContext: Boolean = false
+			var identifierContext: Boolean = false
 
 			if (leaf.text.equals("SELECT", ignoreCase = true)) {
 				selectScope = true
@@ -317,30 +320,38 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 			println(leaf.text)
 			leaf.walkFamilyTree { fam ->
-				if (fam.payload is SelectSublistContext) {
-					selectSublistContext = true
-				} else if (fam.payload is SchemaQualifiedNameContext) {
-					schemaQualifiedNameContext = true
+				when (fam.payload) {
+					is SelectSublistContext -> selectSublistContext = true
+					is SchemaQualifiedNameContext -> schemaQualifiedNameContext = true
+					is AliasClauseContext -> aliasClauseContext = true
+					is IdentifierContext -> identifierContext = true
 				}
 				println(fam.payload::class)
 			}
 
-			if (selectScope) {
-				if (selectSublistContext) {
-					if (selectColumn == null) {
-						selectColumn = leaf.text
-					} else {
-						selectColumn += leaf.text
-					}
-				} else if (selectColumn != null) {
-					selectColumns.add(selectColumn ?: "")
-					selectColumn = null
+			if (aliasClauseContext) {
+				if (identifierContext) {
+					tableAliases[leaf.text] = tableNames.last()
 				}
-			} else if (fromScope) {
-				if (schemaQualifiedNameContext) {
-					tableColumns.add(leaf.text)
+			} else {
+				if (selectScope) {
+					if (selectSublistContext) {
+						if (selectColumn == null) {
+							selectColumn = leaf.text
+						} else {
+							selectColumn += leaf.text
+						}
+					} else if (selectColumn != null) {
+						selectColumns.add(selectColumn ?: "")
+						selectColumn = null
+					}
+				} else if (fromScope) {
+					if (schemaQualifiedNameContext) {
+						tableNames.add(leaf.text)
+					}
 				}
 			}
+
 			println()
 
 
@@ -354,7 +365,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		//println(selectColumn)
 		//println(selectColumns)
 		println(selectColumns.joinToString(separator = " | "))
-		println(tableColumns.joinToString(separator = " | "))
+		println(tableNames.joinToString(separator = " | "))
+		println(tableAliases)
 		println("==================")
 
 		super.visitSelectStmt(ctx)
