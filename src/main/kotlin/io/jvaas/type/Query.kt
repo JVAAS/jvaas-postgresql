@@ -11,36 +11,37 @@ data class Query(
 		return name.capitalize() + "Result"
 	}
 
-	fun getKotlinResultClass(): String {
-		return buildString {
-			appendLine("data class ${getResultClassName()}(")
+	fun getKotlinResultClass(): Function {
+		return Function {
+			+"data class ${getResultClassName()}("
 			outputColumns.map {
 				it.table.kotlinName + it.kotlinName.capitalize() + " : " + it.kotlinType
 			}.forEach {
-				appendLine("\tval $it,")
+				+"\tval $it,"
 			}
-			appendLine(")")
+			+")"
 		}
 	}
 
-	fun getKotlinFunctionHeader(): String {
-		val sb = StringBuilder()
-		sb.append("suspend fun $name(")
+	fun getKotlinFunctionHeader(): Function {
+		return Function {
+			+"suspend fun $name("
 
-		inputColumns.map { column ->
-			"""
-				${column.kotlinName}: ${column.kotlinType}
-			""".trimIndent()
-		}.joinToString().let {
-			sb.append(it)
+			// add some params
+			inputColumns.map { column ->
+				"${column.kotlinName}: ${column.kotlinType}"
+			}.joinToString().let {
+				+it
+			}
+
+			+")"
+
+
+			if (outputColumns.isNotEmpty()) {
+				+": ${getResultClassName()}"
+			}
 		}
-
-		sb.append(")")
-		if (outputColumns.isNotEmpty()) {
-			sb.append(": ${getResultClassName()}")
-		}
-
-		return sb.toString()
 	}
 
 }
+

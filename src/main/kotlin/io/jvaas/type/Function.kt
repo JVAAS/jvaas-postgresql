@@ -1,0 +1,31 @@
+package io.jvaas.type
+
+class Function(val builder: (Function.() -> Unit)? = null) {
+
+	private val lines = mutableListOf<String>()
+
+	init {
+		builder?.invoke(this)
+	}
+
+	operator fun String.unaryPlus() {
+		lines.add(this)
+	}
+
+	operator fun Function.plus(function: Function): Function {
+		return Function().apply {
+			lines.addAll(this.lines)
+			lines.addAll(function.lines)
+		}
+	}
+
+	fun indent(tabs: Int = 0, spaces: Int = 0): Function {
+		return Function().apply {
+			lines.clear()
+			lines.addAll(lines.map {
+				" ".repeat(spaces) + "\t".repeat(tabs) + it
+			})
+		}
+	}
+
+}
