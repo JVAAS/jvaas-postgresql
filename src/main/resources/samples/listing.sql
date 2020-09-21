@@ -48,7 +48,7 @@ UPDATE listing SET modified = now(), published = ? WHERE id = ?;
 UPDATE listing SET modified = now(), section = ? WHERE id = ?;
 
 -- fun selectAllWhereIdIs1
-SELECT l.id, title FROM listing AS l WHERE l.id = 1;
+SELECT l.id, title FROM listing AS l WHERE l.id = ?;
 
 -- fun complexSelectWithJoin
 SELECT

@@ -283,7 +283,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 	// SELECT
 	override fun visitSelectStmt(ctx: SelectStmtContext?) {
 
-		val debug = true
+		val debug = false
 
 		// make sure we're extracting a valid SELECT query
 		// and not a VALUES query
@@ -299,8 +299,12 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		))
 		lastFun = null
 
-		var selectColumn: String? = null
+		var inputColumn: String? = null
+		var outputColumn: String? = null
+		val inputColumns = mutableListOf<String>()
 		val outputColumns = mutableListOf<String>()
+		val columns = mutableListOf<String>()
+
 		val tableNames = mutableListOf<String>()
 		val tableNameAliases = mutableMapOf<String, String>()
 		var selectScope: Boolean = false
@@ -312,6 +316,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			var schemaQualifiedNameContext: Boolean = false
 			var aliasClauseContext: Boolean = false
 			var identifierContext: Boolean = false
+			var indirectionVarContext: Boolean = false
 
 			if (leaf.text.equals("SELECT", ignoreCase = true)) {
 				selectScope = true
@@ -329,6 +334,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 					is SchemaQualifiedNameContext -> schemaQualifiedNameContext = true
 					is AliasClauseContext -> aliasClauseContext = true
 					is IdentifierContext -> identifierContext = true
+					is IndirectionVarContext -> indirectionVarContext = true
 				}
 				if (debug) {
 					println(fam.payload::class)
@@ -342,19 +348,35 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			} else {
 				if (selectScope) {
 					if (selectSublistContext) {
-						if (selectColumn == null) {
-							selectColumn = leaf.text
+						if (outputColumn == null) {
+							outputColumn = leaf.text
 						} else {
-							selectColumn += leaf.text
+							outputColumn += leaf.text
 						}
-					} else if (selectColumn != null) {
-						outputColumns.add(selectColumn ?: "")
-						selectColumn = null
+					} else if (outputColumn != null) {
+						outputColumns.add(outputColumn ?: "")
+						outputColumn = null
 					}
 				} else if (fromScope) {
 					if (schemaQualifiedNameContext) {
 						tableNames.add(leaf.text)
 					}
+
+					if (indirectionVarContext) {
+						if (inputColumn == null) {
+							inputColumn = leaf.text
+						} else {
+							inputColumn += leaf.text
+						}
+					} else if (inputColumn != null) {
+						columns.add(inputColumn ?: "")
+						inputColumn = null
+					}
+
+					if (leaf.text == "?") {
+						inputColumns.add(columns.last())
+					}
+
 				}
 			}
 
@@ -365,44 +387,61 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 		}
 
-		if (selectColumn != null) {
-			outputColumns.add(selectColumn ?: "")
+		if (inputColumn != null) {
+			inputColumns.add(inputColumn ?: "")
+		}
+		if (outputColumn != null) {
+			outputColumns.add(outputColumn ?: "")
 		}
 
-		outputColumns.forEach { column ->
-			var tableName: String? = null
-			var columnName: String? = null
-			if (column.contains(".")) {
-				val parts = column.split(".").toMutableList()
-				columnName = parts.removeLast()
-				tableName = tableNameAliases[parts.removeLast()]
-			} else {
-				columnName = column
-				if (tableNames.size != 1) {
-					throw Exception("""
+		listOf(inputColumns, outputColumns).forEachIndexed { index, col ->
+			col.forEach { column ->
+				var tableName: String? = null
+				var columnName: String? = null
+				if (column.contains(".")) {
+					val parts = column.split(".").toMutableList()
+					columnName = parts.removeLast()
+					tableName = tableNameAliases[parts.removeLast()]
+				} else {
+					columnName = column
+					if (tableNames.size != 1) {
+						throw Exception("""
 						Not sure which table column=${column} matches with,
 						aliases=${tableNameAliases},
 						query=${lastSQL}
 					""".trimIndent())
+					}
+					tableName = tableNames.first()
 				}
-				tableName = tableNames.first()
+
+				// extract tables and columns
+				if (index == 0) {
+					lastQuery.inputColumns.add(getColumnFromString(
+						table = getTableFromString(tableName),
+						columnName = columnName
+					))
+				} else if (index == 1) {
+					lastQuery.outputColumns.add(getColumnFromString(
+						table = getTableFromString(tableName),
+						columnName = columnName
+					))
+				}
 			}
-
-			// extract tables and columns
-			lastQuery.outputColumns.add(getColumnFromString(
-				table = getTableFromString(tableName),
-				columnName = columnName
-			))
-
 		}
 
-
-
-		println("==================")
-		println(outputColumns.joinToString(separator = " | "))
-		println(tableNames.joinToString(separator = " | "))
-		println(tableNameAliases)
-		println("==================")
+		if (debug) {
+			println("==================")
+			println("--------")
+			println(lastSQL)
+			println("--------")
+			println(inputColumn)
+			println("columns = " + columns.joinToString(separator = " | "))
+			println("outputColumns = " + outputColumns.joinToString(separator = " | "))
+			println("inputColumns = " + inputColumns.joinToString(separator = " | "))
+			println(tableNames.joinToString(separator = " | "))
+			println(tableNameAliases)
+			println("==================")
+		}
 
 		super.visitSelectStmt(ctx)
 	}
