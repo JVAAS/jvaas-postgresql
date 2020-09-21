@@ -16,8 +16,8 @@ data class Query(
 			+"data class ${getResultClassName()}("
 			outputColumns.map {
 				it.table.kotlinName + it.kotlinName.capitalize() + " : " + it.kotlinType
-			}.forEach {
-				+"\tval $it,"
+			}.forEach { row ->
+				+"\tval $row,"
 			}
 			+")"
 		}
@@ -28,41 +28,66 @@ data class Query(
 			+"suspend fun $name("
 
 			// add some params
-			inputColumns.map { column ->
-				"${column.kotlinName}: ${column.kotlinType}"
-			}.joinToString().let {
-				+it
+			+Lines {
+				inputColumns.map { column ->
+					"${column.kotlinName}: ${column.kotlinType}"
+				}.forEach { line ->
+					+line
+					-", "
+				}
+			}.indent()
+
+			if (inputColumns.isNotEmpty()) {
+
+				+")"
+			} else {
+				-")"
 			}
-
-			+")"
-
 
 			if (outputColumns.isNotEmpty()) {
-				+": ${getResultClassName()}"
+				-": ${getResultClassName()}"
 			}
+
 		}
 	}
 
-	fun lines(): Lines {
+	fun getKotlinFunctionBody(): Lines {
 		return Lines {
-			//println(query.getKotlinFunctionHeader())
-			//println(query.sql)
-			//println()
-
-			+getKotlinResultClass()
-			+"${getKotlinFunctionHeader()} {"
-			+"con.execute("
-			+"\t// language=SQL"
-			+"\t\"\"\""
-			+"\t${sql}"
-			+"\t\"\"\".trimIndent(),"
-			inputColumns.forEach { column ->
-				+("\t\t${column.kotlinName},")
-			}
-			+"\t)"
-			+"}\n"
+			+getKotlinFunctionHeader()
+			-" {"
+			+Lines {
+				+"con.execute("
+				+Lines {
+					+"// language=SQL"
+					+"""""""""
+					sql.lines().forEach {
+						+it
+					}
+					+"""""""""
+				}.indent()
+				+")"
+			}.indent()
+			+"}"
 		}
 	}
+
+//	fun lines(): Lines {
+//		return Lines {
+//
+//			+getKotlinResultClass().newLine()
+//			+"${getKotlinFunctionHeader()} {"
+//			+"con.execute("
+//			+"\t// language=SQL"
+//			+"\t\"\"\""
+//			+"\t${sql}"
+//			+"\t\"\"\".trimIndent(),"
+//			inputColumns.forEach { column ->
+//				+("\t\t${column.kotlinName},")
+//			}
+//			+"\t)"
+//			+"}\n"
+//		}
+//	}
 
 }
 

@@ -31,7 +31,7 @@ class Lines(val builder: (Lines.() -> Unit)? = null) {
 		}
 	}
 
-	fun indent(tabs: Int = 0, spaces: Int = 0): Lines {
+	fun indent(tabs: Int = 1, spaces: Int = 0): Lines {
 		val newLines = Lines()
 		lines.map {
 			" ".repeat(spaces) + "\t".repeat(tabs) + it
@@ -65,6 +65,10 @@ class Lines(val builder: (Lines.() -> Unit)? = null) {
 
 	operator fun plusAssign(lines: Lines) {
 		this.lines.addAll(lines.lines)
+	}
+
+	override fun toString(): String {
+		return lines.joinToString("\n")
 	}
 
 }

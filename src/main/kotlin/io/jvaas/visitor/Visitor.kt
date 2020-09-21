@@ -48,7 +48,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 	}
 
 	override fun visitStatement(ctx: SQLParser.StatementContext?) {
-		lastSQL = Extractor(ctx).extractSQL(debug = false)
+		lastSQL = Extractor(ctx).extractSQL().toString()
 		super.visitStatement(ctx)
 	}
 

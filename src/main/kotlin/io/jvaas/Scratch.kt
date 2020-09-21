@@ -47,11 +47,24 @@ object Scratch {
 			+"==========================================================================="
 		}.newLine().comment()
 
+		// TODO: print result classes here
+
+
 		lines += Lines {
 			+"==========================================================================="
 			+"\tqueries"
 			+"==========================================================================="
-		}.newLine().comment()
+		}.comment().newLine()
+
+		lines += Lines {
+			model.queries.forEach {
+				lines += it.getKotlinFunctionBody().newLine()
+			}
+		}.indent()
+
+		lines += Lines {
+			+"==========================================================================="
+		}.comment().newLine()
 
 		lines.println()
 

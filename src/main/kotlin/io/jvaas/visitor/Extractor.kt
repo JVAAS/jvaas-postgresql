@@ -1,5 +1,6 @@
 package io.jvaas.visitor
 
+import io.jvaas.type.Lines
 import org.antlr.v4.runtime.tree.ParseTree
 import kotlin.reflect.KClass
 
@@ -39,33 +40,26 @@ class Extractor(tree: ParseTree? = null) {
 	}
 
 	fun extractSQL(
-		childTree: ParseTree = internalTree,
 		parts: MutableList<String> = mutableListOf(),
-		debug: Boolean = false,
-		indent: Int = 2
-	): String {
+	): Lines {
 
-		walkLeaves(debug = debug) { leaf ->
+		walkLeaves { leaf ->
 			parts.add(leaf.text)
 		}
 
 		var len = 0
-		val sb = buildString {
-			parts.forEach {
-				len += it.length
-				if (len > 60 - (indent * 4)) {
-					this.appendLine()
-					(1..indent).forEach { _ ->
-						this.append("\t")
-					}
+		return Lines {
+			parts.forEach { part ->
+				len += part.length
+				if (len > 40) {
+					+""
 					len = 0
 				}
-				this.append(it)
-				this.append(" ")
+				-part
+				-" "
 			}
 		}
 
-		return sb
 	}
 
 	fun extract(vararg clazz: KClass<*>): List<String> {
