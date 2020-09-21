@@ -84,6 +84,16 @@ data class Query(
 						+it
 					}
 					+"""""""""
+					if (inputColumns.isNotEmpty()) {
+						-","
+						inputColumns.forEach {
+							+"${it.kotlinName},"
+						}
+					}
+
+
+
+
 				}.indent()
 				+")"
 
