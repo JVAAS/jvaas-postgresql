@@ -13,7 +13,7 @@ data class Query(
 
 	companion object {
 		fun getJodaToJavaDateTimeConvert() = Lines {
-			+"private fun org.joda.time.LocalDateTime.toJavaLocalDateTime(): java.time.LocalDateTime {"
+			+"private fun org.joda.time.LocalDateTime.fromJodaDateTimeToJavaLocalDateTime(): java.time.LocalDateTime {"
 			+"	val utc = this.toDateTime(org.joda.time.DateTimeZone.UTC);"
 			+"	val secondsSinceEpoch: Long = utc.millis / 1000"
 			+"	val milliSeconds: Long = utc.millis - (secondsSinceEpoch * 1000)"
@@ -105,7 +105,7 @@ data class Query(
 									"Float", "Float?" -> -"getFloat($index)"
 									"java.time.LocalDateTime",
 									"java.time.LocalDateTime?" -> {
-										-"getDate($index)?.toJavaLocalDateTime()"
+										-"getDate($index)?.fromJodaDateTimeToJavaLocalDateTime()"
 									}
 
 									else -> throw Exception("Type ${column.kotlinType} is not handled yet")
