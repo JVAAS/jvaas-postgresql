@@ -3,8 +3,6 @@ package io.jvaas.visitor
 import io.jvaas.gen.SQLParser
 import io.jvaas.gen.SQLParser.*
 import io.jvaas.gen.SQLParserBaseVisitor
-import io.jvaas.mapper.SQLToKotlinTypeMapper
-import io.jvaas.mapper.StringMapper.snakeToLowerCamelCase
 import io.jvaas.type.Column
 import io.jvaas.type.Model
 import io.jvaas.type.Query
@@ -285,6 +283,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 	// SELECT
 	override fun visitSelectStmt(ctx: SelectStmtContext?) {
 
+		val debug = true
+
 		// make sure we're extracting a valid SELECT query
 		// and not a VALUES query
 		if (lastFun == null) {
@@ -300,7 +300,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		lastFun = null
 
 		var selectColumn: String? = null
-		val selectColumns = mutableListOf<String>()
+		val outputColumns = mutableListOf<String>()
 		val tableNames = mutableListOf<String>()
 		val tableNameAliases = mutableMapOf<String, String>()
 		var selectScope: Boolean = false
@@ -320,7 +320,9 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 				fromScope = true
 			}
 
-			//println(leaf.text)
+			if (debug) {
+				println(leaf.text)
+			}
 			leaf.walkFamilyTree { fam ->
 				when (fam.payload) {
 					is SelectSublistContext -> selectSublistContext = true
@@ -328,7 +330,9 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 					is AliasClauseContext -> aliasClauseContext = true
 					is IdentifierContext -> identifierContext = true
 				}
-				//println(fam.payload::class)
+				if (debug) {
+					println(fam.payload::class)
+				}
 			}
 
 			if (aliasClauseContext) {
@@ -344,7 +348,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 							selectColumn += leaf.text
 						}
 					} else if (selectColumn != null) {
-						selectColumns.add(selectColumn ?: "")
+						outputColumns.add(selectColumn ?: "")
 						selectColumn = null
 					}
 				} else if (fromScope) {
@@ -354,16 +358,18 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 				}
 			}
 
-			//println()
+			if (debug) {
+				println()
+			}
 
 
 		}
 
 		if (selectColumn != null) {
-			selectColumns.add(selectColumn ?: "")
+			outputColumns.add(selectColumn ?: "")
 		}
 
-		selectColumns.forEach {  column ->
+		outputColumns.forEach { column ->
 			var tableName: String? = null
 			var columnName: String? = null
 			if (column.contains(".")) {
@@ -392,17 +398,11 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 
 
-		//println(selectColumn)
-		//println(selectColumns)
-		//println("==================")
-		//lastQuery.outputColumns.forEach {
-		//	println(it.table.name + " + " + it.name + " = " + it.kotlinName + ":" + it.kotlinType)
-		//}
-		//println("==================")
-		//println(selectColumns.joinToString(separator = " | "))
-		//println(tableNames.joinToString(separator = " | "))
-		//println(tableNameAliases)
-		//println("==================")
+		println("==================")
+		println(outputColumns.joinToString(separator = " | "))
+		println(tableNames.joinToString(separator = " | "))
+		println(tableNameAliases)
+		println("==================")
 
 		super.visitSelectStmt(ctx)
 	}
