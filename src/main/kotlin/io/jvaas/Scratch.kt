@@ -66,12 +66,14 @@ object Scratch {
 
 		// output query lines.
 		lines += Lines {
-			model.queries.forEach {
+			model.queries.forEach { query ->
 
-				lines += it.getKotlinResultClass()
-				lines += newLine()
+				if (query.outputColumns.isNotEmpty()) {
+					lines += query.getKotlinResultClass()
+					lines += newLine()
+				}
 
-				lines += it.getKotlinFunctionBody()
+				lines += query.getKotlinFunctionBody()
 				lines += newLine()
 				lines += Lines {
 					+"==========================================================================="

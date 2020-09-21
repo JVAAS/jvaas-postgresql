@@ -18,12 +18,11 @@ data class Query(
 			+"	val secondsSinceEpoch: Long = utc.millis / 1000"
 			+"	val milliSeconds: Long = utc.millis - (secondsSinceEpoch * 1000)"
 			+""
-			+"	val javaTime = java.time.LocalDateTime.ofEpochSecond("
+			+"	return java.time.LocalDateTime.ofEpochSecond("
 			+"		secondsSinceEpoch,"
 			+"		milliSeconds.toInt() * 1000000,"
 			+"		java.time.ZoneOffset.UTC"
 			+"	)"
-			+"	return javaTime"
 			+"}"
 		}
 	}
