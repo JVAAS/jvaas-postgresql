@@ -45,7 +45,7 @@ data class Query(
 			}
 
 			if (outputColumns.isNotEmpty()) {
-				-": ${getResultClassName()}"
+				-": List<${getResultClassName()}>"
 			}
 
 		}

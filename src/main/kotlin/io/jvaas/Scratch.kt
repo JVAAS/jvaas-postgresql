@@ -33,22 +33,17 @@ object Scratch {
 			+"==========================================================================="
 			+"\ttables"
 			+"==========================================================================="
-		}.newLine().comment()
+		}
+
+		lines += "/*"
 
 		lines += Lines {
 			model.tables.forEach { table ->
 				+table.lines().indent(tabs = 1)
 			}
-		}.newLine().comment()
-
-		lines += Lines {
-			+"==========================================================================="
-			+"\tresults"
-			+"==========================================================================="
-		}.newLine().comment()
-
-		// TODO: print result classes here
-
+		}.newLine()
+		lines += "*/"
+		lines += Lines().newLine().newLine()
 
 		lines += Lines {
 			+"==========================================================================="
@@ -58,13 +53,18 @@ object Scratch {
 
 		lines += Lines {
 			model.queries.forEach {
-				lines += it.getKotlinFunctionBody().newLine()
-			}
-		}.indent()
 
-		lines += Lines {
-			+"==========================================================================="
-		}.comment().newLine()
+				lines += it.getKotlinResultClass()
+				lines += newLine()
+
+				lines += it.getKotlinFunctionBody()
+				lines += newLine()
+				lines += Lines {
+					+"==========================================================================="
+				}.comment()
+				lines += newLine()
+			}
+		}
 
 		lines.println()
 

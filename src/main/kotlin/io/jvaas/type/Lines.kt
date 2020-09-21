@@ -71,4 +71,8 @@ class Lines(val builder: (Lines.() -> Unit)? = null) {
 		return lines.joinToString("\n")
 	}
 
+	operator fun plusAssign(s: String) {
+		lines.add(s)
+	}
+
 }
