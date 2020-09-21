@@ -4,7 +4,6 @@ This library generates binding code for raw PostreSQL queries
 
 Input: 
 ```
-
 -- fun selectAllWhereIdIs1
 SELECT l.id, title FROM listing AS l WHERE l.id = ?;
 
