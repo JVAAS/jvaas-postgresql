@@ -4,6 +4,7 @@ import io.jvaas.gen.SQLLexer
 import io.jvaas.gen.SQLParser
 import io.jvaas.type.Lines
 import io.jvaas.type.Model
+import io.jvaas.type.Query
 import io.jvaas.visitor.Visitor
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -51,6 +52,19 @@ object Scratch {
 			+"==========================================================================="
 		}.comment().newLine()
 
+		// check if we should generate the Joda -> Java DateTime converter
+		if (model.tables.map {
+			it.columns
+		}.flatten().map {
+			it.kotlinType.startsWith("java.time.LocalDateTime")
+		}.contains(true)) {
+			lines += Query.getJodaToJavaDateTimeConvert().newLine()
+			lines += Lines {
+				+"==========================================================================="
+			}.comment().newLine()
+		}
+
+		// output query lines.
 		lines += Lines {
 			model.queries.forEach {
 

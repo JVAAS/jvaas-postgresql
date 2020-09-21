@@ -11,11 +11,28 @@ data class Query(
 		return name.capitalize() + "Result"
 	}
 
+	companion object {
+		fun getJodaToJavaDateTimeConvert() = Lines {
+			+"private fun org.joda.time.LocalDateTime.toJavaLocalDateTime(): java.time.LocalDateTime {"
+			+"	val utc = this.toDateTime(org.joda.time.DateTimeZone.UTC);"
+			+"	val secondsSinceEpoch: Long = utc.millis / 1000"
+			+"	val milliSeconds: Long = utc.millis - (secondsSinceEpoch * 1000)"
+			+""
+			+"	val javaTime = java.time.LocalDateTime.ofEpochSecond("
+			+"		secondsSinceEpoch,"
+			+"		milliSeconds.toInt() * 1000000,"
+			+"		java.time.ZoneOffset.UTC"
+			+"	)"
+			+"	return javaTime"
+			+"}"
+		}
+	}
+
 	fun getKotlinResultClass(): Lines {
 		return Lines {
 			+"data class ${getResultClassName()}("
 			outputColumns.map {
-				it.table.kotlinName + it.kotlinName.capitalize() + " : " + it.kotlinType
+				it.kotlinName + " : " + it.kotlinType
 			}.forEach { row ->
 				+"\tval $row,"
 			}
@@ -66,6 +83,46 @@ data class Query(
 					+"""""""""
 				}.indent()
 				+")"
+
+				if (outputColumns.isNotEmpty()) {
+					-".rows.map { row ->"
+					+Lines {
+						+getResultClassName()
+						-"("
+						+Lines {
+							outputColumns.forEachIndexed { index, column ->
+								+"${column.kotlinName} = row."
+								when (column.kotlinType) {
+									"String", "String?" -> -"getString($index)"
+									"Boolean", "Boolean?" -> -"getBoolean($index)"
+									"Int", "Int?" -> -"getInt($index)"
+									"Long", "Long?" -> -"getLong($index)"
+									"Double", "Double?" -> -"getDouble($index)"
+									"Float", "Float?" -> -"getFloat($index)"
+									"java.time.LocalDateTime",
+									"java.time.LocalDateTime?" -> {
+										-"getDate($index)?.toJavaLocalDateTime()"
+									}
+
+									else -> throw Exception("Type ${column.kotlinType} is not handled yet")
+								}
+
+								if (column.nullable == false) {
+									-" ?: throw Exception("
+									+Lines {
+										+"\"${column.table.name}.${column.name} is declared as non-nullable, but is returning null\""
+									}.indent()
+									+")"
+								}
+
+								-","
+							}
+						}.indent()
+						+")"
+					}.indent()
+					+"}"
+				}
+
 			}.indent()
 			+"}"
 		}
