@@ -1,8 +1,30 @@
 # JVAAS PostgreSQL
 
-This library generates binding code for raw PostreSQL queries
+This library generates async / reactive non-blocking type-safe binding code for raw PostreSQL queries
 
-Input: 
+It uses Jasync which is non-blocking (no JDBC)
+
+https://github.com/jasync-sql/jasync-sql/tree/master/postgresql-async
+
+Jasync Futures is converted into Kotlin Coroutines
+
+It reads the CREATE statements and based on that, determines if the Kotlin type should be nullable or not, 
+what Kotlin types to use and it checks your raw SQL queries for typos while generating all the boilerplate for you.
+
+Example CREATE statement:
+```
+CREATE TABLE listing_image
+(
+    id         uuid              NOT NULL,
+    listing_id uuid              NOT NULL,
+    width      integer DEFAULT 0,
+    height     integer DEFAULT 0,
+    name       character varying NOT NULL,
+    batch      uuid              NOT NULL
+);
+```
+
+Example Input 1: 
 ```
 -- fun selectAllWhereIdIs1
 SELECT l.id, title FROM listing AS l WHERE l.id = ?;
@@ -112,7 +134,7 @@ suspend fun complexSelectWithJoin(
 
 
 
-Input:
+Example Input 2:
 
 ```
 -- fun demoQuery
@@ -138,7 +160,7 @@ fun demoQuery(title: String?, titleUrl: String?, id: String, version: Int?, titl
 }
 ```
 
-Input:
+Example Input 3:
 
 ```
 -- fun insertListingId
