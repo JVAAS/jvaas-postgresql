@@ -73,7 +73,11 @@ data class Query(
 			+getKotlinFunctionHeader()
 			-" {"
 			+Lines {
-				+"con.execute("
+				if (outputColumns.isEmpty()) {
+					+"con.execute("
+				} else {
+					+"return con.execute("
+				}
 				+Lines {
 					+"// language=SQL"
 					+"""""""""
