@@ -1,4 +1,4 @@
-package io.jvaas.mapper
+package io.jvaas.sql.postgresql.mapper
 
 object SQLToKotlinTypeMapper {
 

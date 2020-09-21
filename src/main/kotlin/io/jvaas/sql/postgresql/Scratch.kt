@@ -1,11 +1,11 @@
-package io.jvaas
+package io.jvaas.sql.postgresql
 
-import io.jvaas.gen.SQLLexer
-import io.jvaas.gen.SQLParser
-import io.jvaas.type.Lines
-import io.jvaas.type.Model
-import io.jvaas.type.Query
-import io.jvaas.visitor.Visitor
+import io.jvaas.sql.postgresql.gen.SQLLexer
+import io.jvaas.sql.postgresql.gen.SQLParser
+import io.jvaas.sql.postgresql.type.Lines
+import io.jvaas.sql.postgresql.type.Model
+import io.jvaas.sql.postgresql.type.Query
+import io.jvaas.sql.postgresql.visitor.Visitor
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 

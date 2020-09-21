@@ -1,5 +1,5 @@
 // Generated from /home/vlad/Code/jvaas-platform/jvaas-postgresql/build/resources/main/antlr/TSQLLexer.g4 by ANTLR 4.8
-package io.jvaas.gen;
+package io.jvaas.sql.postgresql.gen;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

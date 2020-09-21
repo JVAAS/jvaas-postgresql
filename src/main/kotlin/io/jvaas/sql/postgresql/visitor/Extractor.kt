@@ -1,6 +1,6 @@
-package io.jvaas.visitor
+package io.jvaas.sql.postgresql.visitor
 
-import io.jvaas.type.Lines
+import io.jvaas.sql.postgresql.type.Lines
 import org.antlr.v4.runtime.tree.ParseTree
 import kotlin.reflect.KClass
 

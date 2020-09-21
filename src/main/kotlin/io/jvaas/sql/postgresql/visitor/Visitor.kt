@@ -1,13 +1,13 @@
-package io.jvaas.visitor
+package io.jvaas.sql.postgresql.visitor
 
-import io.jvaas.gen.SQLParser
-import io.jvaas.gen.SQLParser.*
-import io.jvaas.gen.SQLParserBaseVisitor
-import io.jvaas.type.Column
-import io.jvaas.type.Model
-import io.jvaas.type.Query
-import io.jvaas.type.Table
-import io.jvaas.visitor.Extractor.Companion.walkFamilyTree
+import io.jvaas.sql.postgresql.gen.SQLParser
+import io.jvaas.sql.postgresql.gen.SQLParser.*
+import io.jvaas.sql.postgresql.gen.SQLParserBaseVisitor
+import io.jvaas.sql.postgresql.type.Column
+import io.jvaas.sql.postgresql.type.Model
+import io.jvaas.sql.postgresql.type.Query
+import io.jvaas.sql.postgresql.type.Table
+import io.jvaas.sql.postgresql.visitor.Extractor.Companion.walkFamilyTree
 
 class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 

@@ -1,4 +1,4 @@
-package io.jvaas.type
+package io.jvaas.sql.postgresql.type
 
 class Lines(val builder: (Lines.() -> Unit)? = null) {
 

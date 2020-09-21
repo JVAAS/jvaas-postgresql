@@ -1,8 +1,8 @@
-package io.jvaas.type
+package io.jvaas.sql.postgresql.type
 
-import io.jvaas.mapper.SQLToKotlinTypeMapper
-import io.jvaas.mapper.StringMapper.snakeToLowerCamelCase
-import io.jvaas.mapper.StringMapper.snakeToUpperCamelCase
+import io.jvaas.sql.postgresql.mapper.SQLToKotlinTypeMapper
+import io.jvaas.sql.postgresql.mapper.StringMapper.snakeToLowerCamelCase
+import io.jvaas.sql.postgresql.mapper.StringMapper.snakeToUpperCamelCase
 
 data class Column(
 	val name: String,

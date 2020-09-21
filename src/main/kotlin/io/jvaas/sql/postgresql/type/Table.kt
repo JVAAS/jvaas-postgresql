@@ -1,6 +1,6 @@
-package io.jvaas.type
+package io.jvaas.sql.postgresql.type
 
-import io.jvaas.mapper.StringMapper.snakeToLowerCamelCase
+import io.jvaas.sql.postgresql.mapper.StringMapper.snakeToLowerCamelCase
 import kotlin.text.StringBuilder
 
 data class Table(
