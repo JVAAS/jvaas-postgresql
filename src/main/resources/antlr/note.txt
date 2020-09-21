@@ -1,1 +1,4 @@
-*.g4 files from https://github.com/pgcodekeeper/pgcodekeeper/tree/master/apgdiff/antlr-src
+Credit for the original ANTLR Grammars goes to:
+https://github.com/pgcodekeeper/pgcodekeeper/tree/master/apgdiff/antlr-src
+
+Grammars have been modified to fit the needs of this project
