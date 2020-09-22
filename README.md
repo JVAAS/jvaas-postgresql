@@ -186,7 +186,7 @@ Create a DB connection pool:
 			database = "demo",
 		)
 		
-and then simply make use of the generated Kotlin:
+Finally, make use of the generated Kotlin:
 
 		pg.transaction { con ->
 			Blah(con).insertListingId(
