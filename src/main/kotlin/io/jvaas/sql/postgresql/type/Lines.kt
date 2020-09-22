@@ -1,5 +1,7 @@
 package io.jvaas.sql.postgresql.type
 
+import java.io.File
+
 class Lines(val builder: (Lines.() -> Unit)? = null) {
 
 	private val lines = mutableListOf<String>()
@@ -59,8 +61,9 @@ class Lines(val builder: (Lines.() -> Unit)? = null) {
 	}
 
 
-	fun println() {
+	fun println(): Lines {
 		lines.forEach(::println)
+		return this
 	}
 
 	operator fun plusAssign(lines: Lines) {
@@ -73,6 +76,15 @@ class Lines(val builder: (Lines.() -> Unit)? = null) {
 
 	operator fun plusAssign(s: String) {
 		lines.add(s)
+	}
+
+	fun dumpToFile(file: File): Lines {
+		file.printWriter().use { writer ->
+			lines.forEach { line ->
+				writer.println(line)
+			}
+		}
+		return this
 	}
 
 }
