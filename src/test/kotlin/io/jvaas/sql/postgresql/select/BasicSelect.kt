@@ -1,4 +1,4 @@
-package io.jvaas.sql.postgresql.insert
+package io.jvaas.sql.postgresql.select
 
 import io.jvaas.sql.postgresql.Generator
 import io.jvaas.sql.postgresql.type.Model
