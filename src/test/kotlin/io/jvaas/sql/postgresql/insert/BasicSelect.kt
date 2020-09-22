@@ -87,22 +87,40 @@ class BasicSelect {
 		query.outputColumns.forEachIndexed { index, column ->
 			when (index) {
 				0 -> {
+					assertFalse(column.nullable)
 					assertEquals("accountId", column.kotlinName)
+					assertEquals("String", column.kotlinType)
 				}
 				1 -> {
+					assertFalse(column.nullable)
 					assertEquals("accountCreated", column.kotlinName)
+					assertEquals("java.time.LocalDateTime", column.kotlinType)
 				}
 				2 -> {
+					assertFalse(column.nullable)
 					assertEquals("accountModified", column.kotlinName)
+					assertEquals("java.time.LocalDateTime", column.kotlinType)
 				}
 				3 -> {
+					assertFalse(column.nullable)
 					assertEquals("accountNonNullVersion", column.kotlinName)
+					assertEquals("Int", column.kotlinType)
 				}
 				4 -> {
+					assertTrue(column.nullable)
 					assertEquals("accountNullableVersion", column.kotlinName)
+					assertEquals("Int?", column.kotlinType)
 				}
 			}
-
+		}
+		query.inputColumns.forEachIndexed { index, column ->
+			when (index) {
+				0 -> {
+					assertFalse(column.nullable)
+					assertEquals("accountId", column.kotlinName)
+					assertEquals("String", column.kotlinType)
+				}
+			}
 		}
 	}
 
@@ -120,26 +138,42 @@ class BasicSelect {
 		query.outputColumns.forEachIndexed { index, column ->
 			when (index) {
 				0 -> {
+					assertFalse(column.nullable)
 					assertEquals("accountId", column.kotlinName)
+					assertEquals("String", column.kotlinType)
 				}
 				1 -> {
+					assertFalse(column.nullable)
 					assertEquals("accountCreated", column.kotlinName)
+					assertEquals("java.time.LocalDateTime", column.kotlinType)
 				}
 				2 -> {
+					assertFalse(column.nullable)
 					assertEquals("accountModified", column.kotlinName)
+					assertEquals("java.time.LocalDateTime", column.kotlinType)
 				}
 				3 -> {
+					assertFalse(column.nullable)
 					assertEquals("accountNonNullVersion", column.kotlinName)
+					assertEquals("Int", column.kotlinType)
 				}
 				4 -> {
+					assertTrue(column.nullable)
 					assertEquals("accountNullableVersion", column.kotlinName)
+					assertEquals("Int?", column.kotlinType)
 				}
 			}
-
+		}
+		query.inputColumns.forEachIndexed { index, column ->
+			when (index) {
+				0 -> {
+					assertFalse(column.nullable)
+					assertEquals("accountId", column.kotlinName)
+					assertEquals("String", column.kotlinType)
+				}
+			}
 		}
 	}
-
-
 
 
 }
