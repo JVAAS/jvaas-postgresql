@@ -1,6 +1,7 @@
 # JVAAS PostgreSQL
 
-This library generates async / reactive non-blocking type-safe binding code for raw PostreSQL queries
+This library generates async / reactive non-blocking type-safe binding code for raw PostreSQL queries.
+There is no JDBC anywhere in this library, instead it uses non-blocking drivers from [Jasync](https://github.com/jasync-sql/jasync-sql)
 
 It reads the CREATE statements and based on that, determines if the Kotlin type should be nullable or not, 
 what Kotlin types to use and it checks your raw SQL queries for typos while generating all the boilerplate for you.
