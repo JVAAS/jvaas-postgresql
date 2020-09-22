@@ -23,7 +23,8 @@ Input:
 ```
 -- fun selectAllWhereIdIs1
 SELECT l.id, title FROM listing AS l WHERE l.id = ?;
-
+```
+```
 -- fun complexSelectWithJoin
 SELECT
     l.id, l.title, l.title_url, li.id, li.width, li.height, li.name, l.published,
@@ -61,7 +62,8 @@ suspend fun selectAllWhereIdIs1(
         )
     }
 }
-
+```
+```
 data class ComplexSelectWithJoinResult(
     val listingId : String,
     val listingTitle : String?,
