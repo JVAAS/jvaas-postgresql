@@ -84,8 +84,10 @@ class Generator(vararg val streams: InputStream) {
 
 
 		return Lines {
-			+"package $packageName"
-			+""
+			if (packageName.isNotEmpty()) {
+				+"package $packageName"
+				+""
+			}
 			+"class $className(val con: com.github.jasync.sql.db.Connection) {"
 			+""
 			+lines.indent()

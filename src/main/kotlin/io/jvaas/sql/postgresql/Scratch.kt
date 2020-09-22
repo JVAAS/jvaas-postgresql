@@ -1,32 +1,52 @@
 package io.jvaas.sql.postgresql
 
-import io.jvaas.sql.postgresql.gen.SQLLexer
-import io.jvaas.sql.postgresql.gen.SQLParser
 import io.jvaas.sql.postgresql.type.Lines
-import io.jvaas.sql.postgresql.type.Model
-import io.jvaas.sql.postgresql.type.Query
-import io.jvaas.sql.postgresql.visitor.Visitor
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
+import kotlinx.coroutines.runBlocking
 import java.io.File
+import java.nio.file.Paths
+import java.util.*
 
 object Scratch {
 
 	@JvmStatic
-	fun main(args: Array<String>) {
+	fun main(args: Array<String>) = runBlocking {
 
 		val generator = Generator(
 			javaClass.getResourceAsStream("/samples/setup.sql"),
 			javaClass.getResourceAsStream("/samples/listing.sql"),
 		).generateOutput(
-			packageName = "com.company.sql",
+			packageName = "io.jvaas.sql.postgresql",
 			className = "Blah"
 		).println().dumpToFile(
-			file = File("Blah.kt")
+			file = File(
+				Lines {
+					-Paths.get("").toAbsolutePath().toString().trimEnd('/', '\\')
+					-File.separator
+					-"src"
+					-File.separator
+					-"main"
+					-File.separator
+					-"kotlin"
+					-File.separator
+					-"Blah.kt"
+				}.toString()
+			)
 		)
 
+		// createdb demo --owner=vlad --password
+		val pg = PostgreSQL(
+			username = "vlad",
+			password = "asdf",
+			host = "localhost",
+			database = "demo",
+		)
 
+		pg.transaction { con ->
+			Blah(con).insertListingId(
+				listingId = UUID.randomUUID().toString()
+			)
+		}
 
-
+		Unit
 	}
 }
