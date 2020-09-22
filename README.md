@@ -132,3 +132,37 @@ suspend fun complexSelectWithJoin(
 }
 ```
 
+# Setup
+
+Gradle Kotlin DSL:
+
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven {
+            url = uri("https://storage.googleapis.com/repo.jvaas.io")
+        }
+    }
+
+    dependencies {
+        val jvaasPostgreSQLVersion = "0.0.1"
+        implementation("io.jvaas:jvaas-sql-postgrsql:$jvaasPostgreSQLVersion")
+    }
+
+Maven:
+
+    <repositories>
+        <repository>
+            <id>jvaas-oss</id>
+            <name>jvaas opensource software</name>
+            <url>https://storage.googleapis.com/repo.jvaas.io</url>
+        </repository>
+    </repositories>
+    
+    <dependencies>
+        <dependency>
+            <groupId>io.jvaas</groupId>
+            <artifactId>jvaas-sql-postgresql</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+    </depdencies>
