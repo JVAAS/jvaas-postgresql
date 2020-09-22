@@ -28,6 +28,14 @@ object Scratch {
 					-File.separator
 					-"kotlin"
 					-File.separator
+					-"io"
+					-File.separator
+					-"jvaas"
+					-File.separator
+					-"sql"
+					-File.separator
+					-"postgresql"
+					-File.separator
 					-"Blah.kt"
 				}.toString()
 			)
