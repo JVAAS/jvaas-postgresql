@@ -169,7 +169,7 @@ Maven:
 
 To generate Kotlin files from SQL input, the following is needed:
 
-		val generator = Generator(
+		Generator(
 			javaClass.getResourceAsStream("/samples/setup.sql"),
 			javaClass.getResourceAsStream("/samples/listing.sql"),
 		).generateOutput(
