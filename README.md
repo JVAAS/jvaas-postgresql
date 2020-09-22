@@ -2,12 +2,6 @@
 
 This library generates async / reactive non-blocking type-safe binding code for raw PostreSQL queries
 
-It uses Jasync which is non-blocking (no JDBC)
-
-https://github.com/jasync-sql/jasync-sql/tree/master/postgresql-async
-
-Jasync Futures is converted into Kotlin Coroutines
-
 It reads the CREATE statements and based on that, determines if the Kotlin type should be nullable or not, 
 what Kotlin types to use and it checks your raw SQL queries for typos while generating all the boilerplate for you.
 
