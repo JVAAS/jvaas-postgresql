@@ -21,6 +21,13 @@ class Generator(vararg val streams: InputStream) {
 			val parser = SQLParser(CommonTokenStream(lexer))
 			Visitor(model = model).visit(parser.sql())
 		}
+
+	}
+
+	fun processAdditionalSQL(sql: String) {
+		val lexer = SQLLexer(CharStreams.fromString(sql))
+		val parser = SQLParser(CommonTokenStream(lexer))
+		Visitor(model = model).visit(parser.sql())
 	}
 
 	fun generateOutput(
