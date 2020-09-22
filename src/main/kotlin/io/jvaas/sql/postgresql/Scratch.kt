@@ -14,18 +14,10 @@ object Scratch {
 	@JvmStatic
 	fun main(args: Array<String>) {
 
-		// create new model to track visits of
-		val model = Model()
-
-		// read sample SQL file to generate sample Kotlin classes from
-		val setupSql = javaClass.getResourceAsStream("/samples/setup.sql")
-		val sampleSql = javaClass.getResourceAsStream("/samples/listing.sql")
-
-		listOf(setupSql, sampleSql).forEach {
-			val lexer = SQLLexer(CharStreams.fromStream(it))
-			val parser = SQLParser(CommonTokenStream(lexer))
-			Visitor(model = model).visit(parser.sql())
-		}
+		val generator = Generator(
+			javaClass.getResourceAsStream("/samples/setup.sql"),
+			javaClass.getResourceAsStream("/samples/listing.sql"),
+		)
 
 		// confirm that model contains all the data
 		val lines = Lines {}
@@ -40,7 +32,7 @@ object Scratch {
 		lines += ""
 
 		lines += Lines {
-			model.tables.forEach { table ->
+			generator.model.tables.forEach { table ->
 				+table.lines().indent(tabs = 1)
 			}
 		}.newLine()
@@ -53,7 +45,7 @@ object Scratch {
 		}.comment().newLine()
 
 		// check if we should generate the Joda -> Java DateTime converter
-		if (model.tables.map {
+		if (generator.model.tables.map {
 			it.columns
 		}.flatten().map {
 			it.kotlinType.startsWith("java.time.LocalDateTime")
@@ -66,7 +58,7 @@ object Scratch {
 
 		// output query lines.
 		lines += Lines {
-			model.queries.forEach { query ->
+			generator.model.queries.forEach { query ->
 
 				if (query.outputColumns.isNotEmpty()) {
 					lines += query.getKotlinResultClass()
