@@ -177,6 +177,8 @@ Generator(
 ).println().dumpToFile(file = File(...))
 ```
 
+(sample sql files located in [src/main/resources](https://github.com/JVAAS/jvaas-postgresql/tree/master/src/main/resources/samples))
+
 Create a DB connection pool:
 
 ```
@@ -197,3 +199,5 @@ pg.transaction { con ->
     )
 }
 ```
+
+(from sample generated Kotlin file [Blah.kt](https://github.com/JVAAS/jvaas-postgresql/blob/master/src/main/kotlin/io/jvaas/sql/postgresql/Blah.kt))
