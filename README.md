@@ -166,3 +166,30 @@ Maven:
             <version>0.0.1</version>
         </dependency>
     </depdencies>
+
+To generate Kotlin files from SQL input, the following is needed:
+
+		val generator = Generator(
+			javaClass.getResourceAsStream("/samples/setup.sql"),
+			javaClass.getResourceAsStream("/samples/listing.sql"),
+		).generateOutput(
+			packageName = "io.company.generated",
+			className = "Blah"
+		).println().dumpToFile(file = File(...))
+		
+Create a DB connection pool:
+
+		val pg = PostgreSQL(
+			username = "vlad",
+			password = "asdf",
+			host = "localhost",
+			database = "demo",
+		)
+		
+and then simply make use of the generated Kotlin:
+
+		pg.transaction { con ->
+			Blah(con).insertListingId(
+				listingId = UUID.randomUUID().toString()
+			)
+		}
