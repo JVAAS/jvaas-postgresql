@@ -9,9 +9,9 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 java.targetCompatibility = JavaVersion.VERSION_1_8
 
 plugins {
-    application
     kotlin("jvm").version("1.4.10")
     maven
+    `maven-publish`
 }
 
 repositories {
