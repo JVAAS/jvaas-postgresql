@@ -143,7 +143,7 @@ repositories {
 }
 
 dependencies {
-    val jvaasPostgreSQLVersion = "0.0.2"
+    val jvaasPostgreSQLVersion = "0.0.4"
     implementation("io.jvaas:jvaas-sql-postgrsql:$jvaasPostgreSQLVersion")
 }
 
@@ -163,7 +163,7 @@ Maven:
     <dependency>
         <groupId>io.jvaas</groupId>
         <artifactId>jvaas-sql-postgresql</artifactId>
-        <version>0.0.2</version>
+        <version>0.0.4</version>
     </dependency>
 </depdencies>
 ```
