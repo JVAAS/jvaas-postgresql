@@ -591,6 +591,7 @@ class Blah(val con: com.github.jasync.sql.db.Connection) {
 		sessionToken: String?, 
 		sessionAccountId: String, 
 		sessionEmail: String?, 
+		sessionVersion: Int,
 	) {
 		con.execute(
 			// language=SQL
@@ -605,6 +606,8 @@ class Blah(val con: com.github.jasync.sql.db.Connection) {
 			sessionToken,
 			sessionAccountId,
 			sessionEmail,
+			sessionToken,
+			sessionVersion,
 		)
 	}
 	

@@ -130,11 +130,14 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		var table: Table? = null
 		var tableName: String? = null
 
-		val columns = mutableListOf<Column>()
-		val values = mutableListOf<String>()
+		val insertColumns = mutableListOf<Column>()
+		val insertValues = mutableListOf<String>()
+		val conflictColumns = mutableListOf<Column>()
 
-		var insertColumns = false
-		var insertValues = false
+		var lastColumn: String? = null
+
+		var insertColumn = false
+		var insertValue = false
 
 		Extractor(ctx).walkLeaves walkLeaves@{ leaf ->
 
@@ -152,7 +155,6 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 				if (debug) {
 					println(fam.payload::class)
-					println(fam.payload is IdentifierContext)
 				}
 
 				identifierContext = identifierContext or (fam.payload is IdentifierContext)
@@ -170,23 +172,23 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 				tableName = leaf.text
 				table = getTableFromString(tableName)
 				return@walkLeaves
-			} else if (insertColumnsContext && !insertColumns) {
-				insertColumns = true
+			} else if (insertColumnsContext && !insertColumn) {
+				insertColumn = true
 				return@walkLeaves
-			} else if (valuesValuesContext && !insertValues) {
-				insertColumns = false
-				insertValues = true
+			} else if (valuesValuesContext && !insertValue) {
+				insertColumn = false
+				insertValue = true
 				return@walkLeaves
 			} else if (conflictActionContext) {
-				insertColumns = false
-				insertValues = false
+				insertColumn = false
+				insertValue = false
 			}
 
-			if (insertColumns) {
+			if (insertColumn) {
 				if (identifierContext) {
-					columns.add(getColumnFromString(table, leaf.text))
+					insertColumns.add(getColumnFromString(table, leaf.text))
 				}
-			} else if (insertValues) {
+			} else if (insertValue) {
 				if (valuesValuesContext) {
 					if (functionCallContext) {
 						if (lastFun == null) {
@@ -196,33 +198,37 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 						}
 					} else {
 						if (lastFun != null) {
-							values.add(lastFun ?: "")
+							insertValues.add(lastFun ?: "")
 							lastFun = null
 						}
 						if (leaf.text != ",") {
-							values.add(leaf.text)
+							insertValues.add(leaf.text)
 						}
 					}
 				}
-			} else if (!insertColumns && !insertValues) {
+			} else if (!insertColumn && !insertValue) {
 				if (lastFun != null) {
-					values.add(lastFun ?: "")
+					insertValues.add(lastFun ?: "")
 					lastFun = null
 				}
 
 				if (conflictActionContext) {
-
+					if (identifierContext) {
+						lastColumn = leaf.text
+					} else if (leaf.text == "?") {
+						conflictColumns.add(getColumnFromString(table, lastColumn))
+					}
 				}
 			}
 		}
 
 		// remove last bracket that's picked up during INSERT INTO ( ... ) VALUES ( ... ) <<--
-		if (values.isNotEmpty()) {
-			values.removeLast()
+		if (insertValues.isNotEmpty()) {
+			insertValues.removeLast()
 		}
 
-		if (columns.size != values.size) {
-			throw Exception("Columns.size == ${columns.size} AND Values.size == ${values.size} for query\n$lastSQL")
+		if (insertColumns.size != insertValues.size) {
+			throw Exception("Columns.size == ${insertColumns.size} AND Values.size == ${insertValues.size} for query\n$lastSQL")
 		}
 
 		if (debug) {
@@ -231,18 +237,22 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			println("=======")
 			println(tableName)
 			println("=======")
-			println(columns)
+			println(insertColumns)
+			println(conflictColumns)
 			println("=======")
-			println(values)
+			println(insertValues)
 			println("=======")
 		}
 
 		// extract columns matching ? symbols
-		values.forEachIndexed { i, value ->
+		insertValues.forEachIndexed { i, value ->
 			if (value == "?") {
-				lastQuery.inputColumns.add(columns[i])
+				lastQuery.inputColumns.add(insertColumns[i])
 			}
 		}
+
+		// add conflict columns
+		lastQuery.inputColumns.addAll(conflictColumns)
 
 		super.visitInsertStmtForPsql(ctx)
 	}
