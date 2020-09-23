@@ -1,7 +1,7 @@
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val projectVersion = "0.0.9"
+val projectVersion = "0.0.10"
 
 group = "io.jvaas"
 version = projectVersion
