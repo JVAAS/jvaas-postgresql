@@ -1,7 +1,7 @@
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val projectVersion = "0.0.10"
+val projectVersion = "0.0.11"
 
 group = "io.jvaas"
 version = projectVersion
@@ -48,7 +48,7 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             groupId = "io.jvaas"
-            artifactId = "jvaas-sql-postgresql"
+            artifactId = "jvaas-postgresql"
             version = projectVersion
 
             from(components["java"])

@@ -146,7 +146,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.jvaas:jvaas-sql-postgrsql:$releaseVersion")
+    implementation("io.jvaas:jvaas-postgresql:$releaseVersion")
 }
 
 ```
@@ -164,7 +164,7 @@ Maven:
 <dependencies>
     <dependency>
         <groupId>io.jvaas</groupId>
-        <artifactId>jvaas-sql-postgresql</artifactId>
+        <artifactId>jvaas-postgresql</artifactId>
         <version>${releaseVersion}</version>
     </dependency>
 </depdencies>

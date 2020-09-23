@@ -1,2 +1,2 @@
 
-rootProject.name = "jvaas-sql-postgresql"
+rootProject.name = "jvaas-postgresql"
