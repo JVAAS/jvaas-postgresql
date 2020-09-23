@@ -127,13 +127,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		))
 		lastFun = null
 
-//		var insertValues: Boolean = false
-//		var onConflict: Boolean = false
-//		var currentValue = ""
-
 		var table: Table? = null
 		var tableName: String? = null
-		var function: String? = null
 
 		val columns = mutableListOf<Column>()
 		val values = mutableListOf<String>()
@@ -218,40 +213,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 				if (conflictActionContext) {
 
 				}
-
 			}
-
-
-//			if (table == null) {
-//				leaf.walkFamilyTree { fam ->
-//					if (tableName == null && fam.payload is IdentifierContext) {
-//						tableName = fam.text
-//						table = getTableFromString(tableName)
-//						return@walkLeaves
-//					}
-//				}
-//			} else if (!onConflict) {
-//				if (!insertValues) {
-//					leaf.walkFamilyTree { fam ->
-//						if (fam.payload is IdTokenContext) {
-//							columns.add(getColumnFromString(table, fam.text))
-//						}
-//					}
-//				} else if (insertValues) {
-//					if (leaf.parent.payload is ValuesValuesContext) {
-//						if (currentValue.isNotEmpty()) {
-//							values.add(currentValue)
-//							currentValue = ""
-//						}
-//					} else {
-//						currentValue += leaf.text
-//					}
-//				}
-//			} else {
-//
-//			}
-
-
 		}
 
 		// remove last bracket that's picked up during INSERT INTO ( ... ) VALUES ( ... ) <<--
