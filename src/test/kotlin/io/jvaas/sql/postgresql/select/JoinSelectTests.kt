@@ -4,7 +4,7 @@ import io.jvaas.sql.postgresql.Generator
 import io.jvaas.sql.postgresql.type.Model
 import io.jvaas.sql.postgresql.type.Query
 
-class JoinSelect {
+class JoinSelectTests {
 
 	lateinit var generator: Generator
 

@@ -50,9 +50,6 @@ object Scratch {
 		)
 
 		pg.transaction { con ->
-			Blah(con).insertListingId(
-				listingId = UUID.randomUUID().toString()
-			)
 		}
 
 		Unit

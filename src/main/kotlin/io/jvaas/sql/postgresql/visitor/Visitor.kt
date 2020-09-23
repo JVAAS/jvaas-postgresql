@@ -18,7 +18,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		get() = model.tables.last()
 
 	val lastColumn
-		get() = model.tables.last().columns.last()
+		get() = lastTable.columns.last()
 
 	val lastQuery
 		get() = model.queries.last()
@@ -94,15 +94,21 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 								))
 							}
 							is SQLParser.DataTypeContext -> {
-								lastColumn.type = columnDefContextToken.text
+								lastTable.columns.add(lastTable.columns.removeLast().copy(
+									type = columnDefContextToken.text
+								))
 							}
 							is SQLParser.ConstraintCommonContext -> {
 								columnDefContextToken.children.forEach { columnDefContextTokenConstraint ->
 									if (columnDefContextTokenConstraint.text.equals("notnull", ignoreCase = true)) {
-										lastColumn.nullable = false
+										lastTable.columns.add(lastTable.columns.removeLast().copy(
+											nullable = false
+										))
 									} else if (columnDefContextTokenConstraint.text.startsWith("default")) {
-										lastColumn.default =
-											columnDefContextTokenConstraint.text.replaceFirst("default", "")
+										lastTable.columns.add(lastTable.columns.removeLast().copy(
+											default =
+												columnDefContextTokenConstraint.text.replaceFirst("default", "")
+										))
 									}
 								}
 							}

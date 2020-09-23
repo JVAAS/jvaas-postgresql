@@ -588,10 +588,11 @@ class Blah(val con: com.github.jasync.sql.db.Connection) {
 	// ========================================
 	
 	suspend fun createSession(
-		sessionToken: String?, 
+		sessionToken1: String?, 
 		sessionAccountId: String, 
 		sessionEmail: String?, 
-		sessionVersion: Int,
+		sessionToken2: String?, 
+		sessionVersion: Int, 
 	) {
 		con.execute(
 			// language=SQL
@@ -603,10 +604,10 @@ class Blah(val con: com.github.jasync.sql.db.Connection) {
 			session . version + 1 , token = ? , active = true WHERE 
 			version = ? 
 			""",
-			sessionToken,
+			sessionToken1,
 			sessionAccountId,
 			sessionEmail,
-			sessionToken,
+			sessionToken2,
 			sessionVersion,
 		)
 	}

@@ -1,5 +1,7 @@
 package io.jvaas.sql.postgresql.type
 
+import io.jvaas.sql.postgresql.type.Column.Companion.numberDuplicateColumns
+
 data class Query(
 	val sql: String,
 	val name: String,
@@ -30,8 +32,8 @@ data class Query(
 	fun getKotlinResultClass(): Lines {
 		return Lines {
 			+"data class ${getResultClassName()}("
-			outputColumns.map {
-				it.kotlinName + " : " + it.kotlinType
+			outputColumns.numberDuplicateColumns().map { column ->
+				"${column.kotlinNameWithCounter} : ${column.kotlinType}"
 			}.forEach { row ->
 				+"\tval $row,"
 			}
@@ -45,8 +47,8 @@ data class Query(
 
 			// add some params
 			+Lines {
-				inputColumns.map { column ->
-					"${column.kotlinName}: ${column.kotlinType}"
+				inputColumns.numberDuplicateColumns().map { column ->
+					"${column.kotlinNameWithCounter}: ${column.kotlinType}"
 				}.forEach { line ->
 					+line
 					-", "
@@ -86,12 +88,10 @@ data class Query(
 					+"""""""""
 					if (inputColumns.isNotEmpty()) {
 						-","
-						inputColumns.forEach {
-							+"${it.kotlinName},"
+						inputColumns.numberDuplicateColumns().forEach {
+							+"${it.kotlinNameWithCounter},"
 						}
 					}
-
-
 
 
 				}.indent()
@@ -104,7 +104,7 @@ data class Query(
 						-"("
 						+Lines {
 							outputColumns.forEachIndexed { index, column ->
-								+"${column.kotlinName} = row."
+								+"${column.kotlinNameWithCounter} = row."
 								when (column.kotlinType) {
 									"String", "String?" -> -"getString($index)"
 									"Boolean", "Boolean?" -> -"getBoolean($index)"
