@@ -1,7 +1,7 @@
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val projectVersion = "0.0.6"
+val projectVersion = "0.0.9"
 
 group = "io.jvaas"
 version = projectVersion
@@ -39,7 +39,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion")
 
-    implementation("com.github.jasync-sql:jasync-postgresql:$jasyncVersion")
+    api("com.github.jasync-sql:jasync-postgresql:$jasyncVersion")
 
     testImplementation(group = "junit", name = "junit", version = "4.12")
 }
