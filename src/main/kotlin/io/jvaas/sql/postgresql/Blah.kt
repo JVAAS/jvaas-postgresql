@@ -570,4 +570,21 @@ class Blah(val con: com.github.jasync.sql.db.Connection) {
 	
 	// ========================================
 	
+	suspend fun updateSession(
+		sessionActive: Boolean, 
+		sessionEmail: String?, 
+	) {
+		con.execute(
+			// language=SQL
+			"""
+			UPDATE session SET active = ? , version = version 
+			+ 1 , modified = now ( ) WHERE email = ? 
+			""",
+			sessionActive,
+			sessionEmail,
+		)
+	}
+	
+	// ========================================
+	
 }

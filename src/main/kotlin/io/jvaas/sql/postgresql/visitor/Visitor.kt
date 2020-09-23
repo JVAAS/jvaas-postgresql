@@ -188,6 +188,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 	// UPDATE
 	override fun visitUpdateStmtForPsql(ctx: SQLParser.UpdateStmtForPsqlContext?) {
 
+		val debug = false
+
 		model.queries.add(Query(
 			sql = lastSQL ?: "",
 			name = lastFun ?: "unknown"
@@ -230,9 +232,17 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			} else if (tableName == null) {
 
 				// extract table name
+				if (debug) {
+					println(leaf.text)
+				}
 
 				leaf.walkFamilyTree { fam ->
-					if (fam.payload is IdTokenContext) {
+
+					if (debug) {
+						println(fam.payload::class)
+					}
+
+					if (tableName == null && fam.payload is IdentifierContext) {
 						tableName = fam.text
 
 						table = getTableFromString(tableName)

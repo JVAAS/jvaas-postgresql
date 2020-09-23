@@ -2,7 +2,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "io.jvaas"
-version = "0.0.1"
+version = "0.0.2"
 description = "Reactive Type-Safe PostgreSQL Binding Generator"
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8

@@ -57,8 +57,9 @@ SELECT
 FROM listing AS l
 LEFT JOIN listing_image AS li ON l.id = li.listing_id
 LEFT JOIN account AS a ON a.id = l.id
-WHERE l.id = ? AND l.created < now() AND li.width > ? AND li.height > ?
+WHERE l.id = ? AND l.created < now() AND li.width > ? AND li.height > ?;
 
 
 
-
+-- fun updateSession
+UPDATE session SET active = ?, version = version + 1, modified = now() WHERE email = ?;
