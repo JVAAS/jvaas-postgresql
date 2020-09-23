@@ -131,6 +131,9 @@ suspend fun complexSelectWithJoin(
 
 # Setup
 
+See [releaseVersion](https://github.com/JVAAS/jvaas-postgresql/releases/latest)
+for the latest version number
+
 Gradle Kotlin DSL:
 
 ```
@@ -143,8 +146,7 @@ repositories {
 }
 
 dependencies {
-    val jvaasPostgreSQLVersion = releaseVersion
-    implementation("io.jvaas:jvaas-sql-postgrsql:$jvaasPostgreSQLVersion")
+    implementation("io.jvaas:jvaas-sql-postgrsql:$releaseVersion")
 }
 
 ```
