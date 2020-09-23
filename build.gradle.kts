@@ -1,8 +1,10 @@
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val projectVersion = "0.0.2"
+
 group = "io.jvaas"
-version = "0.0.2"
+version = projectVersion
 description = "Reactive Type-Safe PostgreSQL Binding Generator"
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
@@ -40,4 +42,16 @@ dependencies {
     implementation("com.github.jasync-sql:jasync-postgresql:$jasyncVersion")
 
     testImplementation(group = "junit", name = "junit", version = "4.12")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "io.jvaas"
+            artifactId = "jvaas-sql-postgresql"
+            version = projectVersion
+
+            from(components["java"])
+        }
+    }
 }
