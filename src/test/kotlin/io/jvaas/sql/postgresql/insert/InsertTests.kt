@@ -1,14 +1,14 @@
-package io.jvaas.sql.postgresql.update
+package io.jvaas.sql.postgresql.insert
 
 import io.jvaas.sql.postgresql.Generator
+import io.jvaas.sql.postgresql.type.Column.Companion.numberDuplicateColumns
 import io.jvaas.sql.postgresql.type.Model
 import io.jvaas.sql.postgresql.type.Query
-import junit.framework.Assert
 import junit.framework.Assert.*
 import org.junit.Before
 import org.junit.Test
 
-class BasicUpdateTests {
+class InsertTests {
 
 	lateinit var generator: Generator
 
@@ -43,39 +43,61 @@ class BasicUpdateTests {
 		)
 	}
 
-	fun testSetup() {
-		// TODO
-	}
-
 	@Test
-	fun testBasicUpdate() {
+	fun testInsertWithConflict() {
 		generator.processAdditionalSQL("""
-			-- fun testBasicUpdate
-			UPDATE session SET active = ?, version = version + 1, modified = now() WHERE email = ?;
+			-- fun testCreateSession
+			INSERT INTO session (
+				created, modified, version, token, account_id, email, active
+			) VALUES (
+				now(), now(), 0, ?, ?, ?, true
+			) ON CONFLICT (account_id) DO UPDATE SET
+				modified = now(),
+				version  = session.version + 1,
+				token    = ?,
+				active   = true
+			WHERE version = ?
 		""")
 
 		val query = queries.first()
-		assertEquals("testBasicUpdate", query.name)
+
+		assertEquals("testCreateSession", query.name)
 		assertTrue(query.outputColumns.isEmpty())
-		assertTrue(query.inputColumns.size == 2)
-		query.inputColumns.forEachIndexed { index, column ->
+		assertTrue(query.inputColumns.size == 5)
+		query.inputColumns.numberDuplicateColumns().forEachIndexed { index, column ->
 			when (index) {
 				0 -> {
-					assertFalse(column.nullable)
-					assertEquals("sessionActive", column.kotlinName)
-					assertEquals("Boolean", column.kotlinType)
+					assertEquals("sessionToken", column.kotlinName)
+					assertEquals("sessionToken1", column.kotlinNameWithCounter)
 				}
 				1 -> {
-					assertTrue(column.nullable)
+					assertEquals("sessionAccountId", column.kotlinName)
+					assertEquals("sessionAccountId", column.kotlinNameWithCounter)
+				}
+				2 -> {
 					assertEquals("sessionEmail", column.kotlinName)
-					assertEquals("String?", column.kotlinType)
+					assertEquals("sessionEmail", column.kotlinNameWithCounter)
+				}
+				3 -> {
+					assertEquals("sessionToken", column.kotlinName)
+					assertEquals("sessionToken2", column.kotlinNameWithCounter)
+				}
+				4 -> {
+					assertEquals("sessionVersion", column.kotlinName)
+					assertEquals("sessionVersion", column.kotlinNameWithCounter)
 				}
 			}
 		}
 
-
 	}
 
+	fun testMoreValuesThanTablesScenario() {
+		// TODO
+	}
+
+	fun testMoreTablesThanValuesScenario() {
+		// TODO
+	}
 
 
 

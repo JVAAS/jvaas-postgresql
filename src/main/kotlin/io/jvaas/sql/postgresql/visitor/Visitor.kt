@@ -125,7 +125,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 	// INSERT
 	override fun visitInsertStmtForPsql(ctx: SQLParser.InsertStmtForPsqlContext?) {
 
-		val debug = true
+		val debug = false
 
 		model.queries.add(Query(
 			sql = lastSQL ?: "",
