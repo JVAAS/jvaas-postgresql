@@ -71,4 +71,5 @@ INSERT INTO session (
     modified = now(),
     version  = session.version + 1,
     token    = ?,
-    active   = true;
+    active   = true
+WHERE version = ?

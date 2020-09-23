@@ -127,65 +127,160 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 		))
 		lastFun = null
 
-		var tableName: String? = null
+//		var insertValues: Boolean = false
+//		var onConflict: Boolean = false
+//		var currentValue = ""
+
 		var table: Table? = null
-		var insertValues: Boolean = false
+		var tableName: String? = null
+		var function: String? = null
+
 		val columns = mutableListOf<Column>()
 		val values = mutableListOf<String>()
-		var currentValue = ""
+
+		var insertColumns = false
+		var insertValues = false
 
 		Extractor(ctx).walkLeaves walkLeaves@{ leaf ->
 
-			if (leaf.text == "VALUES") {
-				insertValues = true
-				return@walkLeaves
+			var identifierContext = false
+			var conflictActionContext = false
+			var insertColumnsContext = false
+			var valuesValuesContext = false
+			var functionCallContext = false
+
+			if (debug) {
+				println(leaf.text)
 			}
 
-			if (table == null) {
-				leaf.walkFamilyTree { fam ->
-					if (tableName == null && fam.payload is IdentifierContext) {
-						tableName = fam.text
-						table = getTableFromString(tableName)
-						return@walkLeaves
-					}
-				}
-			} else if (!insertValues) {
-				leaf.walkFamilyTree { fam ->
-					if (fam.payload is IdTokenContext) {
-						columns.add(getColumnFromString(table, fam.text))
-					}
-				}
-			} else if (insertValues) {
+			leaf.walkFamilyTree { fam ->
 
 				if (debug) {
-					println(leaf.text)
-					println(leaf.parent.payload::class)
+					println(fam.payload::class)
+					println(fam.payload is IdentifierContext)
 				}
 
-				if (leaf.parent.payload is ValuesValuesContext) {
-					if (currentValue.isNotEmpty()) {
-						values.add(currentValue)
-						currentValue = ""
-					}
-				} else {
-					currentValue += leaf.text
-				}
+				identifierContext = identifierContext or (fam.payload is IdentifierContext)
+				conflictActionContext = conflictActionContext or (fam.payload is ConflictActionContext)
+				insertColumnsContext = insertColumnsContext or (fam.payload is InsertColumnsContext)
+				valuesValuesContext = valuesValuesContext or (fam.payload is ValuesValuesContext)
+				functionCallContext = functionCallContext or (fam.payload is FunctionCallContext)
 			}
+
+			if (debug) {
+				println()
+			}
+
+			if (identifierContext && tableName == null) {
+				tableName = leaf.text
+				table = getTableFromString(tableName)
+				return@walkLeaves
+			} else if (insertColumnsContext && !insertColumns) {
+				insertColumns = true
+				return@walkLeaves
+			} else if (valuesValuesContext && !insertValues) {
+				insertColumns = false
+				insertValues = true
+				return@walkLeaves
+			} else if (conflictActionContext) {
+				insertColumns = false
+				insertValues = false
+			}
+
+			if (insertColumns) {
+				if (identifierContext) {
+					columns.add(getColumnFromString(table, leaf.text))
+				}
+			} else if (insertValues) {
+				if (valuesValuesContext) {
+					if (functionCallContext) {
+						if (lastFun == null) {
+							lastFun = leaf.text
+						} else {
+							lastFun += leaf.text
+						}
+					} else {
+						if (lastFun != null) {
+							values.add(lastFun ?: "")
+							lastFun = null
+						}
+						if (leaf.text != ",") {
+							values.add(leaf.text)
+						}
+					}
+				}
+			} else if (!insertColumns && !insertValues) {
+				if (lastFun != null) {
+					values.add(lastFun ?: "")
+					lastFun = null
+				}
+
+				if (conflictActionContext) {
+
+				}
+
+			}
+
+
+//			if (table == null) {
+//				leaf.walkFamilyTree { fam ->
+//					if (tableName == null && fam.payload is IdentifierContext) {
+//						tableName = fam.text
+//						table = getTableFromString(tableName)
+//						return@walkLeaves
+//					}
+//				}
+//			} else if (!onConflict) {
+//				if (!insertValues) {
+//					leaf.walkFamilyTree { fam ->
+//						if (fam.payload is IdTokenContext) {
+//							columns.add(getColumnFromString(table, fam.text))
+//						}
+//					}
+//				} else if (insertValues) {
+//					if (leaf.parent.payload is ValuesValuesContext) {
+//						if (currentValue.isNotEmpty()) {
+//							values.add(currentValue)
+//							currentValue = ""
+//						}
+//					} else {
+//						currentValue += leaf.text
+//					}
+//				}
+//			} else {
+//
+//			}
+
+
 		}
 
-		// TODO: this columns / values check fails when using ON CONFLICT in INSERT query
-		//if (columns.size != values.size) {
-		//	throw Exception("Columns.size == ${columns.size} AND Values.size == ${values.size} for query\n$lastSQL")
-		//}
+		// remove last bracket that's picked up during INSERT INTO ( ... ) VALUES ( ... ) <<--
+		if (values.isNotEmpty()) {
+			values.removeLast()
+		}
 
+		if (columns.size != values.size) {
+			throw Exception("Columns.size == ${columns.size} AND Values.size == ${values.size} for query\n$lastSQL")
+		}
+
+		if (debug) {
+			println("=======")
+			println(lastSQL)
+			println("=======")
+			println(tableName)
+			println("=======")
+			println(columns)
+			println("=======")
+			println(values)
+			println("=======")
+		}
+
+		// extract columns matching ? symbols
 		values.forEachIndexed { i, value ->
 			if (value == "?") {
 				lastQuery.inputColumns.add(columns[i])
 			}
 		}
-
-		//println(columns)
-		//println(values)
 
 		super.visitInsertStmtForPsql(ctx)
 	}
