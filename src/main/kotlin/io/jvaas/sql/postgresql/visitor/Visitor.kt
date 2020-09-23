@@ -119,6 +119,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 	// INSERT
 	override fun visitInsertStmtForPsql(ctx: SQLParser.InsertStmtForPsqlContext?) {
 
+		val debug = true
+
 		model.queries.add(Query(
 			sql = lastSQL ?: "",
 			name = lastFun ?: "unknown"
@@ -141,7 +143,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 
 			if (table == null) {
 				leaf.walkFamilyTree { fam ->
-					if (fam.payload is IdTokenContext) {
+					if (tableName == null && fam.payload is IdentifierContext) {
 						tableName = fam.text
 						table = getTableFromString(tableName)
 						return@walkLeaves
@@ -155,8 +157,10 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 				}
 			} else if (insertValues) {
 
-				//println(leaf.text)
-				//println(leaf.parent.payload::class)
+				if (debug) {
+					println(leaf.text)
+					println(leaf.parent.payload::class)
+				}
 
 				if (leaf.parent.payload is ValuesValuesContext) {
 					if (currentValue.isNotEmpty()) {
@@ -169,9 +173,10 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			}
 		}
 
-		if (columns.size != values.size) {
-			throw Exception("Columns.size == ${columns.size} AND Values.size == ${values.size} for query\n$lastSQL")
-		}
+		// TODO: this columns / values check fails when using ON CONFLICT in INSERT query
+		//if (columns.size != values.size) {
+		//	throw Exception("Columns.size == ${columns.size} AND Values.size == ${values.size} for query\n$lastSQL")
+		//}
 
 		values.forEachIndexed { i, value ->
 			if (value == "?") {

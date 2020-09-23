@@ -59,7 +59,16 @@ LEFT JOIN listing_image AS li ON l.id = li.listing_id
 LEFT JOIN account AS a ON a.id = l.id
 WHERE l.id = ? AND l.created < now() AND li.width > ? AND li.height > ?;
 
-
-
 -- fun updateSession
 UPDATE session SET active = ?, version = version + 1, modified = now() WHERE email = ?;
+
+-- fun createSession
+INSERT INTO session (
+    created, modified, version, token, account_id, email, active
+) VALUES (
+    now(), now(), 0, ?, ?, ?, true
+) ON CONFLICT (account_id) DO UPDATE SET
+    modified = now(),
+    version  = session.version + 1,
+    token    = ?,
+    active   = true;

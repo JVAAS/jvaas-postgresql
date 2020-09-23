@@ -587,4 +587,26 @@ class Blah(val con: com.github.jasync.sql.db.Connection) {
 	
 	// ========================================
 	
+	suspend fun createSession(
+		sessionAccountId: String, 
+		sessionEmail: String?, 
+		sessionActive: Boolean, 
+	) {
+		con.execute(
+			// language=SQL
+			"""
+			INSERT INTO session ( created , modified , 
+			version , token , account_id , email , active ) VALUES ( 
+			now ( ) , now ( ) , 0 , ? , ? , ? , true ) ON CONFLICT ( 
+			account_id ) DO UPDATE SET modified = now ( ) , version = 
+			session . version + 1 , token = ? , active = true 
+			""",
+			sessionAccountId,
+			sessionEmail,
+			sessionActive,
+		)
+	}
+	
+	// ========================================
+	
 }
