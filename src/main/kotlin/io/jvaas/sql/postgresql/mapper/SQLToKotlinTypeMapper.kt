@@ -11,6 +11,7 @@ object SQLToKotlinTypeMapper {
 			"integer" -> "Int"
 			"int" -> "Int"
 			"text" -> "String"
+			"timestamp" -> "java.time.LocalDateTime"
 			"timestampwithouttimezone" -> "java.time.LocalDateTime"
 			"uuid" -> "String"
 			else -> throw Exception("""Unmatched type "$input"""")
