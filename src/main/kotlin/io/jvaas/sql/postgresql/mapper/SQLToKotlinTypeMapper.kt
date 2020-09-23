@@ -7,6 +7,7 @@ object SQLToKotlinTypeMapper {
 		val type = when (input) {
 			"bigint" -> "Long"
 			"boolean" -> "Boolean"
+			"varchar" -> "String"
 			"charactervarying" -> "String"
 			"integer" -> "Int"
 			"int" -> "Int"
