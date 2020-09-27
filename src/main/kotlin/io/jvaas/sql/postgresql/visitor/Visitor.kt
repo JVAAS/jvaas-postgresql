@@ -107,7 +107,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 									} else if (columnDefContextTokenConstraint.text.startsWith("default")) {
 										lastTable.columns.add(lastTable.columns.removeLast().copy(
 											default =
-												columnDefContextTokenConstraint.text.replaceFirst("default", "")
+											columnDefContextTokenConstraint.text.replaceFirst("default", "")
 										))
 									}
 								}
@@ -371,7 +371,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 	// SELECT
 	override fun visitSelectStmt(ctx: SelectStmtContext?) {
 
-		val debug = false
+		val debug = true
 
 		// make sure we're extracting a valid SELECT query
 		// and not a VALUES query
@@ -405,6 +405,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 			var aliasClauseContext: Boolean = false
 			var identifierContext: Boolean = false
 			var indirectionVarContext: Boolean = false
+			var characterStringContext: Boolean = false
 
 			if (leaf.text.equals("SELECT", ignoreCase = true)) {
 				selectScope = true
@@ -417,16 +418,18 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 				println(leaf.text)
 			}
 			leaf.walkFamilyTree { fam ->
-				when (fam.payload) {
-					is SelectSublistContext -> selectSublistContext = true
-					is SchemaQualifiedNameContext -> schemaQualifiedNameContext = true
-					is AliasClauseContext -> aliasClauseContext = true
-					is IdentifierContext -> identifierContext = true
-					is IndirectionVarContext -> indirectionVarContext = true
-				}
+
 				if (debug) {
 					println(fam.payload::class)
 				}
+
+				selectSublistContext = selectSublistContext or (fam.payload is SelectSublistContext)
+				schemaQualifiedNameContext = schemaQualifiedNameContext or (fam.payload is SchemaQualifiedNameContext)
+				aliasClauseContext = aliasClauseContext or (fam.payload is AliasClauseContext)
+				identifierContext = identifierContext or (fam.payload is IdentifierContext)
+				indirectionVarContext = indirectionVarContext or (fam.payload is IndirectionVarContext)
+				characterStringContext = characterStringContext or (fam.payload is CharacterStringContext)
+
 			}
 
 			if (aliasClauseContext) {
@@ -490,6 +493,8 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 					val parts = column.split(".").toMutableList()
 					columnName = parts.removeLast()
 					tableName = tableNameAliases[parts.removeLast()]
+				} else if (column.startsWith("'") && column.endsWith("'")) {
+					println("String Column")
 				} else {
 					columnName = column
 					if (tableNames.size != 1) {

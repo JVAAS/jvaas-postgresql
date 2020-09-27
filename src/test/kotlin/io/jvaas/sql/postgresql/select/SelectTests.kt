@@ -175,5 +175,14 @@ class SelectTests {
 		}
 	}
 
+	@Test
+	fun testTestQuery() {
+		generator.processAdditionalSQL("""
+			-- fun selectTest
+			SELECT 'account';
+		""".trimIndent())
+
+	}
+
 
 }

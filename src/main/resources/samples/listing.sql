@@ -1,4 +1,7 @@
 
+-- fun selectTest
+SELECT 'account' AS name;
+
 -- fun insertListingId
 INSERT INTO listing (id, created, modified) VALUES (?, now(), now());
 
