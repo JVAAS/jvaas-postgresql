@@ -175,7 +175,7 @@ class SelectTests {
 		}
 	}
 
-	@Test
+	//@Test
 	fun testTestQuery() {
 		generator.processAdditionalSQL("""
 			-- fun selectTest
