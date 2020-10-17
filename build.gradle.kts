@@ -1,4 +1,3 @@
-
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val projectVersion = "0.0.13"
@@ -7,8 +6,8 @@ group = "io.jvaas"
 version = projectVersion
 description = "Reactive Type-Safe PostgreSQL Binding Generator"
 
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-java.targetCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_11
+java.targetCompatibility = JavaVersion.VERSION_11
 
 plugins {
     kotlin("jvm").version("1.4.10")
