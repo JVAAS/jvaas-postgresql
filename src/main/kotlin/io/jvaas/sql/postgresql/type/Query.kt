@@ -106,7 +106,8 @@ data class Query(
 							outputColumns.forEachIndexed { index, column ->
 								+"${column.kotlinNameWithCounter} = row."
 								when (column.kotlinType) {
-									"String", "String?" -> -"getString($index)"
+									"String" -> -"get($index)?.toString()"
+									"String?" -> -"get($index)?.toString()"
 									"Boolean", "Boolean?" -> -"getBoolean($index)"
 									"Int", "Int?" -> -"getInt($index)"
 									"Long", "Long?" -> -"getLong($index)"
