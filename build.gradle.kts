@@ -1,56 +1,51 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-val projectVersion = "0.0.13"
+val projectVersion = "0.0.14"
 
 group = "io.jvaas"
 version = projectVersion
 description = "Reactive Type-Safe PostgreSQL Binding Generator"
 
-java.sourceCompatibility = JavaVersion.VERSION_11
-java.targetCompatibility = JavaVersion.VERSION_11
+repositories {
+	mavenLocal()
+	jcenter()
+}
 
 plugins {
-    kotlin("jvm").version("1.4.10")
-    maven
-    `maven-publish`
+	kotlin("jvm").version("1.4.10")
+	maven
+	`maven-publish`
 }
 
-repositories {
-    mavenLocal()
-    jcenter()
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+	kotlinOptions {
+		jvmTarget = "11"
+	}
 }
 
 dependencies {
 
-    val coroutinesVersion = "1.3.9"
-    val jasyncVersion = "1.1.3"
-    val antlrVersion = "4.8-1"
+	val coroutinesVersion = "1.3.9"
+	val jasyncVersion = "1.1.3"
+	val antlrVersion = "4.8-1"
 
-    implementation(kotlin("reflect"))
-    implementation("org.antlr:antlr4-runtime:$antlrVersion")
+	implementation(kotlin("reflect"))
+	implementation("org.antlr:antlr4-runtime:$antlrVersion")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion")
 
-    api("com.github.jasync-sql:jasync-postgresql:$jasyncVersion")
+	api("com.github.jasync-sql:jasync-postgresql:$jasyncVersion")
 
-    testImplementation(group = "junit", name = "junit", version = "4.12")
+	testImplementation(kotlin("test-junit"))
 }
 
 publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = "io.jvaas"
-            artifactId = "jvaas-postgresql"
-            version = projectVersion
+	publications {
+		create<MavenPublication>("maven") {
+			groupId = "io.jvaas"
+			artifactId = "jvaas-postgresql"
+			version = projectVersion
 
-            from(components["java"])
-        }
-    }
+			from(components["java"])
+		}
+	}
 }

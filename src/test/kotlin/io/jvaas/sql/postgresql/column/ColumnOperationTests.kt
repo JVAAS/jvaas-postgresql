@@ -3,8 +3,8 @@ package io.jvaas.sql.postgresql.column
 import io.jvaas.sql.postgresql.type.Column
 import io.jvaas.sql.postgresql.type.Column.Companion.numberDuplicateColumns
 import io.jvaas.sql.postgresql.type.Table
-import junit.framework.Assert.assertEquals
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class ColumnOperationTests {
 

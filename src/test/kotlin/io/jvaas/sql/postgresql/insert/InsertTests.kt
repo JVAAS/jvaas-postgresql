@@ -4,9 +4,10 @@ import io.jvaas.sql.postgresql.Generator
 import io.jvaas.sql.postgresql.type.Column.Companion.numberDuplicateColumns
 import io.jvaas.sql.postgresql.type.Model
 import io.jvaas.sql.postgresql.type.Query
-import junit.framework.Assert.*
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class InsertTests {
 

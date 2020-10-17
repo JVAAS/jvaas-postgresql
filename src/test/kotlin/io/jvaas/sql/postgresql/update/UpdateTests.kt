@@ -3,10 +3,11 @@ package io.jvaas.sql.postgresql.update
 import io.jvaas.sql.postgresql.Generator
 import io.jvaas.sql.postgresql.type.Model
 import io.jvaas.sql.postgresql.type.Query
-import junit.framework.Assert
-import junit.framework.Assert.*
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class UpdateTests {
 
