@@ -1,4 +1,4 @@
-val projectVersion = "0.0.14"
+val projectVersion = "0.0.15"
 
 group = "io.jvaas"
 version = projectVersion

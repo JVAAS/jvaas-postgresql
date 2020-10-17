@@ -371,7 +371,7 @@ class Visitor(val model: Model) : SQLParserBaseVisitor<Unit>() {
 	// SELECT
 	override fun visitSelectStmt(ctx: SelectStmtContext?) {
 
-		val debug = true
+		val debug = false
 
 		// make sure we're extracting a valid SELECT query
 		// and not a VALUES query
