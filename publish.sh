@@ -1,6 +1,6 @@
 
 rm -rf ~/.m2/repository/io/jvaas/jvaas-postgresql
-rm -rf build
+#rm -rf build
 
 gradle build 
 gradle publishToMavenLocal
