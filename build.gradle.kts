@@ -10,7 +10,7 @@ repositories {
 }
 
 plugins {
-	kotlin("jvm").version("1.4.10")
+	kotlin("jvm")
 	maven
 	`maven-publish`
 }
